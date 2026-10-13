@@ -6,7 +6,10 @@ Rectangle {
 
     required property string currentTitle
 
-    color: Theme.background
+    gradient: Gradient {
+        GradientStop { position: 0.0; color: Theme.backgroundRaised }
+        GradientStop { position: 1.0; color: Theme.background }
+    }
     border.color: Theme.border
     border.width: 1
     Layout.fillWidth: true

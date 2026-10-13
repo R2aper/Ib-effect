@@ -1,23 +1,45 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 
-Rectangle {
+Item {
     id: card
 
     required property string glyph
     required property string heading
     required property string description
 
-    radius: 12
-    color: Theme.panel
-    border.color: Theme.border
-    border.width: 1
     implicitHeight: 160
     Layout.fillWidth: true
+
+    Rectangle {
+        id: surface
+        anchors.fill: parent
+        anchors.topMargin: 3
+        radius: 12
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Theme.panelRaised }
+            GradientStop { position: 1.0; color: Theme.panel }
+        }
+        border.color: Theme.borderHighlight
+        border.width: 1
+    }
+
+    MultiEffect {
+        source: surface
+        anchors.fill: surface
+        shadowEnabled: true
+        shadowColor: "#80000000"
+        shadowBlur: 0.35
+        shadowOpacity: 0.42
+        shadowVerticalOffset: 5
+        z: -1
+    }
 
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 20
+        anchors.topMargin: 23
         spacing: 10
         Text {
             text: card.glyph

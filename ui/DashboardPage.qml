@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Effects
 import QtQuick.Layouts
 
 ScrollView {
@@ -12,12 +13,30 @@ ScrollView {
         spacing: 22
         Item { Layout.preferredHeight: 2 }
 
-        Rectangle {
+        Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 286
-            radius: 18
-            color: "#142943"
-            border.color: "#254669"
+            Rectangle {
+                id: heroSurface
+                anchors.fill: parent
+                radius: 18
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: "#1a3b5e" }
+                    GradientStop { position: 0.52; color: "#142b45" }
+                    GradientStop { position: 1.0; color: "#132338" }
+                }
+                border.color: "#31577e"
+            }
+            MultiEffect {
+                source: heroSurface
+                anchors.fill: heroSurface
+                shadowEnabled: true
+                shadowColor: "#a0000000"
+                shadowBlur: 0.55
+                shadowOpacity: 0.55
+                shadowVerticalOffset: 8
+                z: -1
+            }
             RowLayout {
                 anchors.fill: parent
                 anchors.margins: 32
@@ -68,12 +87,29 @@ ScrollView {
                         }
                     }
                 }
-                Rectangle {
+                Item {
                     Layout.preferredWidth: 224
                     Layout.preferredHeight: 204
-                    radius: 18
-                    color: "#193757"
-                    border.color: "#315d86"
+                    Rectangle {
+                        id: brandSurface
+                        anchors.fill: parent
+                        radius: 18
+                        gradient: Gradient {
+                            GradientStop { position: 0.0; color: "#244b74" }
+                            GradientStop { position: 1.0; color: "#19324e" }
+                        }
+                        border.color: "#416b95"
+                    }
+                    MultiEffect {
+                        source: brandSurface
+                        anchors.fill: brandSurface
+                        shadowEnabled: true
+                        shadowColor: "#90000000"
+                        shadowBlur: 0.45
+                        shadowOpacity: 0.5
+                        shadowVerticalOffset: 6
+                        z: -1
+                    }
                     ColumnLayout {
                         anchors.centerIn: parent
                         spacing: 7
@@ -147,8 +183,11 @@ ScrollView {
             Layout.fillWidth: true
             implicitHeight: 84
             radius: 12
-            color: Theme.panel
-            border.color: Theme.border
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: Theme.panelRaised }
+                GradientStop { position: 1.0; color: Theme.panel }
+            }
+            border.color: Theme.borderHighlight
             RowLayout {
                 anchors.fill: parent
                 anchors.margins: 18

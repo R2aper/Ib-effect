@@ -7,7 +7,10 @@ Rectangle {
     property int currentTab: 0
     signal tabSelected(int index)
 
-    color: Theme.sidebar
+    gradient: Gradient {
+        GradientStop { position: 0.0; color: Theme.sidebarRaised }
+        GradientStop { position: 1.0; color: Theme.sidebar }
+    }
     border.color: Theme.border
     border.width: 1
     Layout.preferredWidth: 252
@@ -37,7 +40,11 @@ Rectangle {
                 width: 38
                 height: 38
                 radius: 11
-                color: "#1c3a5e"
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: "#285486" }
+                    GradientStop { position: 1.0; color: "#173250" }
+                }
+                border.color: "#3b6b9f"
                 Text {
                     anchors.centerIn: parent
                     text: "ИБ"
@@ -91,8 +98,11 @@ Rectangle {
             Layout.fillWidth: true
             implicitHeight: 74
             radius: 10
-            color: "#14243a"
-            border.color: Theme.border
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "#1a2c43" }
+                GradientStop { position: 1.0; color: "#142238" }
+            }
+            border.color: Theme.borderHighlight
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 12
