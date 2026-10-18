@@ -12,6 +12,17 @@ qt_standard_project_setup(REQUIRES 6.5)
 
 set(IBE_UI_QML_FILES
     ui/Theme.qml
+    ui/DataStore.qml
+    ui/AppIcon.qml
+    ui/AuthModal.qml
+    ui/AssetDialog.qml
+    ui/RiskDialog.qml
+    ui/MeasureDialog.qml
+    ui/LinkRiskDialog.qml
+    ui/StatusBadge.qml
+    ui/KpiStatCard.qml
+    ui/RiskGauge.qml
+    ui/DistributionBar.qml
     ui/NavigationButton.qml
     ui/SectionHeading.qml
     ui/MetricCard.qml
@@ -25,6 +36,8 @@ set(IBE_UI_QML_FILES
     ui/ProtectionMeasuresPage.qml
     ui/EconomicsPage.qml
     ui/MethodologyPage.qml
+    ui/NormativeExplanationCard.qml
+    ui/WorkflowGuideBanner.qml
 )
 
 set_source_files_properties(ui/Theme.qml PROPERTIES
@@ -32,14 +45,38 @@ set_source_files_properties(ui/Theme.qml PROPERTIES
     QT_RESOURCE_ALIAS Theme.qml
 )
 
+set_source_files_properties(ui/DataStore.qml PROPERTIES
+    QT_QML_SINGLETON_TYPE TRUE
+    QT_RESOURCE_ALIAS DataStore.qml
+)
+
 foreach(qml_file IN LISTS IBE_UI_QML_FILES)
-    if(NOT qml_file STREQUAL "ui/Theme.qml")
+    if(NOT qml_file STREQUAL "ui/Theme.qml" AND NOT qml_file STREQUAL "ui/DataStore.qml")
         get_filename_component(qml_name "${qml_file}" NAME)
         set_source_files_properties("${qml_file}" PROPERTIES
             QT_RESOURCE_ALIAS "${qml_name}"
         )
     endif()
 endforeach()
+
+set(IBE_SVG_ICONS
+    assets/icons/dashboard.svg
+    assets/icons/criteria.svg
+    assets/icons/assets.svg
+    assets/icons/risks.svg
+    assets/icons/measures.svg
+    assets/icons/economics.svg
+    assets/icons/methodology.svg
+    assets/icons/user.svg
+    assets/icons/lock.svg
+    assets/icons/plus.svg
+    assets/icons/edit.svg
+    assets/icons/trash.svg
+    assets/icons/link.svg
+    assets/icons/unlink.svg
+    assets/icons/eye.svg
+    assets/icons/eye-off.svg
+)
 
 qt_add_executable(Ibe
     main.cpp
@@ -50,6 +87,8 @@ qt_add_qml_module(Ibe
     QML_FILES
         Main.qml
         ${IBE_UI_QML_FILES}
+    RESOURCES
+        ${IBE_SVG_ICONS}
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

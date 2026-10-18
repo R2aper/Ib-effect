@@ -15,52 +15,59 @@ Item {
     Rectangle {
         id: surface
         anchors.fill: parent
-        anchors.topMargin: 3
-        radius: 12
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: Theme.panelRaised }
-            GradientStop { position: 1.0; color: Theme.panel }
-        }
-        border.color: Theme.borderHighlight
+        radius: Theme.radiusMd
+        color: mouseArea.containsMouse ? Theme.panelHover : Theme.panel
+        border.color: mouseArea.containsMouse ? Theme.borderHighlight : Theme.border
         border.width: 1
+
+        Behavior on color { ColorAnimation { duration: 140 } }
+        Behavior on border.color { ColorAnimation { duration: 140 } }
     }
 
     MultiEffect {
         source: surface
         anchors.fill: surface
         shadowEnabled: true
-        shadowColor: "#80000000"
+        shadowColor: Theme.isDark ? "#40000000" : "#10000000"
         shadowBlur: 0.35
-        shadowOpacity: 0.42
-        shadowVerticalOffset: 5
+        shadowOpacity: Theme.isDark ? 0.35 : 0.1
+        shadowVerticalOffset: 1
         z: -1
     }
 
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 20
-        anchors.topMargin: 23
         spacing: 10
+
         Text {
             text: card.glyph
             color: Theme.accent
-            font.pixelSize: 21
+            font.pixelSize: 22
             font.bold: true
         }
+
         Text {
             text: card.heading
             color: Theme.text
-            font.pixelSize: 15
-            font.weight: Font.DemiBold
+            font.pixelSize: Theme.fontH3
+            font.weight: Font.Bold
             wrapMode: Text.Wrap
             Layout.fillWidth: true
         }
+
         Text {
             text: card.description
             color: Theme.muted
-            font.pixelSize: 12
+            font.pixelSize: Theme.fontCaption
             wrapMode: Text.Wrap
             Layout.fillWidth: true
         }
+    }
+
+    MouseArea {
+        id: mouseArea
+        anchors.fill: parent
+        hoverEnabled: true
     }
 }

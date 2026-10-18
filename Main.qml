@@ -58,4 +58,8 @@ Window {
             }
         }
     }
+
+    AuthModal {
+        id: authModal
+    }
 }

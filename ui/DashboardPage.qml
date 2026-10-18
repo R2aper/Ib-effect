@@ -10,135 +10,156 @@ ScrollView {
 
     ColumnLayout {
         width: parent.width
-        spacing: 22
+        spacing: 24
         Item { Layout.preferredHeight: 2 }
 
+        // --- ВЕРХНИЙ ПРЕДСТАВИТЕЛЬСКИЙ БАННЕР (ЧИСТЫЙ ENTERPRISE B2B, БЕЗ КИБЕРПАНКА) ---
         Item {
             Layout.fillWidth: true
-            Layout.preferredHeight: 286
+            Layout.preferredHeight: 210
+
             Rectangle {
                 id: heroSurface
                 anchors.fill: parent
-                radius: 18
-                gradient: Gradient {
-                    GradientStop { position: 0.0; color: "#1a3b5e" }
-                    GradientStop { position: 0.52; color: "#142b45" }
-                    GradientStop { position: 1.0; color: "#132338" }
+                radius: Theme.radiusLg
+                color: Theme.panel
+                border.color: Theme.border
+                border.width: 1
+
+                Behavior on color { ColorAnimation { duration: 180 } }
+                Behavior on border.color { ColorAnimation { duration: 180 } }
+
+                // Тонкая акцентная полоса сверху
+                Rectangle {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    height: 3
+                    radius: Theme.radiusXs
+                    color: Theme.accent
                 }
-                border.color: "#31577e"
             }
+
             MultiEffect {
                 source: heroSurface
                 anchors.fill: heroSurface
                 shadowEnabled: true
-                shadowColor: "#a0000000"
-                shadowBlur: 0.55
-                shadowOpacity: 0.55
-                shadowVerticalOffset: 8
+                shadowColor: Theme.isDark ? "#40000000" : "#12000000"
+                shadowBlur: 0.4
+                shadowOpacity: Theme.isDark ? 0.35 : 0.1
+                shadowVerticalOffset: 2
                 z: -1
             }
+
             RowLayout {
                 anchors.fill: parent
-                anchors.margins: 32
+                anchors.margins: 26
                 spacing: 24
+
                 ColumnLayout {
-                    spacing: 13
+                    spacing: 10
                     Layout.fillWidth: true
-                    Text {
-                        text: qsTr("ПЛАТФОРМА УПРАВЛЕНИЯ ЭФФЕКТИВНОСТЬЮ ИБ")
-                        color: "#82b9f7"
-                        font.pixelSize: 10
-                        font.weight: Font.Bold
-                        font.letterSpacing: 1.2
-                        wrapMode: Text.Wrap
-                    }
-                    Text {
-                        text: qsTr("Управляйте рисками.\nДоказывайте ценность ИБ.")
-                        color: Theme.text
-                        font.pixelSize: 29
-                        font.weight: Font.DemiBold
-                        wrapMode: Text.Wrap
-                        Layout.fillWidth: true
-                    }
-                    Text {
-                        text: qsTr("Единая модель связывает активы, риски, защитные меры и экономический результат — от первой оценки до обоснования инвестиций.")
-                        color: "#b4c4d8"
-                        font.pixelSize: 13
-                        wrapMode: Text.Wrap
-                        Layout.maximumWidth: 620
-                        Layout.fillWidth: true
-                    }
+
                     RowLayout {
                         spacing: 8
+                        StatusBadge {
+                            text: qsTr("СУИБ · ГОСТ Р ИСО/МЭК 27005-2010")
+                            level: "teal"
+                        }
+                        StatusBadge {
+                            text: qsTr("ГОСТ Р 59339-2021")
+                            level: "info"
+                        }
+                        StatusBadge {
+                            text: qsTr("Версия 0.1 · Корпоративный релиз")
+                            level: "success"
+                        }
+                    }
+
+                    Text {
+                        text: qsTr("Управляйте рисками. Доказывайте ценность ИБ.")
+                        color: Theme.text
+                        font.pixelSize: Theme.fontHero
+                        font.weight: Font.Bold
+                        wrapMode: Text.Wrap
+                        Layout.fillWidth: true
+                    }
+
+                    Text {
+                        text: qsTr("Единая модель связывает активы, угрозы, защитные меры и финансовый результат — от оценки ущерба до возврата инвестиций (ROSI).")
+                        color: Theme.muted
+                        font.pixelSize: Theme.fontBody
+                        wrapMode: Text.Wrap
+                        Layout.maximumWidth: 680
+                        Layout.fillWidth: true
+                    }
+
+                    RowLayout {
+                        spacing: 12
+                        Layout.topMargin: 4
                         Repeater {
                             model: [
-                                qsTr("Активы  →"),
-                                qsTr("Риски  →"),
-                                qsTr("Меры  →"),
-                                qsTr("Экономика")
+                                qsTr("01. Активы  →"),
+                                qsTr("02. Риски  →"),
+                                qsTr("03. Меры  →"),
+                                qsTr("04. Экономика (ROSI)")
                             ]
                             delegate: Text {
                                 required property string modelData
                                 text: modelData
-                                color: "#d2e1f3"
-                                font.pixelSize: 10
-                                Layout.rightMargin: 3
+                                color: Theme.accent
+                                font.pixelSize: Theme.fontCaption
+                                font.weight: Font.Bold
                             }
                         }
                     }
                 }
-                Item {
-                    Layout.preferredWidth: 224
-                    Layout.preferredHeight: 204
-                    Rectangle {
-                        id: brandSurface
-                        anchors.fill: parent
-                        radius: 18
-                        gradient: Gradient {
-                            GradientStop { position: 0.0; color: "#244b74" }
-                            GradientStop { position: 1.0; color: "#19324e" }
-                        }
-                        border.color: "#416b95"
-                    }
-                    MultiEffect {
-                        source: brandSurface
-                        anchors.fill: brandSurface
-                        shadowEnabled: true
-                        shadowColor: "#90000000"
-                        shadowBlur: 0.45
-                        shadowOpacity: 0.5
-                        shadowVerticalOffset: 6
-                        z: -1
-                    }
+
+                // Правый информационный блок бренда
+                Rectangle {
+                    Layout.preferredWidth: 190
+                    Layout.preferredHeight: 156
+                    radius: Theme.radiusMd
+                    color: Theme.isDark ? Theme.sidebarRaised : "#f8f9fb"
+                    border.color: Theme.border
+                    border.width: 1
+
+                    Behavior on color { ColorAnimation { duration: 180 } }
+                    Behavior on border.color { ColorAnimation { duration: 180 } }
+
                     ColumnLayout {
                         anchors.centerIn: parent
-                        spacing: 7
+                        spacing: 5
+
                         Text {
                             text: "ИБ"
-                            color: "#8fc6ff"
-                            font.pixelSize: 41
+                            color: Theme.accent
+                            font.pixelSize: 34
                             font.weight: Font.Bold
                             Layout.alignment: Qt.AlignHCenter
                         }
+
                         Text {
                             text: qsTr("ЭФФЕКТ")
-                            color: "#c9ddf4"
+                            color: Theme.text
                             font.pixelSize: 11
                             font.weight: Font.Bold
-                            font.letterSpacing: 3
+                            font.letterSpacing: 2
                             Layout.alignment: Qt.AlignHCenter
                         }
+
                         Rectangle {
                             Layout.alignment: Qt.AlignHCenter
-                            Layout.topMargin: 7
-                            width: 86
+                            Layout.topMargin: 4
+                            width: 48
                             height: 2
                             color: Theme.accent
                         }
+
                         Text {
-                            text: qsTr("Риск → защита → результат")
-                            color: "#a9bdd4"
-                            font.pixelSize: 9
+                            text: qsTr("Риск → Мера → ROSI")
+                            color: Theme.muted
+                            font.pixelSize: Theme.fontMicro
                             Layout.alignment: Qt.AlignHCenter
                         }
                     }
@@ -146,68 +167,167 @@ ScrollView {
             }
         }
 
+        WorkflowGuideBanner {
+            stepNumber: "00"
+            stepTitle: qsTr("Сводная панель управления (Dashboard)")
+            purpose: qsTr("Интегральный мониторинг состояния системы управления рисками информационной безопасности (СУИБ).")
+            whatToDo: qsTr("Отслеживайте динамику остаточного риска по отношению к порогу риск-аппетита организации, финансовую отдачу от портфеля мер (Net ROSI) и контролируйте критические риски, требующие немедленной реакции.")
+        }
+
+        // --- СКРЫТЫЙ ПОЯСНЯЮЩИЙ БЛОК: СВОДНАЯ НОРМАТИВНАЯ БАЗА ---
+        NormativeExplanationCard {
+            title: qsTr("Нормативная база функционирования программного комплекса «ИБ-Эффект»")
+            standard: "ГОСТ Р ИСО/МЭК 27005-2010 / ГОСТ Р 59339-2021 / ГОСТ Р 57580.3-2022"
+            clause: qsTr("Комплекс национальных стандартов РФ в области защиты информации и оценки рисков")
+            quote: qsTr("«Система управления рисками информационной безопасности обеспечивает своевременную идентификацию угроз, расчет вероятного ущерба, обоснование превентивных мер защиты и оценку их экономической эффективности» (ГОСТ Р ИСО/МЭК 27005-2010, ГОСТ Р 59339-2021, ГОСТ Р 57580.3-2022).")
+            practicalNote: qsTr("Программа реализует сквозной процесс СУИБ: Каталог критичных активов → Модель угроз (БДУ ФСТЭК) → Оценка рисков → Формирование защитных мер → Расчет возврата инвестиций (Net ROSI).")
+        }
+
+        // --- БЛОК 1: СВОДНЫЕ KPI-МЕТРИКИ (КРУПНЫЙ ТЕКСТ, ЧИТАЕМЫЙ С РАССТОЯНИЯ) ---
         SectionHeading {
-            eyebrow: qsTr("КАК РАБОТАЕТ ИБ-ЭФФЕКТ")
-            heading: qsTr("От вопроса «что защищать?» к решению «во что инвестировать?»")
-            description: qsTr("Последовательно пройдите модель — от карты активов до оценки экономического эффекта.")
+            eyebrow: qsTr("СВОДКА СОСТОЯНИЯ")
+            heading: qsTr("Ключевые показатели эффективности")
+            description: qsTr("Оперативные метрики защищенности активов и прогнозируемой финансовой отдачи.")
         }
 
         GridLayout {
-            columns: width >= 880 ? 4 : 2
-            columnSpacing: 12
-            rowSpacing: 12
+            columns: width >= 1100 ? 4 : (width >= 650 ? 2 : 1)
+            columnSpacing: 16
+            rowSpacing: 16
             Layout.fillWidth: true
-            PlaceholderCard {
-                glyph: "01  ▣"
-                heading: qsTr("Определите активы")
-                description: qsTr("Что защищаем и насколько это важно?")
+
+            KpiStatCard {
+                label: qsTr("АКТИВЫ НА ЗАЩИТЕ")
+                value: DataStore.assetsList.length.toString()
+                delta: "Реестр"
+                deltaIsGood: true
+                note: qsTr("Критические системы и СУБД")
+                accentColor: Theme.accent
             }
-            PlaceholderCard {
-                glyph: "02  △"
-                heading: qsTr("Оцените риски")
-                description: qsTr("Какой ущерб и вероятность сценария?")
+
+            KpiStatCard {
+                label: qsTr("ВЫЯВЛЕННЫЕ РИСКИ")
+                value: DataStore.risksList.length.toString()
+                delta: DataStore.criticalRisksCount + " крит."
+                deltaIsGood: false
+                note: DataStore.criticalRisksCount + qsTr(" критических требуют нейтрализации")
+                accentColor: Theme.riskCritical
+                valueColor: Theme.riskCritical
             }
-            PlaceholderCard {
-                glyph: "03  ◉"
-                heading: qsTr("Выберите меры")
-                description: qsTr("Что снизит риск и сколько это стоит?")
+
+            KpiStatCard {
+                label: qsTr("ПОРТФЕЛЬ МЕР ЗАЩИТЫ")
+                value: DataStore.measuresList.length.toString()
+                delta: (DataStore.totalMeasuresCost >= 1000000 ? (DataStore.totalMeasuresCost / 1000000).toFixed(1) + "M ₽" : (DataStore.totalMeasuresCost / 1000).toFixed(0) + "K ₽")
+                deltaIsGood: true
+                note: qsTr("Инвестиции в безопасность")
+                accentColor: Theme.green
+                valueColor: Theme.green
             }
-            PlaceholderCard {
-                glyph: "04  ₽"
-                heading: qsTr("Посчитайте эффект")
-                description: qsTr("Как снижение риска превращается в деньги?")
+
+            KpiStatCard {
+                label: qsTr("ПРОГНОЗНЫЙ ROSI")
+                value: (DataStore.rosi >= 0 ? "+" : "") + DataStore.rosi + "%"
+                delta: DataStore.rosi >= 0 ? "Окупаем" : "Неокупаем"
+                deltaIsGood: DataStore.rosi >= 0
+                note: qsTr("Чистый эффект: ") + (DataStore.netBenefit >= 1000000 ? (DataStore.netBenefit / 1000000).toFixed(1) + "M ₽" : (DataStore.netBenefit / 1000).toFixed(0) + "K ₽")
+                accentColor: Theme.teal
+                valueColor: Theme.isDark ? Theme.tealLight : Theme.teal
             }
         }
 
+        // --- БЛОК 2: ГЛУБОКАЯ АНАЛИТИКА (РИСК-ШКАЛА И РАСПРЕДЕЛЕНИЕ) ---
+        GridLayout {
+            columns: width >= 900 ? 2 : 1
+            columnSpacing: 16
+            rowSpacing: 16
+            Layout.fillWidth: true
+
+            RiskGauge {
+                title: qsTr("Интегральный уровень риска")
+                score: Math.round(DataStore.averageScore)
+                maxScore: 64
+                statusText: DataStore.getLevelName(DataStore.getLevelByScore(DataStore.averageScore))
+                statusLevel: DataStore.getLevelByScore(DataStore.averageScore)
+            }
+
+            DistributionBar {
+                title: qsTr("Распределение рисков по критичности")
+                criticalCount: DataStore.criticalRisksCount
+                highCount: DataStore.highRisksCount
+                mediumCount: DataStore.mediumRisksCount
+                lowCount: DataStore.lowRisksCount
+            }
+        }
+
+        // --- БЛОК 3: ЦЕПОЧКА АРХИТЕКТУРЫ МОДЕЛИ ---
+        SectionHeading {
+            eyebrow: qsTr("АРХИТЕКТУРА МОДЕЛИ")
+            heading: qsTr("От вопроса «что защищать?» к решению «во что инвестировать?»")
+            description: qsTr("Последовательное движение по контуру оценки эффективности информационной безопасности.")
+        }
+
+        GridLayout {
+            columns: width >= 880 ? 4 : (width >= 500 ? 2 : 1)
+            columnSpacing: 14
+            rowSpacing: 14
+            Layout.fillWidth: true
+
+            PlaceholderCard {
+                glyph: "01"
+                heading: qsTr("Определите активы")
+                description: qsTr("Что защищаем и какова стоимость простоя и утечки данных?")
+            }
+            PlaceholderCard {
+                glyph: "02"
+                heading: qsTr("Оцените риски")
+                description: qsTr("Сценарии угроз, матрица ущерба и вероятность реализации.")
+            }
+            PlaceholderCard {
+                glyph: "03"
+                heading: qsTr("Выберите меры")
+                description: qsTr("Каталог мер, стоимость внедрения и коэффициент снижения риска.")
+            }
+            PlaceholderCard {
+                glyph: "04"
+                heading: qsTr("Посчитайте эффект")
+                description: qsTr("Финансовая оценка предотвращенных потерь и коэффициент ROSI.")
+            }
+        }
+
+        // --- БЛОК 4: ИНФОРМАЦИОННЫЙ БАННЕР ПАЙПЛАЙНА ---
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: 84
-            radius: 12
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: Theme.panelRaised }
-                GradientStop { position: 1.0; color: Theme.panel }
-            }
-            border.color: Theme.borderHighlight
+            implicitHeight: 74
+            radius: Theme.radiusMd
+            color: Theme.panel
+            border.color: Theme.border
+            border.width: 1
+
+            Behavior on color { ColorAnimation { duration: 180 } }
+            Behavior on border.color { ColorAnimation { duration: 180 } }
+
             RowLayout {
                 anchors.fill: parent
                 anchors.margins: 18
-                spacing: 14
-                Text {
+                spacing: 16
+
+                StatusBadge {
                     text: qsTr("ЕДИНАЯ МОДЕЛЬ")
-                    color: Theme.accent
-                    font.pixelSize: 10
-                    font.weight: Font.Bold
+                    level: "teal"
                 }
+
                 Text {
-                    text: qsTr("Риск   →   Мера   →   Снижение   →   Экономический эффект   →   ROSI")
-                    color: Theme.text
-                    font.pixelSize: 13
-                    font.weight: Font.DemiBold
+                    text: qsTr("Риск   →   Мера защиты   →   Снижение потерь   →   Экономический эффект   →   ROSI")
+                    color: Theme.textSecondary
+                    font.pixelSize: Theme.fontBody
+                    font.weight: Font.Medium
                     wrapMode: Text.Wrap
                     Layout.fillWidth: true
                 }
             }
         }
+
         Item { Layout.preferredHeight: 18 }
     }
 }

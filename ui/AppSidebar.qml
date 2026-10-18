@@ -1,92 +1,176 @@
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 
 Rectangle {
     id: sidebar
 
     property int currentTab: 0
+    property bool collapsed: false
     signal tabSelected(int index)
 
-    gradient: Gradient {
-        GradientStop { position: 0.0; color: Theme.sidebarRaised }
-        GradientStop { position: 1.0; color: Theme.sidebar }
-    }
+    color: Theme.sidebar
     border.color: Theme.border
     border.width: 1
-    Layout.preferredWidth: 252
+    Layout.preferredWidth: collapsed ? Theme.sidebarWidthCompact : Theme.sidebarWidthExpanded
     Layout.fillHeight: true
 
+    Behavior on color { ColorAnimation { duration: 180 } }
+    Behavior on border.color { ColorAnimation { duration: 180 } }
+
+    Behavior on Layout.preferredWidth {
+        NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+    }
+
     readonly property var items: [
-        { glyph: "⌂", label: qsTr("Панель эффективности") },
-        { glyph: "◈", label: qsTr("Модель риска") },
-        { glyph: "▣", label: qsTr("Активы") },
-        { glyph: "△", label: qsTr("Риски") },
-        { glyph: "◉", label: qsTr("Меры защиты") },
-        { glyph: "₽", label: qsTr("Экономика") },
-        { glyph: "∑", label: qsTr("Методика") }
+        { icon: "dashboard", glyph: "⌂", label: qsTr("Панель эффективности") },
+        { icon: "criteria", glyph: "◈", label: qsTr("Модель риска") },
+        { icon: "assets", glyph: "▣", label: qsTr("Активы") },
+        { icon: "risks", glyph: "△", label: qsTr("Риски") },
+        { icon: "measures", glyph: "◉", label: qsTr("Меры защиты") },
+        { icon: "economics", glyph: "₽", label: qsTr("Экономика") },
+        { icon: "methodology", glyph: "∑", label: qsTr("Методика") }
     ]
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 16
+        anchors.margins: sidebar.collapsed ? 8 : 14
         spacing: 0
 
+        // --- ШАПКА САЙДБАРА (ЛОГОТИП И КНОПКА СВОРАЧИВАНИЯ) ---
         RowLayout {
             Layout.fillWidth: true
-            Layout.topMargin: 7
-            Layout.bottomMargin: 24
-            spacing: 11
+            Layout.topMargin: 4
+            Layout.bottomMargin: 20
+            spacing: 10
+
             Rectangle {
                 width: 38
                 height: 38
-                radius: 11
-                gradient: Gradient {
-                    GradientStop { position: 0.0; color: "#285486" }
-                    GradientStop { position: 1.0; color: "#173250" }
-                }
-                border.color: "#3b6b9f"
+                radius: Theme.radiusMd
+                color: Theme.accent
+                border.color: Theme.accentLight
+                border.width: 1
+
                 Text {
                     anchors.centerIn: parent
                     text: "ИБ"
-                    color: "#83bdff"
+                    color: "#ffffff"
                     font.pixelSize: 13
                     font.weight: Font.Bold
                 }
             }
+
             ColumnLayout {
+                visible: !sidebar.collapsed
                 spacing: 2
+                Layout.fillWidth: true
+
                 Text {
                     text: qsTr("ИБ-Эффект")
                     color: Theme.text
-                    font.pixelSize: 16
+                    font.pixelSize: Theme.fontH2
                     font.weight: Font.Bold
                 }
                 Text {
                     text: qsTr("Платформа оценки ИБ")
                     color: Theme.muted
+                    font.pixelSize: Theme.fontCaption
+                }
+            }
+
+            // Кнопка сворачивания/разворачивания
+            Rectangle {
+                visible: !sidebar.collapsed
+                width: 28
+                height: 28
+                radius: Theme.radiusXs
+                color: toggleMouse.containsMouse ? Theme.panelHover : "transparent"
+                border.color: toggleMouse.containsMouse ? Theme.borderHighlight : "transparent"
+                border.width: 1
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "◀"
+                    color: Theme.muted
                     font.pixelSize: 10
                 }
+
+                MouseArea {
+                    id: toggleMouse
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: sidebar.collapsed = !sidebar.collapsed
+                }
+
+                ToolTip.visible: toggleMouse.containsMouse
+                ToolTip.delay: 400
+                ToolTip.text: qsTr("Свернуть меню")
             }
         }
 
-        Text {
-            text: qsTr("РАБОЧЕЕ ПРОСТРАНСТВО")
-            color: "#6f829b"
-            font.pixelSize: 9
-            font.weight: Font.Bold
-            font.letterSpacing: 1.2
-            Layout.leftMargin: 9
-            Layout.bottomMargin: 10
+        // Если свернуто — отдельная кнопка развернуть
+        Rectangle {
+            visible: sidebar.collapsed
+            Layout.alignment: Qt.AlignHCenter
+            Layout.bottomMargin: 14
+            width: 32
+            height: 24
+            radius: Theme.radiusXs
+            color: expandMouse.containsMouse ? Theme.panelHover : "transparent"
+
+            Text {
+                anchors.centerIn: parent
+                text: "▶"
+                color: Theme.muted
+                font.pixelSize: 10
+            }
+
+            MouseArea {
+                id: expandMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: sidebar.collapsed = false
+            }
+
+            ToolTip.visible: expandMouse.containsMouse
+            ToolTip.delay: 400
+            ToolTip.text: qsTr("Развернуть меню")
         }
 
+        // Подзаголовок раздела
+        Text {
+            visible: !sidebar.collapsed
+            text: qsTr("РАБОЧЕЕ ПРОСТРАНСТВО")
+            color: Theme.subtle
+            font.pixelSize: Theme.fontMicro
+            font.weight: Font.Bold
+            font.letterSpacing: 1.2
+            Layout.leftMargin: 8
+            Layout.bottomMargin: 8
+        }
+
+        Rectangle {
+            visible: sidebar.collapsed
+            Layout.fillWidth: true
+            height: 1
+            color: Theme.border
+            Layout.bottomMargin: 8
+        }
+
+        // Список навигации
         Repeater {
             model: sidebar.items
             delegate: NavigationButton {
                 required property int index
                 required property var modelData
                 tabIndex: index
-                glyph: modelData.glyph
+                iconName: modelData.icon || ""
+                glyph: modelData.glyph || ""
                 label: modelData.label
+                compact: sidebar.collapsed
                 checked: sidebar.currentTab === index
                 onClicked: sidebar.tabSelected(index)
             }
@@ -94,31 +178,64 @@ Rectangle {
 
         Item { Layout.fillHeight: true }
 
+        // --- НИЖНИЙ БЛОК СТАТУСА ПРОЕКТА ---
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: 74
-            radius: 10
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: "#1a2c43" }
-                GradientStop { position: 1.0; color: "#142238" }
-            }
-            border.color: Theme.borderHighlight
+            implicitHeight: sidebar.collapsed ? 36 : 68
+            radius: Theme.radiusSm
+            color: Theme.panel
+            border.color: Theme.border
+            border.width: 1
+
+            Behavior on color { ColorAnimation { duration: 180 } }
+            Behavior on border.color { ColorAnimation { duration: 180 } }
+
             ColumnLayout {
+                visible: !sidebar.collapsed
                 anchors.fill: parent
-                anchors.margins: 12
-                spacing: 5
-                Text {
-                    text: qsTr("Локальный проект")
-                    color: Theme.text
-                    font.pixelSize: 11
-                    font.weight: Font.DemiBold
+                anchors.margins: 10
+                spacing: 3
+
+                RowLayout {
+                    spacing: 6
+                    Rectangle {
+                        width: 7
+                        height: 7
+                        radius: 3.5
+                        color: Theme.green
+                    }
+                    Text {
+                        text: qsTr("Локальный проект")
+                        color: Theme.text
+                        font.pixelSize: Theme.fontCaption
+                        font.weight: Font.Bold
+                    }
                 }
+
                 Text {
-                    text: qsTr("Черновик · данные не подключены")
+                    text: qsTr("Готов к расчётам · v0.1")
                     color: Theme.muted
-                    font.pixelSize: 10
+                    font.pixelSize: Theme.fontMicro
                     wrapMode: Text.Wrap
                     Layout.fillWidth: true
+                }
+            }
+
+            Rectangle {
+                visible: sidebar.collapsed
+                anchors.centerIn: parent
+                width: 8
+                height: 8
+                radius: 4
+                color: Theme.green
+
+                ToolTip.visible: statusMouse.containsMouse
+                ToolTip.text: qsTr("Проект активен · v0.1")
+
+                MouseArea {
+                    id: statusMouse
+                    anchors.fill: parent
+                    hoverEnabled: true
                 }
             }
         }

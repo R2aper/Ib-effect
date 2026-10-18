@@ -6,53 +6,75 @@ Button {
     id: control
 
     required property int tabIndex
-    required property string glyph
+    property string iconName: ""
+    property string glyph: ""
     required property string label
+    property bool compact: false
 
     checkable: true
     implicitHeight: 46
     Layout.fillWidth: true
 
+    ToolTip.visible: control.compact && control.hovered
+    ToolTip.delay: 300
+    ToolTip.text: control.label
+
     contentItem: RowLayout {
         spacing: 12
+        anchors.fill: parent
+        anchors.leftMargin: control.compact ? 0 : 14
+        anchors.rightMargin: control.compact ? 0 : 14
+
+        AppIcon {
+            visible: control.iconName !== ""
+            name: control.iconName
+            size: 20
+            color: control.checked ? Theme.accent : (control.hovered ? Theme.text : Theme.muted)
+            Layout.preferredWidth: 24
+            Layout.preferredHeight: 24
+            Layout.alignment: control.compact ? Qt.AlignCenter : Qt.AlignVCenter
+        }
+
         Text {
+            visible: control.iconName === ""
             text: control.glyph
-            color: control.checked ? Theme.accent : Theme.muted
+            color: control.checked ? Theme.accent : (control.hovered ? Theme.text : Theme.muted)
             font.pixelSize: 17
             font.bold: true
-            Layout.preferredWidth: 22
+            Layout.preferredWidth: 24
+            Layout.preferredHeight: 24
+            Layout.alignment: control.compact ? Qt.AlignCenter : Qt.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
         }
+
         Text {
+            visible: !control.compact
             text: control.label
-            color: control.checked ? Theme.text : Theme.muted
-            font.pixelSize: 13
-            font.weight: control.checked ? Font.DemiBold : Font.Normal
+            color: control.checked ? (Theme.isDark ? Theme.accentLight : Theme.accent) : (control.hovered ? Theme.text : Theme.textSecondary)
+            font.pixelSize: Theme.fontBody
+            font.weight: control.checked ? Font.Bold : Font.Normal
             elide: Text.ElideRight
             Layout.fillWidth: true
+            Layout.alignment: Qt.AlignVCenter
         }
     }
 
     background: Rectangle {
-        radius: 9
-        gradient: control.checked ? activeGradient
-               : control.hovered ? hoverGradient : null
-        color: control.checked ? "#1d3555"
-              : control.hovered ? "#19283d" : "transparent"
+        radius: Theme.radiusSm
+        color: control.checked 
+               ? (Theme.isDark ? "#1d293d" : "#eff6ff") 
+               : (control.hovered ? Theme.panelHover : "transparent")
         border.width: control.checked ? 1 : 0
-        border.color: control.checked ? "#345d89" : "transparent"
+        border.color: control.checked 
+               ? (Theme.isDark ? "#2d4263" : "#bfdbfe") 
+               : "transparent"
 
-        Gradient {
-            id: activeGradient
-            GradientStop { position: 0.0; color: "#24466e" }
-            GradientStop { position: 1.0; color: "#1a304c" }
-        }
-        Gradient {
-            id: hoverGradient
-            GradientStop { position: 0.0; color: "#1e3048" }
-            GradientStop { position: 1.0; color: "#17263a" }
+        Behavior on color {
+            ColorAnimation { duration: 140 }
         }
 
+        // Индикатор активного пункта (вертикальная плашка слева)
         Rectangle {
             visible: control.checked
             width: 3
@@ -61,7 +83,7 @@ Button {
             anchors.left: parent.left
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            anchors.margins: 8
+            anchors.margins: 6
         }
     }
 }
