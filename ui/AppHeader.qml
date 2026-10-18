@@ -95,6 +95,59 @@ Rectangle {
 
         Item { Layout.fillWidth: true }
 
+        // --- ПЕРЕКЛЮЧАТЕЛЬ КОНТУРА (КОРПОРАТИВНЫЙ IT / АСУ ТП И КИИ) ---
+        Rectangle {
+            implicitHeight: 36
+            implicitWidth: domainRow.implicitWidth + 24
+            radius: Theme.radiusSm
+            color: domainMouse.containsMouse ? (DataStore.isIndustrialMode ? (Theme.isDark ? "#172b3c" : "#e0f2fe") : Theme.panelHover) : (DataStore.isIndustrialMode ? (Theme.isDark ? "#0f2334" : "#f0f9ff") : Theme.panel)
+            border.color: DataStore.isIndustrialMode ? Theme.teal : Theme.border
+            border.width: 1
+
+            Behavior on color { ColorAnimation { duration: 120 } }
+            Behavior on border.color { ColorAnimation { duration: 120 } }
+
+            RowLayout {
+                id: domainRow
+                anchors.centerIn: parent
+                spacing: 8
+
+                Text {
+                    text: DataStore.isIndustrialMode ? "⚡" : "🏢"
+                    font.pixelSize: 13
+                }
+
+                Text {
+                    text: DataStore.isIndustrialMode ? qsTr("Контур: АСУ ТП (КИИ)") : qsTr("Контур: IT-системы")
+                    color: DataStore.isIndustrialMode ? (Theme.isDark ? Theme.tealLight : Theme.teal) : Theme.text
+                    font.pixelSize: Theme.fontCaption
+                    font.weight: Font.Bold
+                }
+
+                StatusBadge {
+                    text: DataStore.isIndustrialMode ? "ФСТЭК № 239" : "ГОСТ 27005"
+                    level: DataStore.isIndustrialMode ? "teal" : "info"
+                }
+            }
+
+            MouseArea {
+                id: domainMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    if (DataStore.isIndustrialMode) {
+                        DataStore.loadCorporatePreset();
+                    } else {
+                        DataStore.loadIndustrialPreset();
+                    }
+                }
+            }
+
+            ToolTip.visible: domainMouse.containsMouse
+            ToolTip.text: qsTr("Нажмите для переключения между корпоративным IT-контуром и промышленным контуром АСУ ТП КИИ")
+        }
+
         // --- ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ (СВЕТЛАЯ / ТЕМНАЯ) ---
         Rectangle {
             implicitHeight: 36

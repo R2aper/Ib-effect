@@ -124,29 +124,93 @@ Item {
                     StatusBadge { text: qsTr("Все (") + DataStore.assetsList.length + ")"; level: "info" }
                 }
 
-                Rectangle {
-                    implicitWidth: addBtnText.implicitWidth + 24
-                    implicitHeight: 34
-                    radius: Theme.radiusSm
-                    color: addBtnMouse.containsMouse ? Theme.accentGlow : Theme.accent
+                RowLayout {
+                    spacing: 8
 
-                    Behavior on color { ColorAnimation { duration: 120 } }
+                    Rectangle {
+                        implicitWidth: otPresetBtnText.implicitWidth + 24
+                        implicitHeight: 34
+                        radius: Theme.radiusSm
+                        color: otPresetMouse.containsMouse ? Theme.panelHover : "transparent"
+                        border.color: Theme.accent
+                        border.width: 1
 
-                    Text {
-                        id: addBtnText
-                        anchors.centerIn: parent
-                        text: qsTr("+ Добавить актив")
-                        color: "#ffffff"
-                        font.pixelSize: Theme.fontCaption
-                        font.weight: Font.Bold
+                        RowLayout {
+                            anchors.centerIn: parent
+                            spacing: 6
+                            Text { text: "⚡"; color: Theme.accent; font.pixelSize: 12 }
+                            Text {
+                                id: otPresetBtnText
+                                text: qsTr("Профиль АСУ ТП (КИИ)")
+                                color: Theme.accent
+                                font.pixelSize: Theme.fontCaption
+                                font.weight: Font.Bold
+                            }
+                        }
+
+                        MouseArea {
+                            id: otPresetMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: DataStore.loadIndustrialPreset()
+                        }
                     }
 
-                    MouseArea {
-                        id: addBtnMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: assetDialog.openForAdd()
+                    Rectangle {
+                        implicitWidth: itPresetBtnText.implicitWidth + 24
+                        implicitHeight: 34
+                        radius: Theme.radiusSm
+                        color: itPresetMouse.containsMouse ? Theme.panelHover : "transparent"
+                        border.color: Theme.border
+                        border.width: 1
+
+                        RowLayout {
+                            anchors.centerIn: parent
+                            spacing: 6
+                            Text { text: "🏢"; font.pixelSize: 12 }
+                            Text {
+                                id: itPresetBtnText
+                                text: qsTr("Профиль IT-контура")
+                                color: Theme.text
+                                font.pixelSize: Theme.fontCaption
+                                font.weight: Font.Medium
+                            }
+                        }
+
+                        MouseArea {
+                            id: itPresetMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: DataStore.loadCorporatePreset()
+                        }
+                    }
+
+                    Rectangle {
+                        implicitWidth: addBtnText.implicitWidth + 24
+                        implicitHeight: 34
+                        radius: Theme.radiusSm
+                        color: addBtnMouse.containsMouse ? Theme.accentGlow : Theme.accent
+
+                        Behavior on color { ColorAnimation { duration: 120 } }
+
+                        Text {
+                            id: addBtnText
+                            anchors.centerIn: parent
+                            text: qsTr("+ Добавить актив")
+                            color: "#ffffff"
+                            font.pixelSize: Theme.fontCaption
+                            font.weight: Font.Bold
+                        }
+
+                        MouseArea {
+                            id: addBtnMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: assetDialog.openForAdd()
+                        }
                     }
                 }
             }
@@ -224,13 +288,24 @@ Item {
                                 Layout.preferredWidth: 70
                             }
 
-                            Text {
-                                text: rowRect.modelData.name
-                                color: Theme.text
-                                font.pixelSize: Theme.fontBody
-                                font.weight: Font.Medium
-                                elide: Text.ElideRight
+                            RowLayout {
                                 Layout.fillWidth: true
+                                spacing: 8
+
+                                StatusBadge {
+                                    visible: rowRect.modelData.oaCode ? true : false
+                                    text: rowRect.modelData.oaCode || ""
+                                    level: "teal"
+                                }
+
+                                Text {
+                                    text: rowRect.modelData.name
+                                    color: Theme.text
+                                    font.pixelSize: Theme.fontBody
+                                    font.weight: Font.Medium
+                                    elide: Text.ElideRight
+                                    Layout.fillWidth: true
+                                }
                             }
 
                             Text {

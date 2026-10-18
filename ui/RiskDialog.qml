@@ -8,6 +8,7 @@ Rectangle {
 
     property bool isEditMode: false
     property int editIndex: -1
+    property var currentSuggestedThreats: []
 
     anchors.fill: parent
     color: Theme.isDark ? "#aa000000" : "#66000000"
@@ -22,6 +23,7 @@ Rectangle {
         impactSelector.selectedVal = 3;
         probSelector.selectedVal = 3;
         populateAssets();
+        updateThreatSuggestions();
         errorText.text = "";
         visible = true;
     }
@@ -35,11 +37,12 @@ Rectangle {
         probSelector.selectedVal = item.probability || 3;
         populateAssets();
         for (var i = 0; i < assetBox.model.length; i++) {
-            if (assetBox.model[i].id === item.assetId) {
+            if (DataStore.assetsList[i] && DataStore.assetsList[i].id === item.assetId) {
                 assetBox.currentIndex = i;
                 break;
             }
         }
+        updateThreatSuggestions();
         errorText.text = "";
         visible = true;
     }
@@ -48,17 +51,59 @@ Rectangle {
         var names = [];
         for (var a = 0; a < DataStore.assetsList.length; a++) {
             var ast = DataStore.assetsList[a];
-            names.push(ast.id + " · " + ast.name + " (Приоритет: " + ast.prio + ")");
+            var oaTag = ast.oaCode ? ("[" + ast.oaCode + "] ") : "";
+            names.push(oaTag + ast.id + " · " + ast.name + " (Приоритет: " + ast.prio + ")");
         }
         assetBox.model = names;
-        if (names.length > 0) assetBox.currentIndex = 0;
+        if (names.length > 0 && assetBox.currentIndex < 0) assetBox.currentIndex = 0;
+    }
+
+    function updateThreatSuggestions() {
+        var aIdx = assetBox.currentIndex;
+        var asset = DataStore.assetsList[aIdx];
+        var suggestions = [];
+        var titles = [qsTr("— Выбрать угрозу из классификатора ФСТЭК —")];
+
+        if (asset && asset.oaCode) {
+            // АСУ ТП актив с кодом ОА
+            var threats = DataStore.getThreatsForAssetOa(asset.oaCode);
+            for (var i = 0; i < threats.length; i++) {
+                var th = threats[i];
+                suggestions.push({
+                    code: th.code,
+                    title: th.code + ": " + th.title,
+                    vuln: qsTr("Уязвимость конфигурации и разграничения доступа компонента ") + asset.oaCode,
+                    defImpact: (asset.prio >= 4 ? 4 : 3),
+                    defProb: 3
+                });
+                titles.push(th.code + " · " + th.title);
+            }
+        } else {
+            // Корпоративный IT актив -> выборка из 227 УБИ
+            var itTh = DataStore.bduThreatsIT;
+            var sampleCount = Math.min(25, itTh.length);
+            for (var j = 0; j < sampleCount; j++) {
+                var it = itTh[j];
+                suggestions.push({
+                    code: it.id,
+                    title: it.id + ": " + it.name,
+                    vuln: it.description ? it.description.slice(0, 100) + "..." : qsTr("Уязвимость контура защиты"),
+                    defImpact: 3,
+                    defProb: 3
+                });
+                titles.push(it.id + " · " + it.name);
+            }
+        }
+        currentSuggestedThreats = suggestions;
+        threatPickerBox.model = titles;
+        threatPickerBox.currentIndex = 0;
     }
 
     MouseArea { anchors.fill: parent }
 
     Rectangle {
         id: card
-        width: 520
+        width: 540
         height: dialogCol.implicitHeight + 48
         implicitHeight: height
         anchors.centerIn: parent
@@ -82,7 +127,7 @@ Rectangle {
             id: dialogCol
             anchors.fill: parent
             anchors.margins: 24
-            spacing: 14
+            spacing: 12
 
             RowLayout {
                 Layout.fillWidth: true
@@ -107,20 +152,53 @@ Rectangle {
 
             Rectangle { Layout.fillWidth: true; height: 1; color: Theme.border }
 
-            // Нормативное обоснование
-            NormativeExplanationCard {
-                title: qsTr("Классификация угроз по БДУ ФСТЭК")
-                standard: "ФСТЭК России / ГОСТ Р ИСО/МЭК 27005-2010"
-                clause: qsTr("БДУ ФСТЭК (УБИ.xxx); п. 8.2 ГОСТ 27005")
-                quote: qsTr("«Идентификация угроз безопасности информации осуществляется с указанием кода угрозы по Банку данных угроз (УБИ.xxx). Оценка вероятности базируется на модели нарушителя» (Методика ФСТЭК от 05.02.2021).")
-                practicalNote: qsTr("Указывайте угрозу с кодом по классификатору ФСТЭК (например: «УБИ.031: Угроза несанкционированного доступа к информации»).")
+            // Связанный актив (выбирается первым)
+            ColumnLayout {
+                visible: !riskDialog.isEditMode
+                Layout.fillWidth: true
+                spacing: 5
+                Text { text: qsTr("Атакуемый актив:"); color: Theme.textSecondary; font.pixelSize: Theme.fontCaption; font.weight: Font.DemiBold }
+                ComboBox {
+                    id: assetBox
+                    Layout.fillWidth: true
+                    onActivated: riskDialog.updateThreatSuggestions()
+                }
+            }
+
+            // Быстрый выбор из классификатора ФСТЭК (УТП / УБИ)
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 5
+                RowLayout {
+                    Text { text: qsTr("Классификатор угроз ФСТЭК (автоподбор):"); color: Theme.textSecondary; font.pixelSize: Theme.fontCaption; font.weight: Font.DemiBold }
+                    Item { Layout.fillWidth: true }
+                    Text {
+                        text: qsTr("БДУ АСУ ТП / БДУ ФСТЭК")
+                        color: Theme.accent
+                        font.pixelSize: 11
+                        font.weight: Font.DemiBold
+                    }
+                }
+                ComboBox {
+                    id: threatPickerBox
+                    Layout.fillWidth: true
+                    onActivated: {
+                        if (currentIndex > 0 && currentSuggestedThreats.length >= currentIndex) {
+                            var sel = currentSuggestedThreats[currentIndex - 1];
+                            threatInput.text = sel.title;
+                            vulnInput.text = sel.vuln;
+                            impactSelector.selectedVal = sel.defImpact;
+                            probSelector.selectedVal = sel.defProb;
+                        }
+                    }
+                }
             }
 
             // Сценарий угрозы
             ColumnLayout {
                 Layout.fillWidth: true
                 spacing: 5
-                Text { text: qsTr("Сценарий угрозы (желательно с кодом УБИ.xxx):"); color: Theme.textSecondary; font.pixelSize: Theme.fontCaption; font.weight: Font.DemiBold }
+                Text { text: qsTr("Наименование и сценарий угрозы:"); color: Theme.textSecondary; font.pixelSize: Theme.fontCaption; font.weight: Font.DemiBold }
                 Rectangle {
                     Layout.fillWidth: true
                     implicitHeight: 38
@@ -144,7 +222,7 @@ Rectangle {
             ColumnLayout {
                 Layout.fillWidth: true
                 spacing: 5
-                Text { text: qsTr("Уязвимость контура защиты:"); color: Theme.textSecondary; font.pixelSize: Theme.fontCaption; font.weight: Font.DemiBold }
+                Text { text: qsTr("Уязвимость / способ реализации (СПА):"); color: Theme.textSecondary; font.pixelSize: Theme.fontCaption; font.weight: Font.DemiBold }
                 Rectangle {
                     Layout.fillWidth: true
                     implicitHeight: 38
@@ -161,18 +239,6 @@ Rectangle {
                         font.pixelSize: Theme.fontBody
                         clip: true
                     }
-                }
-            }
-
-            // Связанный актив
-            ColumnLayout {
-                visible: !riskDialog.isEditMode
-                Layout.fillWidth: true
-                spacing: 5
-                Text { text: qsTr("Атакуемый актив:"); color: Theme.textSecondary; font.pixelSize: Theme.fontCaption; font.weight: Font.DemiBold }
-                ComboBox {
-                    id: assetBox
-                    Layout.fillWidth: true
                 }
             }
 
@@ -269,7 +335,7 @@ Rectangle {
             // Превью балла
             Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: 40
+                implicitHeight: 38
                 radius: Theme.radiusSm
                 color: Theme.raised
                 border.color: Theme.border
@@ -301,7 +367,7 @@ Rectangle {
             // Кнопки
             RowLayout {
                 Layout.fillWidth: true
-                Layout.topMargin: 12
+                Layout.topMargin: 6
                 spacing: 12
 
                 Item { Layout.fillWidth: true }

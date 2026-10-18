@@ -141,29 +141,63 @@ Item {
                         StatusBadge { text: qsTr("Выс. (") + DataStore.highRisksCount + ")"; level: "high" }
                     }
 
-                    Rectangle {
-                        implicitWidth: addRiskBtn.implicitWidth + 24
-                        implicitHeight: 34
-                        radius: Theme.radiusSm
-                        color: addRiskMouse.containsMouse ? Theme.accentGlow : Theme.accent
+                    RowLayout {
+                        spacing: 8
 
-                        Behavior on color { ColorAnimation { duration: 120 } }
+                        Rectangle {
+                            implicitWidth: importScenBtnText.implicitWidth + 24
+                            implicitHeight: 34
+                            radius: Theme.radiusSm
+                            color: importScenMouse.containsMouse ? Theme.panelHover : "transparent"
+                            border.color: Theme.accent
+                            border.width: 1
 
-                        Text {
-                            id: addRiskBtn
-                            anchors.centerIn: parent
-                            text: qsTr("+ Новый риск")
-                            color: "#ffffff"
-                            font.pixelSize: Theme.fontCaption
-                            font.weight: Font.Bold
+                            RowLayout {
+                                anchors.centerIn: parent
+                                spacing: 6
+                                Text { text: "⚡"; color: Theme.accent; font.pixelSize: 12 }
+                                Text {
+                                    id: importScenBtnText
+                                    text: qsTr("Сценарий ФСТЭК (С1–С3)")
+                                    color: Theme.accent
+                                    font.pixelSize: Theme.fontCaption
+                                    font.weight: Font.Bold
+                                }
+                            }
+
+                            MouseArea {
+                                id: importScenMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: scenarioImportModal.openDialog()
+                            }
                         }
 
-                        MouseArea {
-                            id: addRiskMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: riskDialog.openForAdd()
+                        Rectangle {
+                            implicitWidth: addRiskBtn.implicitWidth + 24
+                            implicitHeight: 34
+                            radius: Theme.radiusSm
+                            color: addRiskMouse.containsMouse ? Theme.accentGlow : Theme.accent
+
+                            Behavior on color { ColorAnimation { duration: 120 } }
+
+                            Text {
+                                id: addRiskBtn
+                                anchors.centerIn: parent
+                                text: qsTr("+ Новый риск")
+                                color: "#ffffff"
+                                font.pixelSize: Theme.fontCaption
+                                font.weight: Font.Bold
+                            }
+
+                            MouseArea {
+                                id: addRiskMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: riskDialog.openForAdd()
+                            }
                         }
                     }
                 }
@@ -386,6 +420,11 @@ Item {
 
     RiskDialog {
         id: riskDialog
+        anchors.fill: parent
+    }
+
+    ScenarioImportDialog {
+        id: scenarioImportModal
         anchors.fill: parent
     }
 }

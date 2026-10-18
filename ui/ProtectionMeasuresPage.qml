@@ -126,29 +126,63 @@ Item {
                         StatusBadge { text: qsTr("Все (") + DataStore.measuresList.length + ")"; level: "info" }
                     }
 
-                    Rectangle {
-                        implicitWidth: addMeasureBtn.implicitWidth + 24
-                        implicitHeight: 34
-                        radius: Theme.radiusSm
-                        color: addMeasureMouse.containsMouse ? Theme.accentGlow : Theme.accent
+                    RowLayout {
+                        spacing: 8
 
-                        Behavior on color { ColorAnimation { duration: 120 } }
+                        Rectangle {
+                            implicitWidth: addPresetMeasureBtn.implicitWidth + 24
+                            implicitHeight: 34
+                            radius: Theme.radiusSm
+                            color: addPresetMeasureMouse.containsMouse ? Theme.panelHover : "transparent"
+                            border.color: Theme.accent
+                            border.width: 1
 
-                        Text {
-                            id: addMeasureBtn
-                            anchors.centerIn: parent
-                            text: qsTr("+ Новая мера")
-                            color: "#ffffff"
-                            font.pixelSize: Theme.fontCaption
-                            font.weight: Font.Bold
+                            RowLayout {
+                                anchors.centerIn: parent
+                                spacing: 6
+                                Text { text: "⚡"; color: Theme.accent; font.pixelSize: 12 }
+                                Text {
+                                    id: addPresetMeasureBtn
+                                    text: qsTr("Меры Приказа № 239 (АСУ ТП)")
+                                    color: Theme.accent
+                                    font.pixelSize: Theme.fontCaption
+                                    font.weight: Font.Bold
+                                }
+                            }
+
+                            MouseArea {
+                                id: addPresetMeasureMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: DataStore.addIndustrialMeasuresPreset()
+                            }
                         }
 
-                        MouseArea {
-                            id: addMeasureMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: measureDialog.openForAdd()
+                        Rectangle {
+                            implicitWidth: addMeasureBtn.implicitWidth + 24
+                            implicitHeight: 34
+                            radius: Theme.radiusSm
+                            color: addMeasureMouse.containsMouse ? Theme.accentGlow : Theme.accent
+
+                            Behavior on color { ColorAnimation { duration: 120 } }
+
+                            Text {
+                                id: addMeasureBtn
+                                anchors.centerIn: parent
+                                text: qsTr("+ Новая мера")
+                                color: "#ffffff"
+                                font.pixelSize: Theme.fontCaption
+                                font.weight: Font.Bold
+                            }
+
+                            MouseArea {
+                                id: addMeasureMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: measureDialog.openForAdd()
+                            }
                         }
                     }
                 }

@@ -19,6 +19,7 @@ set(IBE_UI_QML_FILES
     ui/RiskDialog.qml
     ui/MeasureDialog.qml
     ui/LinkRiskDialog.qml
+    ui/ScenarioImportDialog.qml
     ui/StatusBadge.qml
     ui/KpiStatCard.qml
     ui/RiskGauge.qml
@@ -38,6 +39,10 @@ set(IBE_UI_QML_FILES
     ui/MethodologyPage.qml
     ui/NormativeExplanationCard.qml
     ui/WorkflowGuideBanner.qml
+)
+
+set_source_files_properties(ui/BduData.js PROPERTIES
+    QT_RESOURCE_ALIAS BduData.js
 )
 
 set_source_files_properties(ui/Theme.qml PROPERTIES
@@ -87,8 +92,11 @@ qt_add_qml_module(Ibe
     QML_FILES
         Main.qml
         ${IBE_UI_QML_FILES}
+        ui/BduData.js
     RESOURCES
         ${IBE_SVG_ICONS}
+        bdu_it_threats.json
+        bdu_asutp_catalog.json
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

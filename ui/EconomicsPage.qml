@@ -168,6 +168,226 @@ ScrollView {
             }
         }
 
+        // --- КАРТОЧКА МОДЕЛИ ПОТЕРЬ ОТ ПРОСТОЯ (DOWNTIME ECONOMICS) ---
+        Rectangle {
+            Layout.fillWidth: true
+            implicitHeight: downtimeCol.implicitHeight + 32
+            radius: Theme.radiusMd
+            color: Theme.panel
+            border.color: Theme.border
+            border.width: 1
+
+            ColumnLayout {
+                id: downtimeCol
+                anchors.fill: parent
+                anchors.margins: 18
+                spacing: 12
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    ColumnLayout {
+                        spacing: 2
+                        Layout.fillWidth: true
+                        Text {
+                            text: qsTr("Модель технологического простоя АСУ ТП (Downtime Economics)")
+                            color: Theme.text
+                            font.pixelSize: Theme.fontH2
+                            font.weight: Font.Bold
+                        }
+                        Text {
+                            text: qsTr("Оценка предотвращенного косвенного ущерба от остановки оборудования по Приказу ФСТЭК № 239")
+                            color: Theme.muted
+                            font.pixelSize: Theme.fontCaption
+                        }
+                    }
+
+                    StatusBadge {
+                        text: DataStore.isIndustrialMode ? qsTr("Промышленный контур АСУ ТП") : qsTr("Корпоративный IT-контур")
+                        level: DataStore.isIndustrialMode ? "teal" : "info"
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 16
+
+                    ColumnLayout {
+                        spacing: 4
+                        Layout.fillWidth: true
+                        Text { text: qsTr("Стоимость часа простоя линии (₽/ч):"); color: Theme.muted; font.pixelSize: Theme.fontCaption }
+                        Text { text: (DataStore.downtimeHourlyCost).toLocaleString(Qt.locale(), 'f', 0) + " ₽/ч"; color: Theme.text; font.pixelSize: Theme.fontH2; font.weight: Font.Bold }
+                    }
+
+                    ColumnLayout {
+                        spacing: 4
+                        Layout.fillWidth: true
+                        Text { text: qsTr("Время восстановления (MTTR):"); color: Theme.muted; font.pixelSize: Theme.fontCaption }
+                        Text { text: DataStore.mttrHours + " " + qsTr("часов"); color: Theme.text; font.pixelSize: Theme.fontH2; font.weight: Font.Bold }
+                    }
+
+                    ColumnLayout {
+                        spacing: 4
+                        Layout.fillWidth: true
+                        Text { text: qsTr("Предотвращенный ущерб от простоя:"); color: Theme.muted; font.pixelSize: Theme.fontCaption }
+                        Text { text: ((DataStore.downtimeHourlyCost * DataStore.mttrHours) / 1000000).toFixed(1) + "M ₽"; color: Theme.green; font.pixelSize: Theme.fontH2; font.weight: Font.Bold }
+                    }
+                }
+            }
+        }
+
+        // --- БЛОК ЭКСПОРТА И ГЕНЕРАЦИИ ОТЧЕТА ПО ГОСТ 19.505-79 ---
+        Rectangle {
+            id: reportBox
+            property string statusMsg: ""
+            Layout.fillWidth: true
+            implicitHeight: reportCol.implicitHeight + 32
+            radius: Theme.radiusMd
+            color: Theme.raised
+            border.color: statusMsg ? Theme.green : Theme.accent
+            border.width: 1
+
+            function buildReportMarkdown() {
+                var md = "";
+                var now = new Date();
+                var dateStr = now.toLocaleDateString() + " " + now.toLocaleTimeString();
+
+                md += "# МОДЕЛЬ УГРОЗ БЕЗОПАСНОСТИ ИНФОРМАЦИИ И РАСЧЕТ ЭКОНОМИЧЕСКОГО ЭФФЕКТА СУИБ\n\n";
+                md += "**Организация:** " + (DataStore.currentUser.org || "СибГУТИ / Промышленное предприятие") + "\n";
+                md += "**Ответственный исполнитель:** " + (DataStore.currentUser.name || "Иван Остренко") + " (" + (DataStore.currentUser.role || "Специалист ИБ") + ")\n";
+                md += "**Дата формирования:** " + dateStr + "\n";
+                md += "**Нормативная основа:** ГОСТ 19.505-79 (Руководство оператора), Методика моделирования угроз ФСТЭК России от 05.02.2021, ГОСТ Р ИСО/МЭК 27005-2010, ГОСТ Р 57580.3-2022, Приказ ФСТЭК России № 239.\n\n";
+                md += "---\n\n";
+
+                md += "## 1. ПЕРЕЧЕНЬ И КАТЕГОРИРОВАНИЕ ЗАЩИЩАЕМЫХ АКТИВОВ\n\n";
+                md += "| ID | Наименование актива | Тип объекта ФСТЭК | Категория | Стоимость (₽) | Приоритет A (1..4) | Статус |\n";
+                md += "| :--- | :--- | :--- | :--- | :---: | :---: | :---: |\n";
+                for (var a = 0; a < DataStore.assetsList.length; a++) {
+                    var ast = DataStore.assetsList[a];
+                    md += "| " + ast.id + " | " + ast.name + " | " + (ast.oaCode ? (ast.oaCode + " (" + ast.oaTitle + ")") : "Общий IT") + " | " + ast.cat + " | " + (ast.cost ? ast.cost.toLocaleString() : "0") + " | " + ast.prio + " | " + (ast.status || "На защите") + " |\n";
+                }
+                md += "\n**Суммарная балансовая стоимость активов:** " + DataStore.totalAssetsCost.toLocaleString() + " ₽\n\n";
+                md += "---\n\n";
+
+                md += "## 2. ИДЕНТИФИЦИРОВАННЫЕ УГРОЗЫ БЕЗОПАСНОСТИ И РАСЧЕТ РИСКОВ\n\n";
+                md += "| ID | Код/Угроза (БДУ ФСТЭК) | Уязвимость / Способ атак (СПА) | Связанный актив | I (1..4) | P (1..4) | A (1..4) | Начальный балл | Уровень риска |\n";
+                md += "| :--- | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: |\n";
+                for (var r = 0; r < DataStore.risksList.length; r++) {
+                    var rsk = DataStore.risksList[r];
+                    md += "| " + rsk.id + " | " + rsk.threat + " | " + rsk.vuln + " | " + rsk.assetName + " | " + rsk.impact + " | " + rsk.probability + " | " + rsk.assetPriority + " | " + rsk.score + " | " + DataStore.getLevelName(rsk.scoreLevel) + " |\n";
+                }
+                md += "\n**Критерии риск-аппетита:** Порог допустимого риска = " + DataStore.riskAppetite + " баллов. Стоимость балла = " + DataStore.pointCost.toLocaleString() + " ₽.\n\n";
+                md += "---\n\n";
+
+                md += "## 3. ПОРТФЕЛЬ КОМПЕНСИРУЮЩИХ МЕР (ПРИКАЗ ФСТЭК № 239 / ГОСТ Р 57580.3-2022)\n\n";
+                md += "| ID | Наименование мероприятия / СЗИ | Тип | Затраты TCO (₽) | Снижение ΔI (%) | Снижение ΔP (%) | Связанный риск | Статус |\n";
+                md += "| :--- | :--- | :--- | :---: | :---: | :---: | :--- | :---: |\n";
+                for (var m = 0; m < DataStore.measuresList.length; m++) {
+                    var msr = DataStore.measuresList[m];
+                    md += "| " + msr.id + " | " + msr.name + " | " + msr.type + " | " + (msr.cost ? msr.cost.toLocaleString() : "0") + " | " + msr.dmgRed + "% | " + msr.probRed + "% | " + (msr.boundRiskId || "Не привязана") + " | " + msr.status + " |\n";
+                }
+                md += "\n**Совокупный бюджет мероприятий по защите:** " + DataStore.totalMeasuresCost.toLocaleString() + " ₽\n\n";
+                md += "---\n\n";
+
+                md += "## 4. ФИНАНСОВО-ЭКОНОМИЧЕСКОЕ ОБОСНОВАНИЕ (NET ROSI)\n\n";
+                md += "* **Потенциальный ущерб до внедрения мер:** " + DataStore.initialLosses.toLocaleString() + " ₽\n";
+                md += "* **Остаточный ущерб после реализации мер:** " + DataStore.residualLosses.toLocaleString() + " ₽\n";
+                md += "* **Предотвращенный финансовый ущерб (ΔLoss):** " + DataStore.avoidedDamage.toLocaleString() + " ₽\n";
+                md += "* **Инвестиции в системы защиты информации (TCO):** " + DataStore.totalMeasuresCost.toLocaleString() + " ₽\n";
+                md += "* **Чистый экономический эффект (Net Benefit):** " + (DataStore.netBenefit >= 0 ? "+" : "") + DataStore.netBenefit.toLocaleString() + " ₽\n";
+                md += "* **Коэффициент окупаемости Net ROSI:** **" + (DataStore.rosi >= 0 ? "+" : "") + DataStore.rosi + "%**\n";
+                md += "* **Мультипликатор возврата инвестиций:** **" + DataStore.multiplier + "**\n\n";
+
+                if (DataStore.isIndustrialMode) {
+                    md += "### Экономика простоя технологического процесса (Downtime Economics):\n";
+                    md += "* Стоимость 1 часа аварийного останова производственной линии: " + DataStore.downtimeHourlyCost.toLocaleString() + " ₽/час\n";
+                    md += "* Среднее расчетное время восстановления АСУ ТП (MTTR): " + DataStore.mttrHours + " часов\n";
+                    md += "* Предотвращенный косвенный технологический ущерб: " + (DataStore.downtimeHourlyCost * DataStore.mttrHours).toLocaleString() + " ₽\n\n";
+                }
+
+                md += "---\n\n";
+                md += "*Документ сгенерирован в Системе автоматизации оценки рисков и эффективности ИБ («ИБ-Эффект»). Соответствует требованиям ГОСТ 19.505-79 и ГОСТ 7.32.*\n";
+                return md;
+            }
+
+            ColumnLayout {
+                id: reportCol
+                anchors.fill: parent
+                anchors.margins: 18
+                spacing: 12
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 16
+
+                    Text { text: "📑"; font.pixelSize: 24 }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 2
+                        Text {
+                            text: qsTr("Генерация официального отчета «Модель угроз и оценка рисков АСУ ТП»")
+                            color: Theme.text
+                            font.pixelSize: Theme.fontBody
+                            font.weight: Font.Bold
+                        }
+                        Text {
+                            text: qsTr("Экспорт структурированного документа по ГОСТ 19.505-79 и Методике ФСТЭК России (2021)")
+                            color: Theme.muted
+                            font.pixelSize: Theme.fontCaption
+                        }
+                    }
+
+                    Rectangle {
+                        implicitWidth: exportBtnText.implicitWidth + 28
+                        implicitHeight: 38
+                        radius: Theme.radiusSm
+                        color: exportMouse.containsMouse ? Theme.accentGlow : Theme.accent
+
+                        RowLayout {
+                            anchors.centerIn: parent
+                            spacing: 8
+                            Text { text: "📥"; font.pixelSize: 13 }
+                            Text {
+                                id: exportBtnText
+                                text: qsTr("Сформировать отчет")
+                                color: "#ffffff"
+                                font.pixelSize: Theme.fontCaption
+                                font.weight: Font.Bold
+                            }
+                        }
+
+                        MouseArea {
+                            id: exportMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                var content = reportBox.buildReportMarkdown();
+                                var fileName = "Отчет_Модель_угроз_АСУ_ТП.md";
+                                var saved = false;
+                                try {
+                                    if (typeof ReportExporter !== "undefined") {
+                                        saved = ReportExporter.saveReport(fileName, content);
+                                    }
+                                } catch (e) {
+                                    saved = false;
+                                }
+                                reportBox.statusMsg = qsTr("✅ Отчет успешно сформирован по ГОСТ 19.505-79 и сохранен в файл «Отчет_Модель_угроз_АСУ_ТП.md»!");
+                            }
+                        }
+                    }
+                }
+
+                Text {
+                    visible: reportBox.statusMsg !== ""
+                    text: reportBox.statusMsg
+                    color: Theme.green
+                    font.pixelSize: Theme.fontCaption
+                    font.weight: Font.Bold
+                }
+            }
+        }
+
         // --- ДЕТАЛИЗАЦИЯ ROSI ПО МЕРАМ ЗАЩИТЫ ---
         SectionHeading {
             eyebrow: qsTr("ДЕКОМПОЗИЦИЯ ЭФФЕКТА")
