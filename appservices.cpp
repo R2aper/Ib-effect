@@ -17,7 +17,59 @@ QString entityFromOperation(const QString &operation) {
 
 } // namespace
 
-MockDataProvider::MockDataProvider(QObject *parent) : DataProvider(parent) {}
+MockDataProvider::MockDataProvider(QObject *parent) : DataProvider(parent) {
+  m_collections.insert(
+      QStringLiteral("assets"),
+      QVariantList{
+          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-01")},
+                      {QStringLiteral("name"),
+                       QStringLiteral("Автоматизированная банковская система (АБС)")},
+                      {QStringLiteral("cat"), QStringLiteral("Информ. система")},
+                      {QStringLiteral("cost"), 24000000},
+                      {QStringLiteral("prio"), 4},
+                      {QStringLiteral("oaCode"), QStringLiteral("ОА.003")},
+                      {QStringLiteral("oaTitle"),
+                       QStringLiteral("Промышленный сервер")},
+                      {QStringLiteral("domain"), QStringLiteral("IT")},
+                      {QStringLiteral("status"), QStringLiteral("На защите")},
+                      {QStringLiteral("statusLevel"), QStringLiteral("success")}},
+          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-02")},
+                      {QStringLiteral("name"),
+                       QStringLiteral("Центральная СУБД PostgreSQL (Клиентские данные)")},
+                      {QStringLiteral("cat"), QStringLiteral("База данных")},
+                      {QStringLiteral("cost"), 12500000},
+                      {QStringLiteral("prio"), 4},
+                      {QStringLiteral("oaCode"), QStringLiteral("ОА.004")},
+                      {QStringLiteral("oaTitle"),
+                       QStringLiteral("Сервер архивов / баз данных")},
+                      {QStringLiteral("domain"), QStringLiteral("IT")},
+                      {QStringLiteral("status"), QStringLiteral("На защите")},
+                      {QStringLiteral("statusLevel"), QStringLiteral("success")}},
+          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-03")},
+                      {QStringLiteral("name"),
+                       QStringLiteral("Корпоративный почтовый сервер и веб-шлюз")},
+                      {QStringLiteral("cat"), QStringLiteral("Инфраструктура")},
+                      {QStringLiteral("cost"), 5300000},
+                      {QStringLiteral("prio"), 3},
+                      {QStringLiteral("oaCode"), QStringLiteral("ОА.001")},
+                      {QStringLiteral("oaTitle"),
+                       QStringLiteral("АРМ оператора / сервер")},
+                      {QStringLiteral("domain"), QStringLiteral("IT")},
+                      {QStringLiteral("status"), QStringLiteral("На контроле")},
+                      {QStringLiteral("statusLevel"), QStringLiteral("high")}},
+          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-04")},
+                      {QStringLiteral("name"),
+                       QStringLiteral("Контроллер домена Active Directory")},
+                      {QStringLiteral("cat"), QStringLiteral("Служба каталога")},
+                      {QStringLiteral("cost"), 4000000},
+                      {QStringLiteral("prio"), 3},
+                      {QStringLiteral("oaCode"), QStringLiteral("ОА.001")},
+                      {QStringLiteral("oaTitle"),
+                       QStringLiteral("АРМ оператора / сервер")},
+                      {QStringLiteral("domain"), QStringLiteral("IT")},
+                      {QStringLiteral("status"), QStringLiteral("На защите")},
+                      {QStringLiteral("statusLevel"), QStringLiteral("success")}}});
+}
 
 QString MockDataProvider::modeName() const { return QStringLiteral("mock"); }
 
@@ -62,11 +114,150 @@ void MockDataProvider::request(const QString &requestId,
 
   } else if (operation.endsWith(QStringLiteral(".list"))) {
     result = m_collections.value(entity);
+  } else if (operation == QStringLiteral("assets.preset")) {
+    const bool industrial = payload.value(QStringLiteral("industrial")).toBool();
+    QVariantList assets;
+    if (industrial) {
+      assets = {
+          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-OT-01")},
+                      {QStringLiteral("name"),
+                       QStringLiteral("ПЛК агрегата компрессии (Siemens S7-1500)")},
+                      {QStringLiteral("cat"), QStringLiteral("Контроллер (ПЛК)")},
+                      {QStringLiteral("cost"), 18500000},
+                      {QStringLiteral("prio"), 4},
+                      {QStringLiteral("oaCode"), QStringLiteral("ОА.006")},
+                      {QStringLiteral("oaTitle"),
+                       QStringLiteral("Программируемый логический контроллер (ПЛК / PLC)")},
+                      {QStringLiteral("domain"), QStringLiteral("OT")},
+                      {QStringLiteral("status"), QStringLiteral("На защите")},
+                      {QStringLiteral("statusLevel"), QStringLiteral("success")}},
+          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-OT-02")},
+                      {QStringLiteral("name"),
+                       QStringLiteral("Инженерная станция АСУ ТП (TIA Portal)")},
+                      {QStringLiteral("cat"), QStringLiteral("АРМ инженера")},
+                      {QStringLiteral("cost"), 9800000},
+                      {QStringLiteral("prio"), 4},
+                      {QStringLiteral("oaCode"), QStringLiteral("ОА.002")},
+                      {QStringLiteral("oaTitle"),
+                       QStringLiteral("АРМ инженера (инженерная станция)")},
+                      {QStringLiteral("domain"), QStringLiteral("OT")},
+                      {QStringLiteral("status"), QStringLiteral("На защите")},
+                      {QStringLiteral("statusLevel"), QStringLiteral("success")}},
+          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-OT-03")},
+                      {QStringLiteral("name"),
+                       QStringLiteral("Технологический съемный накопитель (USB-Flash)")},
+                      {QStringLiteral("cat"), QStringLiteral("Съемный носитель")},
+                      {QStringLiteral("cost"), 1200000},
+                      {QStringLiteral("prio"), 4},
+                      {QStringLiteral("oaCode"), QStringLiteral("ОА.009")},
+                      {QStringLiteral("oaTitle"),
+                       QStringLiteral("Съемный носитель информации (USB, flash)")},
+                      {QStringLiteral("domain"), QStringLiteral("OT")},
+                      {QStringLiteral("status"), QStringLiteral("На контроле")},
+                      {QStringLiteral("statusLevel"), QStringLiteral("high")}},
+          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-OT-04")},
+                      {QStringLiteral("name"),
+                       QStringLiteral("Главный SCADA-сервер диспетчеризации (WinCC)")},
+                      {QStringLiteral("cat"), QStringLiteral("Промышленный сервер")},
+                      {QStringLiteral("cost"), 26000000},
+                      {QStringLiteral("prio"), 4},
+                      {QStringLiteral("oaCode"), QStringLiteral("ОА.003")},
+                      {QStringLiteral("oaTitle"),
+                       QStringLiteral("Промышленный сервер (SCADA/DCS)")},
+                      {QStringLiteral("domain"), QStringLiteral("OT")},
+                      {QStringLiteral("status"), QStringLiteral("На защите")},
+                      {QStringLiteral("statusLevel"), QStringLiteral("success")}},
+          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-OT-05")},
+                      {QStringLiteral("name"),
+                       QStringLiteral("Панель оператора на технологической установке (HMI)")},
+                      {QStringLiteral("cat"), QStringLiteral("Панель оператора")},
+                      {QStringLiteral("cost"), 4300000},
+                      {QStringLiteral("prio"), 3},
+                      {QStringLiteral("oaCode"), QStringLiteral("ОА.005")},
+                      {QStringLiteral("oaTitle"),
+                       QStringLiteral("Сенсорная панель оператора (HMI)")},
+                      {QStringLiteral("domain"), QStringLiteral("OT")},
+                      {QStringLiteral("status"), QStringLiteral("На контроле")},
+                      {QStringLiteral("statusLevel"), QStringLiteral("high")}}};
+    } else {
+      assets = {
+          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-01")},
+                      {QStringLiteral("name"),
+                       QStringLiteral("Автоматизированная банковская система (АБС)")},
+                      {QStringLiteral("cat"), QStringLiteral("Информ. система")},
+                      {QStringLiteral("cost"), 24000000},
+                      {QStringLiteral("prio"), 4},
+                      {QStringLiteral("oaCode"), QStringLiteral("ОА.003")},
+                      {QStringLiteral("oaTitle"),
+                       QStringLiteral("Промышленный сервер")},
+                      {QStringLiteral("domain"), QStringLiteral("IT")},
+                      {QStringLiteral("status"), QStringLiteral("На защите")},
+                      {QStringLiteral("statusLevel"), QStringLiteral("success")}},
+          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-02")},
+                      {QStringLiteral("name"),
+                       QStringLiteral("Центральная СУБД PostgreSQL (Клиентские данные)")},
+                      {QStringLiteral("cat"), QStringLiteral("База данных")},
+                      {QStringLiteral("cost"), 12500000},
+                      {QStringLiteral("prio"), 4},
+                      {QStringLiteral("oaCode"), QStringLiteral("ОА.004")},
+                      {QStringLiteral("oaTitle"),
+                       QStringLiteral("Сервер архивов / баз данных")},
+                      {QStringLiteral("domain"), QStringLiteral("IT")},
+                      {QStringLiteral("status"), QStringLiteral("На защите")},
+                      {QStringLiteral("statusLevel"), QStringLiteral("success")}},
+          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-03")},
+                      {QStringLiteral("name"),
+                       QStringLiteral("Корпоративный почтовый сервер и веб-шлюз")},
+                      {QStringLiteral("cat"), QStringLiteral("Инфраструктура")},
+                      {QStringLiteral("cost"), 5300000},
+                      {QStringLiteral("prio"), 3},
+                      {QStringLiteral("oaCode"), QStringLiteral("ОА.001")},
+                      {QStringLiteral("oaTitle"),
+                       QStringLiteral("АРМ оператора / сервер")},
+                      {QStringLiteral("domain"), QStringLiteral("IT")},
+                      {QStringLiteral("status"), QStringLiteral("На контроле")},
+                      {QStringLiteral("statusLevel"), QStringLiteral("high")}},
+          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-04")},
+                      {QStringLiteral("name"),
+                       QStringLiteral("Контроллер домена Active Directory")},
+                      {QStringLiteral("cat"), QStringLiteral("Служба каталога")},
+                      {QStringLiteral("cost"), 4000000},
+                      {QStringLiteral("prio"), 3},
+                      {QStringLiteral("oaCode"), QStringLiteral("ОА.001")},
+                      {QStringLiteral("oaTitle"),
+                       QStringLiteral("АРМ оператора / сервер")},
+                      {QStringLiteral("domain"), QStringLiteral("IT")},
+                      {QStringLiteral("status"), QStringLiteral("На защите")},
+                      {QStringLiteral("statusLevel"), QStringLiteral("success")}}};
+    }
+    m_collections.insert(QStringLiteral("assets"), assets);
+    result = QVariantMap{{QStringLiteral("assets"), assets},
+                         {QStringLiteral("industrialMode"), industrial}};
   } else if (operation.endsWith(QStringLiteral(".create"))) {
     QVariantMap item = payload;
-    item.insert(QStringLiteral("id"),
-                QUuid::createUuid().toString(QUuid::WithoutBraces));
     QVariantList items = m_collections.value(entity);
+    const bool industrial = item.value(QStringLiteral("domain")).toString() ==
+                           QStringLiteral("OT");
+    const QString prefix = industrial ? QStringLiteral("ACT-OT-")
+                                      : QStringLiteral("ACT-");
+    int nextNumber = 1;
+    bool foundId = false;
+    do {
+      foundId = false;
+      const QString candidate =
+          prefix + (nextNumber < 10 ? QStringLiteral("0") : QString()) +
+          QString::number(nextNumber++);
+      for (const QVariant &value : items) {
+        if (value.toMap().value(QStringLiteral("id")).toString() == candidate) {
+          foundId = true;
+          break;
+        }
+      }
+      if (!foundId)
+        item.insert(QStringLiteral("id"), candidate);
+    } while (foundId);
+    item.insert(QStringLiteral("status"), QStringLiteral("На защите"));
+    item.insert(QStringLiteral("statusLevel"), QStringLiteral("success"));
     items.append(item);
     m_collections.insert(entity, items);
     result = items;
@@ -372,7 +563,27 @@ QString EntityService::remove(const QString &id) {
 }
 
 AssetService::AssetService(DataProvider *provider, QObject *parent)
-    : EntityService(provider, QStringLiteral("assets"), parent) {}
+    : EntityService(provider, QStringLiteral("assets"), parent) {
+  connect(this, &ServiceBase::operationFinished, this,
+          [this](const QString &, const QString &operation, bool success,
+                 const QVariant &data, const QString &) {
+            if (operation != QStringLiteral("assets.preset") || !success)
+              return;
+            const bool industrial =
+                data.toMap().value(QStringLiteral("industrialMode")).toBool();
+            if (m_industrialMode != industrial) {
+              m_industrialMode = industrial;
+              emit industrialModeChanged();
+            }
+          });
+}
+
+bool AssetService::industrialMode() const { return m_industrialMode; }
+
+QString AssetService::loadPreset(bool industrial) {
+  return sendRequest(QStringLiteral("assets.preset"),
+                     {{QStringLiteral("industrial"), industrial}});
+}
 
 RiskService::RiskService(DataProvider *provider, QObject *parent)
     : EntityService(provider, QStringLiteral("risks"), parent) {}

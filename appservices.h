@@ -132,8 +132,19 @@ private:
 
 class AssetService final : public EntityService {
   Q_OBJECT
+  Q_PROPERTY(bool industrialMode READ industrialMode NOTIFY industrialModeChanged)
+
 public:
   explicit AssetService(DataProvider *provider, QObject *parent = nullptr);
+
+  bool industrialMode() const;
+  Q_INVOKABLE QString loadPreset(bool industrial);
+
+signals:
+  void industrialModeChanged();
+
+private:
+  bool m_industrialMode = false;
 };
 
 class RiskService final : public EntityService {

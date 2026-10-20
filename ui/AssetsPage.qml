@@ -4,6 +4,36 @@ import QtQuick.Effects
 import QtQuick.Layouts
 
 Item {
+    id: root
+
+    function totalAssetsCost() {
+        var total = 0;
+        for (var i = 0; i < AssetService.items.length; i++)
+            total += Number(AssetService.items[i].cost) || 0;
+        return total;
+    }
+
+    function criticalAssetsCount() {
+        var count = 0;
+        for (var i = 0; i < AssetService.items.length; i++) {
+            if (Number(AssetService.items[i].prio) === 4)
+                count++;
+        }
+        return count;
+    }
+
+    function matchesSearch(item) {
+        var query = searchAsset.text.trim().toLowerCase();
+        if (!query)
+            return true;
+        return String(item.id || "").toLowerCase().indexOf(query) !== -1
+                || String(item.name || "").toLowerCase().indexOf(query) !== -1
+                || String(item.cat || "").toLowerCase().indexOf(query) !== -1
+                || String(item.oaCode || "").toLowerCase().indexOf(query) !== -1;
+    }
+
+    Component.onCompleted: AssetService.load()
+
     ScrollView {
         anchors.fill: parent
         clip: true
@@ -36,8 +66,8 @@ Item {
 
             KpiStatCard {
                 label: qsTr("ВСЕГО АКТИВОВ")
-                value: DataStore.assetsList.length.toString()
-                delta: "+1 нов."
+                value: AssetService.items.length.toString()
+                delta: AssetService.loading ? qsTr("Загрузка") : qsTr("Реестр")
                 deltaIsGood: true
                 note: qsTr("Зарегистрировано в реестре")
                 glyph: "▣"
@@ -46,7 +76,7 @@ Item {
 
             KpiStatCard {
                 label: qsTr("СУММАРНАЯ СТОИМОСТЬ АКТИВОВ")
-                value: (DataStore.totalAssetsCost >= 1000000 ? (DataStore.totalAssetsCost / 1000000).toFixed(1) + "M ₽" : (DataStore.totalAssetsCost / 1000).toFixed(0) + "K ₽")
+                value: (root.totalAssetsCost() >= 1000000 ? (root.totalAssetsCost() / 1000000).toFixed(1) + "M ₽" : (root.totalAssetsCost() / 1000).toFixed(0) + "K ₽")
                 delta: "Оценка"
                 deltaIsGood: true
                 note: qsTr("Балансовая и эксплуатационная ценность")
@@ -59,10 +89,7 @@ Item {
                 label: qsTr("КРИТИЧЕСКИЕ СИСТЕМЫ (КИИ)")
                 value: {
                     var count = 0;
-                    for (var i = 0; i < DataStore.assetsList.length; i++) {
-                        if (DataStore.assetsList[i].prio === 4) count++;
-                    }
-                    return count.toString();
+                    return root.criticalAssetsCount().toString();
                 }
                 delta: "Приоритет 4"
                 deltaIsGood: false
@@ -121,7 +148,7 @@ Item {
 
                 RowLayout {
                     spacing: 6
-                    StatusBadge { text: qsTr("Все (") + DataStore.assetsList.length + ")"; level: "info" }
+                    StatusBadge { text: qsTr("Все (") + AssetService.items.length + ")"; level: "info" }
                 }
 
                 RowLayout {
@@ -153,7 +180,7 @@ Item {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: DataStore.loadIndustrialPreset()
+                            onClicked: AssetService.loadPreset(true)
                         }
                     }
 
@@ -183,7 +210,7 @@ Item {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: DataStore.loadCorporatePreset()
+                            onClicked: AssetService.loadPreset(false)
                         }
                     }
 
@@ -212,8 +239,18 @@ Item {
                             onClicked: assetDialog.openForAdd()
                         }
                     }
+
                 }
             }
+        }
+
+        Text {
+            visible: AssetService.loading || AssetService.error !== ""
+            text: AssetService.loading ? qsTr("Выполняется запрос…") : AssetService.error
+            color: AssetService.error !== "" ? Theme.riskCritical : Theme.muted
+            font.pixelSize: Theme.fontCaption
+            wrapMode: Text.Wrap
+            Layout.fillWidth: true
         }
 
         // --- ТАБЛИЦА РЕЕСТРА АКТИВОВ (DATA TABLE) ---
@@ -258,7 +295,7 @@ Item {
 
                 // Строки таблицы
                 Repeater {
-                    model: DataStore.assetsList
+                    model: AssetService.items
 
                     delegate: Rectangle {
                         id: rowRect
@@ -267,6 +304,7 @@ Item {
 
                         Layout.fillWidth: true
                         implicitHeight: 48
+                        visible: root.matchesSearch(modelData)
                         radius: Theme.radiusSm
                         color: rowMouse.containsMouse ? Theme.panelHover : (index % 2 === 0 ? "transparent" : (Theme.isDark ? "#171a21" : "#f8f9fb"))
 
@@ -281,7 +319,7 @@ Item {
                             spacing: 12
 
                             Text {
-                                text: rowRect.modelData.id
+                                text: rowRect.modelData.id || ""
                                 color: Theme.accent
                                 font.pixelSize: Theme.fontCaption
                                 font.weight: Font.Bold
@@ -293,7 +331,7 @@ Item {
                                 spacing: 8
 
                                 StatusBadge {
-                                    visible: rowRect.modelData.oaCode ? true : false
+                                    visible: !!rowRect.modelData.oaCode
                                     text: rowRect.modelData.oaCode || ""
                                     level: "teal"
                                 }
@@ -309,14 +347,14 @@ Item {
                             }
 
                             Text {
-                                text: rowRect.modelData.cat
+                                text: rowRect.modelData.cat || ""
                                 color: Theme.muted
                                 font.pixelSize: Theme.fontCaption
                                 Layout.preferredWidth: 150
                             }
 
                             Text {
-                                text: (rowRect.modelData.cost ? (rowRect.modelData.cost).toLocaleString(Qt.locale(), 'f', 0) : "0") + " ₽"
+                                text: (rowRect.modelData.cost ? Number(rowRect.modelData.cost).toLocaleString(Qt.locale(), 'f', 0) : "0") + " ₽"
                                 color: Theme.isDark ? Theme.tealLight : Theme.teal
                                 font.pixelSize: Theme.fontCaption
                                 font.weight: Font.DemiBold
@@ -359,7 +397,7 @@ Item {
                                         id: editMouse
                                         anchors.fill: parent
                                         cursorShape: Qt.PointingHandCursor
-                                        onClicked: assetDialog.openForEdit(rowRect.index, rowRect.modelData)
+                                        onClicked: assetDialog.openForEdit(rowRect.modelData)
                                     }
 
                                     ToolTip.visible: editMouse.containsMouse
@@ -385,7 +423,7 @@ Item {
                                         id: delMouse
                                         anchors.fill: parent
                                         cursorShape: Qt.PointingHandCursor
-                                        onClicked: DataStore.deleteAsset(rowRect.index)
+                                        onClicked: AssetService.remove(rowRect.modelData.id)
                                     }
 
                                     ToolTip.visible: delMouse.containsMouse

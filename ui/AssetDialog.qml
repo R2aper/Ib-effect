@@ -7,7 +7,7 @@ Rectangle {
     id: assetDialog
 
     property bool isEditMode: false
-    property int editIndex: -1
+    property string editId: ""
     property string initialName: ""
     property string initialCategory: "Информ. система"
     property real initialCost: 1000000
@@ -38,20 +38,20 @@ Rectangle {
 
     function openForAdd() {
         isEditMode = false;
-        editIndex = -1;
+        editId = "";
         nameInput.text = "";
-        costInput.text = DataStore.isIndustrialMode ? "15000000" : "5000000";
-        prioSelector.selectedPrio = DataStore.isIndustrialMode ? 4 : 3;
+        costInput.text = AssetService.industrialMode ? "15000000" : "5000000";
+        prioSelector.selectedPrio = AssetService.industrialMode ? 4 : 3;
         categoryBox.currentIndex = 0;
-        oaBox.currentIndex = DataStore.isIndustrialMode ? 6 : 0; // ОА.006 по умолчанию для АСУ ТП
+        oaBox.currentIndex = AssetService.industrialMode ? 6 : 0;
         updateOaHint();
         errorText.text = "";
         visible = true;
     }
 
-    function openForEdit(index, item) {
+    function openForEdit(item) {
         isEditMode = true;
-        editIndex = index;
+        editId = String(item.id || "");
         nameInput.text = item.name || "";
         costInput.text = item.cost ? item.cost.toString() : "0";
         prioSelector.selectedPrio = item.prio || 3;
@@ -370,12 +370,21 @@ Rectangle {
                             var selOa = oaBox.currentIndex > 0 ? oaList[oaBox.currentIndex] : null;
                             var oaCode = selOa ? selOa.code : "";
                             var oaTitle = selOa ? selOa.title : "";
-                            var domain = selOa ? "OT" : (DataStore.isIndustrialMode ? "OT" : "IT");
+                            var domain = selOa ? "OT" : (AssetService.industrialMode ? "OT" : "IT");
 
+                            var asset = {
+                                name: nameInput.text.trim(),
+                                cat: categoryBox.currentText,
+                                cost: costVal,
+                                prio: prioSelector.selectedPrio,
+                                oaCode: oaCode,
+                                oaTitle: oaTitle,
+                                domain: domain
+                            };
                             if (assetDialog.isEditMode) {
-                                DataStore.updateAsset(assetDialog.editIndex, nameInput.text.trim(), categoryBox.currentText, costVal, prioSelector.selectedPrio, oaCode, oaTitle, domain);
+                                AssetService.update(assetDialog.editId, asset);
                             } else {
-                                DataStore.addAsset(nameInput.text.trim(), categoryBox.currentText, costVal, prioSelector.selectedPrio, oaCode, oaTitle, domain);
+                                AssetService.create(asset);
                             }
                             assetDialog.visible = false;
                         }

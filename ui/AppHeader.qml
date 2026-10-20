@@ -100,8 +100,8 @@ Rectangle {
             implicitHeight: 36
             implicitWidth: domainRow.implicitWidth + 24
             radius: Theme.radiusSm
-            color: domainMouse.containsMouse ? (DataStore.isIndustrialMode ? (Theme.isDark ? "#172b3c" : "#e0f2fe") : Theme.panelHover) : (DataStore.isIndustrialMode ? (Theme.isDark ? "#0f2334" : "#f0f9ff") : Theme.panel)
-            border.color: DataStore.isIndustrialMode ? Theme.teal : Theme.border
+            color: domainMouse.containsMouse ? (AssetService.industrialMode ? (Theme.isDark ? "#172b3c" : "#e0f2fe") : Theme.panelHover) : (AssetService.industrialMode ? (Theme.isDark ? "#0f2334" : "#f0f9ff") : Theme.panel)
+            border.color: AssetService.industrialMode ? Theme.teal : Theme.border
             border.width: 1
 
             Behavior on color { ColorAnimation { duration: 120 } }
@@ -113,20 +113,20 @@ Rectangle {
                 spacing: 8
 
                 Text {
-                    text: DataStore.isIndustrialMode ? "⚡" : "🏢"
+                    text: AssetService.industrialMode ? "⚡" : "🏢"
                     font.pixelSize: 13
                 }
 
                 Text {
-                    text: DataStore.isIndustrialMode ? qsTr("Контур: АСУ ТП (КИИ)") : qsTr("Контур: IT-системы")
-                    color: DataStore.isIndustrialMode ? (Theme.isDark ? Theme.tealLight : Theme.teal) : Theme.text
+                    text: AssetService.industrialMode ? qsTr("Контур: АСУ ТП (КИИ)") : qsTr("Контур: IT-системы")
+                    color: AssetService.industrialMode ? (Theme.isDark ? Theme.tealLight : Theme.teal) : Theme.text
                     font.pixelSize: Theme.fontCaption
                     font.weight: Font.Bold
                 }
 
                 StatusBadge {
-                    text: DataStore.isIndustrialMode ? "ФСТЭК № 239" : "ГОСТ 27005"
-                    level: DataStore.isIndustrialMode ? "teal" : "info"
+                    text: AssetService.industrialMode ? "ФСТЭК № 239" : "ГОСТ 27005"
+                    level: AssetService.industrialMode ? "teal" : "info"
                 }
             }
 
@@ -136,11 +136,7 @@ Rectangle {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
-                    if (DataStore.isIndustrialMode) {
-                        DataStore.loadCorporatePreset();
-                    } else {
-                        DataStore.loadIndustrialPreset();
-                    }
+                    AssetService.loadPreset(!AssetService.industrialMode);
                 }
             }
 
