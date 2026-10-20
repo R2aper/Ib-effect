@@ -10,10 +10,16 @@ Window {
     minimumWidth: 980
     minimumHeight: 680
     visible: true
-    title: qsTr("ИБ-Эффект · Платформа оценки ИБ")
+    title: qsTr("IB-effect")
     color: Theme.background
 
     property int currentTab: 0
+
+    Component.onCompleted: {
+        AssetService.load();
+        RiskService.load();
+        MeasureService.load();
+    }
 
     readonly property var sectionNames: [
         qsTr("Панель эффективности"),
@@ -61,5 +67,29 @@ Window {
 
     AuthModal {
         id: authModal
+    }
+
+    Connections {
+        target: AssetService
+        function onOperationFinished(requestId, operation, success) {
+            if (success && operation !== "assets.list")
+                DashboardService.refresh();
+        }
+    }
+
+    Connections {
+        target: RiskService
+        function onOperationFinished(requestId, operation, success) {
+            if (success && operation !== "risks.list")
+                DashboardService.refresh();
+        }
+    }
+
+    Connections {
+        target: MeasureService
+        function onOperationFinished(requestId, operation, success) {
+            if (success && operation !== "measures.list")
+                DashboardService.refresh();
+        }
     }
 }

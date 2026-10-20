@@ -6,6 +6,23 @@ import QtQuick.Layouts
 Item {
     id: root
 
+    function totalCost() {
+        var total = 0;
+        for (var i = 0; i < MeasureService.items.length; i++)
+            total += Number(MeasureService.items[i].cost) || 0;
+        return total;
+    }
+
+    function averageReduction() {
+        if (MeasureService.items.length === 0) return 0;
+        var total = 0;
+        for (var i = 0; i < MeasureService.items.length; i++) {
+            total += ((MeasureService.items[i].dmgRed || 0) +
+                      (MeasureService.items[i].probRed || 0)) / 2.0;
+        }
+        return Math.round(total / MeasureService.items.length);
+    }
+
     ScrollView {
         anchors.fill: parent
         clip: true
@@ -15,6 +32,19 @@ Item {
         ColumnLayout {
             width: parent.width
             spacing: 20
+
+            Text {
+                visible: MeasureService.loading || RiskService.loading ||
+                         MeasureService.error !== "" || RiskService.error !== ""
+                text: {
+                    if (MeasureService.error) return MeasureService.error;
+                    if (RiskService.error) return RiskService.error;
+                    return qsTr("Загрузка реестров мер и рисков…");
+                }
+                color: MeasureService.error !== "" || RiskService.error !== "" ? Theme.riskCritical : Theme.muted
+                font.pixelSize: Theme.fontCaption
+                Layout.fillWidth: true
+            }
 
             SectionHeading {
                 eyebrow: qsTr("ПОРТФЕЛЬ МЕР ЗАЩИТЫ")
@@ -38,7 +68,7 @@ Item {
 
                 KpiStatCard {
                     label: qsTr("МЕР В ПОРТФЕЛЕ")
-                    value: DataStore.measuresList.length.toString()
+                    value: MeasureService.items.length.toString()
                     delta: "Реестр"
                     deltaIsGood: true
                     note: qsTr("Зарегистрировано защитных мероприятий")
@@ -48,7 +78,7 @@ Item {
 
                 KpiStatCard {
                     label: qsTr("ОБЩИЕ ИНВЕСТИЦИИ В ИБ")
-                    value: (DataStore.totalMeasuresCost >= 1000000 ? (DataStore.totalMeasuresCost / 1000000).toFixed(1) + "M ₽" : (DataStore.totalMeasuresCost / 1000).toFixed(0) + "K ₽")
+                    value: (root.totalCost() >= 1000000 ? (root.totalCost() / 1000000).toFixed(1) + "M ₽" : (root.totalCost() / 1000).toFixed(0) + "K ₽")
                     delta: "CAPEX+OPEX"
                     deltaIsGood: true
                     note: qsTr("Суммарные затраты на внедрение и лицензии")
@@ -59,13 +89,7 @@ Item {
 
                 KpiStatCard {
                     label: qsTr("СРЕДНЕЕ СНИЖЕНИЕ РИСКА")
-                    value: DataStore.measuresList.length > 0 ? ("-" + Math.round((function(){
-                        var s = 0;
-                        for (var i = 0; i < DataStore.measuresList.length; i++) {
-                            s += ((DataStore.measuresList[i].dmgRed || 0) + (DataStore.measuresList[i].probRed || 0)) / 2.0;
-                        }
-                        return s / DataStore.measuresList.length;
-                    })()) + "%") : "0%"
+                    value: "-" + root.averageReduction() + "%"
                     delta: "Эффект"
                     deltaIsGood: true
                     note: qsTr("Прогнозное падение ущерба и вероятности")
@@ -123,7 +147,7 @@ Item {
 
                     RowLayout {
                         spacing: 6
-                        StatusBadge { text: qsTr("Все (") + DataStore.measuresList.length + ")"; level: "info" }
+                        StatusBadge { text: qsTr("Все (") + MeasureService.items.length + ")"; level: "info" }
                     }
 
                     RowLayout {
@@ -155,7 +179,7 @@ Item {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: DataStore.addIndustrialMeasuresPreset()
+                                onClicked: MeasureService.addIndustrialPreset()
                             }
                         }
 
@@ -232,7 +256,7 @@ Item {
 
                     // Строки таблицы
                     Repeater {
-                        model: DataStore.measuresList
+                        model: MeasureService.items
 
                         delegate: Rectangle {
                             id: measureRow
@@ -246,6 +270,14 @@ Item {
 
                             Behavior on color {
                                 ColorAnimation { duration: 100 }
+                            }
+
+                            MouseArea {
+                                id: measureRowMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                propagateComposedEvents: true
                             }
 
                             RowLayout {
@@ -339,7 +371,7 @@ Item {
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: {
                                                 if (measureRow.modelData.boundRiskId) {
-                                                    DataStore.unbindMeasure(measureRow.index);
+                                                    RiskService.unbindMeasure(measureRow.modelData.boundRiskId);
                                                 } else {
                                                     linkRiskDialog.openForLink(measureRow.index, measureRow.modelData);
                                                 }
@@ -397,21 +429,13 @@ Item {
                                             id: delMeasureMouse
                                             anchors.fill: parent
                                             cursorShape: Qt.PointingHandCursor
-                                            onClicked: DataStore.deleteMeasure(measureRow.index)
+                                            onClicked: MeasureService.remove(measureRow.modelData.id)
                                         }
 
                                         ToolTip.visible: delMeasureMouse.containsMouse
                                         ToolTip.text: qsTr("Удалить меру")
                                     }
                                 }
-                            }
-
-                            MouseArea {
-                                id: measureRowMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                propagateComposedEvents: true
                             }
                         }
                     }

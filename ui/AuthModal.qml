@@ -8,13 +8,24 @@ Rectangle {
 
     anchors.fill: parent
     color: Theme.isDark ? "#bb000000" : "#77000000"
-    visible: !DataStore.isAuthenticated
+    visible: !AuthService.authenticated
     z: 9999
 
     Behavior on opacity { NumberAnimation { duration: 200 } }
 
     MouseArea {
         anchors.fill: parent
+    }
+
+    Connections {
+        target: AuthService
+        function onOperationFinished(requestId, operation, success, data, error) {
+            if (requestId !== card.pendingRequestId)
+                return;
+            card.pendingRequestId = "";
+            if (!success)
+                card.errorMessage = error;
+        }
     }
 
     Rectangle {
@@ -41,6 +52,7 @@ Rectangle {
         property bool isRegisterMode: false
         property string audienceType: "student" // "student" | "company"
         property string errorMessage: ""
+        property string pendingRequestId: ""
 
         ColumnLayout {
             id: contentCol
@@ -409,6 +421,14 @@ Rectangle {
                 horizontalAlignment: Text.AlignHCenter
             }
 
+            Text {
+                visible: AuthService.loading
+                text: qsTr("Выполняется запрос…")
+                color: Theme.muted
+                font.pixelSize: Theme.fontCaption
+                Layout.alignment: Qt.AlignHCenter
+            }
+
             // Кнопка подтверждения
             Rectangle {
                 Layout.fillWidth: true
@@ -435,21 +455,36 @@ Rectangle {
                 MouseArea {
                     id: authBtnMouse
                     anchors.fill: parent
+                    enabled: !AuthService.loading
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         card.errorMessage = "";
                         if (card.isRegisterMode) {
                             if (card.audienceType === "student") {
-                                var sRes = DataStore.registerStudent(studentNameField.text, studentGroupField.text, studentUnivField.text, loginField.text, passField.text);
-                                if (!sRes.success) card.errorMessage = sRes.error;
+                                card.pendingRequestId = AuthService.registerUser({
+                                    login: loginField.text.trim(),
+                                    password: passField.text,
+                                    name: studentNameField.text.trim(),
+                                    type: "student",
+                                    group: studentGroupField.text.trim(),
+                                    org: studentUnivField.text.trim() || "СибГУТИ",
+                                    role: "Студент"
+                                });
                             } else {
-                                var cRes = DataStore.registerCompany(companyNameField.text, companyContactField.text, companyDeptField.text, loginField.text, passField.text);
-                                if (!cRes.success) card.errorMessage = cRes.error;
+                                card.pendingRequestId = AuthService.registerUser({
+                                    login: loginField.text.trim(),
+                                    password: passField.text,
+                                    name: companyContactField.text.trim(),
+                                    type: "company",
+                                    group: companyDeptField.text.trim() || "Отдел ИБ",
+                                    org: companyNameField.text.trim(),
+                                    role: "Специалист ИБ"
+                                });
                             }
                         } else {
-                            var logRes = DataStore.login(loginField.text, passField.text, card.audienceType);
-                            if (!logRes.success) card.errorMessage = logRes.error;
+                            card.pendingRequestId = AuthService.login(
+                                loginField.text.trim(), passField.text);
                         }
                     }
                 }

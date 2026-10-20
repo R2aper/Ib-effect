@@ -8,6 +8,8 @@ Rectangle {
 
     property bool isEditMode: false
     property int editIndex: -1
+    property string editMeasureId: ""
+    property string pendingRequestId: ""
 
     anchors.fill: parent
     color: Theme.isDark ? "#aa000000" : "#66000000"
@@ -29,6 +31,7 @@ Rectangle {
     function openForEdit(index, item) {
         isEditMode = true;
         editIndex = index;
+        editMeasureId = item.id;
         nameInput.text = item.name || "";
         costInput.text = item.cost ? item.cost.toString() : "0";
         typeBox.currentIndex = (item.type === "Организационная") ? 1 : 0;
@@ -36,6 +39,20 @@ Rectangle {
         probSlider.value = item.probRed || 60;
         errorText.text = "";
         visible = true;
+    }
+
+    Connections {
+        target: MeasureService
+        function onOperationFinished(requestId, operation, success, data, error) {
+            if (requestId !== measureDialog.pendingRequestId)
+                return;
+            measureDialog.pendingRequestId = "";
+            if (success) {
+                measureDialog.visible = false;
+            } else {
+                errorText.text = error;
+            }
+        }
     }
 
     MouseArea { anchors.fill: parent }
@@ -265,12 +282,21 @@ Rectangle {
                                 return;
                             }
                             var costVal = parseFloat(costInput.text) || 0;
+                            var entity = {
+                                name: nameInput.text.trim(),
+                                type: typeBox.currentText,
+                                cost: costVal,
+                                dmgRed: Math.round(dmgSlider.value),
+                                probRed: Math.round(probSlider.value),
+                                domain: AssetService.industrialMode ? "OT" : "IT"
+                            };
+                            var requestId;
                             if (measureDialog.isEditMode) {
-                                DataStore.updateMeasure(measureDialog.editIndex, nameInput.text.trim(), typeBox.currentText, costVal, Math.round(dmgSlider.value), Math.round(probSlider.value));
+                                requestId = MeasureService.update(measureDialog.editMeasureId, entity);
                             } else {
-                                DataStore.addMeasure(nameInput.text.trim(), typeBox.currentText, costVal, Math.round(dmgSlider.value), Math.round(probSlider.value));
+                                requestId = MeasureService.create(entity);
                             }
-                            measureDialog.visible = false;
+                            measureDialog.pendingRequestId = requestId;
                         }
                     }
                 }

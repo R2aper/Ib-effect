@@ -4,6 +4,22 @@ import QtQuick.Effects
 import QtQuick.Layouts
 
 ScrollView {
+    function getLevelByScore(score) {
+        if (score > 32) return "critical";
+        if (score > 16) return "high";
+        if (score > 8) return "medium";
+        return "low";
+    }
+
+    function getLevelName(level) {
+        if (level === "critical") return qsTr("Критический");
+        if (level === "high") return qsTr("Высокий");
+        if (level === "medium") return qsTr("Средний");
+        return qsTr("Низкий");
+    }
+
+    Component.onCompleted: DashboardService.refresh()
+
     clip: true
     padding: 24
     contentWidth: availableWidth
@@ -12,6 +28,13 @@ ScrollView {
         width: parent.width
         spacing: 24
         Item { Layout.preferredHeight: 2 }
+        Text {
+            visible: DashboardService.loading || DashboardService.error !== ""
+            text: DashboardService.loading ? qsTr("Загрузка сводки…") : DashboardService.error
+            color: DashboardService.error !== "" ? Theme.riskCritical : Theme.muted
+            font.pixelSize: Theme.fontCaption
+            Layout.fillWidth: true
+        }
 
         // --- ВЕРХНИЙ ПРЕДСТАВИТЕЛЬСКИЙ БАННЕР (ЧИСТЫЙ ENTERPRISE B2B, БЕЗ КИБЕРПАНКА) ---
         Item {
@@ -198,7 +221,7 @@ ScrollView {
 
             KpiStatCard {
                 label: qsTr("АКТИВЫ НА ЗАЩИТЕ")
-                value: DataStore.assetsList.length.toString()
+                value: (DashboardService.summary.assetCount || 0).toString()
                 delta: "Реестр"
                 deltaIsGood: true
                 note: qsTr("Критические системы и СУБД")
@@ -207,18 +230,18 @@ ScrollView {
 
             KpiStatCard {
                 label: qsTr("ВЫЯВЛЕННЫЕ РИСКИ")
-                value: DataStore.risksList.length.toString()
-                delta: DataStore.criticalRisksCount + " крит."
+                value: (DashboardService.summary.riskCount || 0).toString()
+                delta: (DashboardService.summary.criticalRisksCount || 0) + " крит."
                 deltaIsGood: false
-                note: DataStore.criticalRisksCount + qsTr(" критических требуют нейтрализации")
+                note: (DashboardService.summary.criticalRisksCount || 0) + qsTr(" критических требуют нейтрализации")
                 accentColor: Theme.riskCritical
                 valueColor: Theme.riskCritical
             }
 
             KpiStatCard {
                 label: qsTr("ПОРТФЕЛЬ МЕР ЗАЩИТЫ")
-                value: DataStore.measuresList.length.toString()
-                delta: (DataStore.totalMeasuresCost >= 1000000 ? (DataStore.totalMeasuresCost / 1000000).toFixed(1) + "M ₽" : (DataStore.totalMeasuresCost / 1000).toFixed(0) + "K ₽")
+                value: (DashboardService.summary.measureCount || 0).toString()
+                delta: ((DashboardService.summary.totalMeasuresCost || 0) >= 1000000 ? ((DashboardService.summary.totalMeasuresCost || 0) / 1000000).toFixed(1) + "M ₽" : ((DashboardService.summary.totalMeasuresCost || 0) / 1000).toFixed(0) + "K ₽")
                 deltaIsGood: true
                 note: qsTr("Инвестиции в безопасность")
                 accentColor: Theme.green
@@ -227,10 +250,10 @@ ScrollView {
 
             KpiStatCard {
                 label: qsTr("ПРОГНОЗНЫЙ ROSI")
-                value: (DataStore.rosi >= 0 ? "+" : "") + DataStore.rosi + "%"
-                delta: DataStore.rosi >= 0 ? "Окупаем" : "Неокупаем"
-                deltaIsGood: DataStore.rosi >= 0
-                note: qsTr("Чистый эффект: ") + (DataStore.netBenefit >= 1000000 ? (DataStore.netBenefit / 1000000).toFixed(1) + "M ₽" : (DataStore.netBenefit / 1000).toFixed(0) + "K ₽")
+                value: ((DashboardService.summary.rosi || 0) >= 0 ? "+" : "") + (DashboardService.summary.rosi || 0) + "%"
+                delta: (DashboardService.summary.rosi || 0) >= 0 ? "Окупаем" : "Неокупаем"
+                deltaIsGood: (DashboardService.summary.rosi || 0) >= 0
+                note: qsTr("Чистый эффект: ") + ((DashboardService.summary.netBenefit || 0) >= 1000000 ? ((DashboardService.summary.netBenefit || 0) / 1000000).toFixed(1) + "M ₽" : ((DashboardService.summary.netBenefit || 0) / 1000).toFixed(0) + "K ₽")
                 accentColor: Theme.teal
                 valueColor: Theme.isDark ? Theme.tealLight : Theme.teal
             }
@@ -245,18 +268,18 @@ ScrollView {
 
             RiskGauge {
                 title: qsTr("Интегральный уровень риска")
-                score: Math.round(DataStore.averageScore)
+                score: Math.round(DashboardService.summary.averageScore || 0)
                 maxScore: 64
-                statusText: DataStore.getLevelName(DataStore.getLevelByScore(DataStore.averageScore))
-                statusLevel: DataStore.getLevelByScore(DataStore.averageScore)
+                statusText: getLevelName(getLevelByScore(DashboardService.summary.averageScore || 0))
+                statusLevel: getLevelByScore(DashboardService.summary.averageScore || 0)
             }
 
             DistributionBar {
                 title: qsTr("Распределение рисков по критичности")
-                criticalCount: DataStore.criticalRisksCount
-                highCount: DataStore.highRisksCount
-                mediumCount: DataStore.mediumRisksCount
-                lowCount: DataStore.lowRisksCount
+                criticalCount: DashboardService.summary.criticalRisksCount || 0
+                highCount: DashboardService.summary.highRisksCount || 0
+                mediumCount: DashboardService.summary.mediumRisksCount || 0
+                lowCount: DashboardService.summary.lowRisksCount || 0
             }
         }
 

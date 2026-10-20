@@ -6,6 +6,29 @@ import QtQuick.Layouts
 Item {
     id: root
 
+    function countByLevel(level) {
+        var count = 0;
+        for (var i = 0; i < RiskService.items.length; i++) {
+            if (RiskService.items[i].scoreLevel === level) count++;
+        }
+        return count;
+    }
+
+    function boundRiskCount() {
+        var count = 0;
+        for (var i = 0; i < RiskService.items.length; i++) {
+            if (RiskService.items[i].boundMeasureId) count++;
+        }
+        return count;
+    }
+
+    function levelName(level) {
+        if (level === "critical") return qsTr("Критический");
+        if (level === "high") return qsTr("Высокий");
+        if (level === "medium") return qsTr("Средний");
+        return qsTr("Низкий");
+    }
+
     ScrollView {
         anchors.fill: parent
         clip: true
@@ -15,6 +38,14 @@ Item {
         ColumnLayout {
             width: parent.width
             spacing: 20
+
+            Text {
+                visible: RiskService.loading || RiskService.error !== ""
+                text: RiskService.loading ? qsTr("Загрузка реестра рисков…") : RiskService.error
+                color: RiskService.error !== "" ? Theme.riskCritical : Theme.muted
+                font.pixelSize: Theme.fontCaption
+                Layout.fillWidth: true
+            }
 
             SectionHeading {
                 eyebrow: qsTr("РЕЕСТР РИСКОВ И УГРОЗ")
@@ -38,7 +69,7 @@ Item {
 
                 KpiStatCard {
                     label: qsTr("ВСЕГО РИСКОВ")
-                    value: DataStore.risksList.length.toString()
+                    value: RiskService.items.length.toString()
                     delta: "Реестр"
                     deltaIsGood: true
                     note: qsTr("Зарегистрировано в реестре СУИБ")
@@ -47,7 +78,7 @@ Item {
 
                 KpiStatCard {
                     label: qsTr("КРИТИЧЕСКИЕ РИСКИ")
-                    value: DataStore.criticalRisksCount.toString()
+                    value: root.countByLevel("critical").toString()
                     delta: "Балл > 32"
                     deltaIsGood: false
                     note: qsTr("Требуют немедленной нейтрализации")
@@ -57,7 +88,7 @@ Item {
 
                 KpiStatCard {
                     label: qsTr("ВЫСОКИЙ УРОВЕНЬ")
-                    value: DataStore.highRisksCount.toString()
+                    value: root.countByLevel("high").toString()
                     delta: "Балл 17–32"
                     deltaIsGood: false
                     note: qsTr("Включены в план обработки рисков")
@@ -69,18 +100,10 @@ Item {
                     label: qsTr("ПОД КОНТРОЛЕМ")
                     value: {
                         var cnt = 0;
-                        for (var i = 0; i < DataStore.risksList.length; i++) {
-                            if (DataStore.risksList[i].boundMeasureId) cnt++;
-                        }
+                        cnt = root.boundRiskCount();
                         return cnt.toString();
                     }
-                    delta: DataStore.risksList.length > 0 ? (Math.round((function(){
-                        var cnt = 0;
-                        for (var i = 0; i < DataStore.risksList.length; i++) {
-                            if (DataStore.risksList[i].boundMeasureId) cnt++;
-                        }
-                        return (cnt / DataStore.risksList.length) * 100;
-                    })()) + "% реестра") : "0%"
+                    delta: RiskService.items.length > 0 ? (Math.round((root.boundRiskCount() / RiskService.items.length) * 100) + "% реестра") : "0%"
                     deltaIsGood: true
                     note: qsTr("Назначены компенсирующие меры")
                     accentColor: Theme.green
@@ -136,9 +159,9 @@ Item {
 
                     RowLayout {
                         spacing: 6
-                        StatusBadge { text: qsTr("Все (") + DataStore.risksList.length + ")"; level: "info" }
-                        StatusBadge { text: qsTr("Крит. (") + DataStore.criticalRisksCount + ")"; level: "critical" }
-                        StatusBadge { text: qsTr("Выс. (") + DataStore.highRisksCount + ")"; level: "high" }
+                        StatusBadge { text: qsTr("Все (") + RiskService.items.length + ")"; level: "info" }
+                        StatusBadge { text: qsTr("Крит. (") + root.countByLevel("critical") + ")"; level: "critical" }
+                        StatusBadge { text: qsTr("Выс. (") + root.countByLevel("high") + ")"; level: "high" }
                     }
 
                     RowLayout {
@@ -246,7 +269,7 @@ Item {
 
                     // Строки таблицы
                     Repeater {
-                        model: DataStore.risksList
+                        model: RiskService.items
 
                         delegate: Rectangle {
                             id: riskRow
@@ -323,7 +346,7 @@ Item {
                                 }
 
                                 StatusBadge {
-                                    text: riskRow.modelData.score + " · " + DataStore.getLevelName(riskRow.modelData.scoreLevel)
+                                    text: riskRow.modelData.score + " · " + root.levelName(riskRow.modelData.scoreLevel)
                                     level: riskRow.modelData.scoreLevel
                                     Layout.preferredWidth: 125
                                 }
@@ -393,7 +416,7 @@ Item {
                                             id: delRiskMouse
                                             anchors.fill: parent
                                             cursorShape: Qt.PointingHandCursor
-                                            onClicked: DataStore.deleteRisk(riskRow.index)
+                                            onClicked: RiskService.remove(riskRow.modelData.id)
                                         }
 
                                         ToolTip.visible: delRiskMouse.containsMouse

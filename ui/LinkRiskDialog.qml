@@ -8,6 +8,9 @@ Rectangle {
 
     property int measureIndex: -1
     property var measureItem: null
+    property var availableRisks: []
+    property string pendingRequestId: ""
+    property string operationError: ""
 
     anchors.fill: parent
     color: Theme.isDark ? "#aa000000" : "#66000000"
@@ -17,18 +20,38 @@ Rectangle {
     function openForLink(index, item) {
         measureIndex = index;
         measureItem = item;
+        operationError = "";
         populateRisks();
         visible = true;
     }
 
     function populateRisks() {
         var names = [];
-        for (var r = 0; r < DataStore.risksList.length; r++) {
-            var rsk = DataStore.risksList[r];
-            names.push(rsk.id + " · " + rsk.threat.substring(0, 45) + "... (Балл: " + rsk.score + ")");
+        var risks = [];
+        for (var r = 0; r < RiskService.items.length; r++) {
+            var rsk = RiskService.items[r];
+            if (!rsk.boundMeasureId || rsk.boundMeasureId === measureItem.id) {
+                risks.push(rsk);
+                names.push(rsk.id + " · " + rsk.threat.substring(0, 45) + "... (Балл: " + rsk.score + ")");
+            }
         }
+        availableRisks = risks;
         riskPicker.model = names;
-        if (names.length > 0) riskPicker.currentIndex = 0;
+        riskPicker.currentIndex = names.length > 0 ? 0 : -1;
+    }
+
+    Connections {
+        target: RiskService
+        function onOperationFinished(requestId, operation, success, data, error) {
+            if (requestId !== linkDialog.pendingRequestId)
+                return;
+            linkDialog.pendingRequestId = "";
+            if (success) {
+                linkDialog.visible = false;
+            } else {
+                linkDialog.operationError = error;
+            }
+        }
     }
 
     MouseArea { anchors.fill: parent }
@@ -126,6 +149,15 @@ Rectangle {
                     id: riskPicker
                     Layout.fillWidth: true
                 }
+
+                Text {
+                    visible: linkDialog.availableRisks.length === 0
+                    text: qsTr("Нет свободных рисков для привязки. Сначала отвяжите меру от занятого риска.")
+                    color: Theme.muted
+                    font.pixelSize: Theme.fontCaption
+                    wrapMode: Text.Wrap
+                    Layout.fillWidth: true
+                }
             }
 
             // Карточка прогноза эффекта
@@ -146,7 +178,7 @@ Rectangle {
                         Text { text: qsTr("Базовый балл риска"); color: Theme.muted; font.pixelSize: Theme.fontMicro }
                         Text {
                             text: {
-                                var r = DataStore.risksList[riskPicker.currentIndex];
+                                var r = linkDialog.availableRisks[riskPicker.currentIndex];
                                 return r ? (r.score + " баллов") : "—";
                             }
                             color: Theme.riskHigh
@@ -162,7 +194,7 @@ Rectangle {
                         Text { text: qsTr("Остаточный балл после меры"); color: Theme.muted; font.pixelSize: Theme.fontMicro }
                         Text {
                             text: {
-                                var r = DataStore.risksList[riskPicker.currentIndex];
+                                var r = linkDialog.availableRisks[riskPicker.currentIndex];
                                 var m = linkDialog.measureItem;
                                 if (r && m) {
                                     var resI = r.impact * (1.0 - m.dmgRed / 100.0);
@@ -178,6 +210,15 @@ Rectangle {
                         }
                     }
                 }
+            }
+
+            Text {
+                visible: linkDialog.operationError !== "" || RiskService.loading
+                text: RiskService.loading ? qsTr("Обновление связи…") : linkDialog.operationError
+                color: linkDialog.operationError !== "" ? Theme.riskCritical : Theme.muted
+                font.pixelSize: Theme.fontCaption
+                wrapMode: Text.Wrap
+                Layout.fillWidth: true
             }
 
             // Кнопки
@@ -219,6 +260,9 @@ Rectangle {
                     implicitHeight: 38
                     radius: Theme.radiusSm
                     color: linkBtnMouse.containsMouse ? Theme.accentGlow : Theme.accent
+                    enabled: linkDialog.availableRisks.length > 0 &&
+                             linkDialog.pendingRequestId === ""
+                    opacity: enabled ? 1 : 0.5
 
                     Text {
                         id: linkBtnText
@@ -235,10 +279,13 @@ Rectangle {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            if (riskPicker.currentIndex >= 0) {
-                                DataStore.bindMeasureToRisk(linkDialog.measureIndex, riskPicker.currentIndex);
+                            var risk = linkDialog.availableRisks[riskPicker.currentIndex];
+                            if (risk && linkDialog.measureItem) {
+                                linkDialog.pendingRequestId = RiskService.bindMeasure(
+                                    risk.id, linkDialog.measureItem.id);
+                            } else {
+                                linkDialog.operationError = qsTr("Выберите риск для привязки");
                             }
-                            linkDialog.visible = false;
                         }
                     }
                 }

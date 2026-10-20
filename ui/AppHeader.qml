@@ -189,8 +189,17 @@ Rectangle {
 
         // --- СТАТУС / ТИП ПРОФИЛЯ ---
         StatusBadge {
-            text: DataStore.currentUser.type === "company" ? qsTr("🏢 Организация") : qsTr("🎓 Студент")
-            level: DataStore.currentUser.type === "company" ? "teal" : "info"
+            text: AuthService.user.type === "company" ? qsTr("🏢 Организация") : qsTr("🎓 Студент")
+            level: AuthService.user.type === "company" ? "teal" : "info"
+        }
+
+        Text {
+            visible: AuthService.loading || AuthService.error !== ""
+            text: AuthService.loading ? qsTr("Обновление профиля…") : AuthService.error
+            color: AuthService.error !== "" ? Theme.riskCritical : Theme.muted
+            font.pixelSize: Theme.fontMicro
+            elide: Text.ElideRight
+            Layout.maximumWidth: 180
         }
 
         // --- ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ ---
@@ -220,7 +229,7 @@ Rectangle {
 
                     Text {
                         anchors.centerIn: parent
-                        text: DataStore.currentUser.name ? DataStore.currentUser.name.charAt(0) : "И"
+                        text: AuthService.user.name ? AuthService.user.name.charAt(0) : "И"
                         color: "#ffffff"
                         font.pixelSize: 10
                         font.weight: Font.Bold
@@ -230,17 +239,17 @@ Rectangle {
                 ColumnLayout {
                     spacing: 0
                     Text {
-                        text: DataStore.currentUser.name || qsTr("Пользователь")
+                        text: AuthService.user.name || qsTr("Пользователь")
                         color: Theme.text
                         font.pixelSize: Theme.fontCaption
                         font.weight: Font.Bold
                     }
                     Text {
                         text: {
-                            if (DataStore.currentUser.type === "company") {
-                                return (DataStore.currentUser.org ? (DataStore.currentUser.org + " · ") : "") + (DataStore.currentUser.group || qsTr("Отдел ИБ"));
+                            if (AuthService.user.type === "company") {
+                                return (AuthService.user.org ? (AuthService.user.org + " · ") : "") + (AuthService.user.group || qsTr("Отдел ИБ"));
                             } else {
-                                return (DataStore.currentUser.group ? (DataStore.currentUser.group + " · ") : "") + (DataStore.currentUser.org || "СибГУТИ");
+                                return (AuthService.user.group ? (AuthService.user.group + " · ") : "") + (AuthService.user.org || "СибГУТИ");
                             }
                         }
                         color: Theme.muted
@@ -254,12 +263,12 @@ Rectangle {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onClicked: DataStore.logout()
+                onClicked: AuthService.logout()
             }
 
             ToolTip.visible: profileMouse.containsMouse
             ToolTip.delay: 300
-            ToolTip.text: qsTr("Вы вошли как: %1. Нажмите для смены профиля / выхода").arg(DataStore.currentUser.name)
+            ToolTip.text: qsTr("Вы вошли как: %1. Нажмите для смены профиля / выхода").arg(AuthService.user.name)
         }
     }
 }

@@ -2,13 +2,17 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
+import "BduData.js" as BduData
 
 Rectangle {
     id: riskDialog
 
     property bool isEditMode: false
     property int editIndex: -1
+    property string editRiskId: ""
     property var currentSuggestedThreats: []
+    property string selectedThreatCode: ""
+    property string pendingRequestId: ""
 
     anchors.fill: parent
     color: Theme.isDark ? "#aa000000" : "#66000000"
@@ -20,6 +24,7 @@ Rectangle {
         editIndex = -1;
         threatInput.text = "";
         vulnInput.text = "";
+        selectedThreatCode = "";
         impactSelector.selectedVal = 3;
         probSelector.selectedVal = 3;
         populateAssets();
@@ -31,13 +36,15 @@ Rectangle {
     function openForEdit(index, item) {
         isEditMode = true;
         editIndex = index;
+        editRiskId = item.id;
         threatInput.text = item.threat || "";
         vulnInput.text = item.vuln || "";
+        selectedThreatCode = item.threatCode || "";
         impactSelector.selectedVal = item.impact || 3;
         probSelector.selectedVal = item.probability || 3;
         populateAssets();
-        for (var i = 0; i < assetBox.model.length; i++) {
-            if (DataStore.assetsList[i] && DataStore.assetsList[i].id === item.assetId) {
+        for (var i = 0; i < AssetService.items.length; i++) {
+            if (AssetService.items[i].id === item.assetId) {
                 assetBox.currentIndex = i;
                 break;
             }
@@ -49,8 +56,8 @@ Rectangle {
 
     function populateAssets() {
         var names = [];
-        for (var a = 0; a < DataStore.assetsList.length; a++) {
-            var ast = DataStore.assetsList[a];
+        for (var a = 0; a < AssetService.items.length; a++) {
+            var ast = AssetService.items[a];
             var oaTag = ast.oaCode ? ("[" + ast.oaCode + "] ") : "";
             names.push(oaTag + ast.id + " · " + ast.name + " (Приоритет: " + ast.prio + ")");
         }
@@ -60,13 +67,13 @@ Rectangle {
 
     function updateThreatSuggestions() {
         var aIdx = assetBox.currentIndex;
-        var asset = DataStore.assetsList[aIdx];
+        var asset = AssetService.items[aIdx];
         var suggestions = [];
         var titles = [qsTr("— Выбрать угрозу из классификатора ФСТЭК —")];
 
         if (asset && asset.oaCode) {
             // АСУ ТП актив с кодом ОА
-            var threats = DataStore.getThreatsForAssetOa(asset.oaCode);
+            var threats = BduData.getThreatsForObject(asset.oaCode);
             for (var i = 0; i < threats.length; i++) {
                 var th = threats[i];
                 suggestions.push({
@@ -80,7 +87,7 @@ Rectangle {
             }
         } else {
             // Корпоративный IT актив -> выборка из 227 УБИ
-            var itTh = DataStore.bduThreatsIT;
+            var itTh = BduData.getItThreats();
             var sampleCount = Math.min(25, itTh.length);
             for (var j = 0; j < sampleCount; j++) {
                 var it = itTh[j];
@@ -93,10 +100,39 @@ Rectangle {
                 });
                 titles.push(it.id + " · " + it.name);
             }
+
         }
         currentSuggestedThreats = suggestions;
         threatPickerBox.model = titles;
         threatPickerBox.currentIndex = 0;
+    }
+
+    function levelByScore(score) {
+        if (score > 32) return "critical";
+        if (score > 16) return "high";
+        if (score > 8) return "medium";
+        return "low";
+    }
+
+    function levelName(level) {
+        if (level === "critical") return qsTr("Критический");
+        if (level === "high") return qsTr("Высокий");
+        if (level === "medium") return qsTr("Средний");
+        return qsTr("Низкий");
+    }
+
+    Connections {
+        target: RiskService
+        function onOperationFinished(requestId, operation, success, data, error) {
+            if (requestId !== riskDialog.pendingRequestId)
+                return;
+            riskDialog.pendingRequestId = "";
+            if (success) {
+                riskDialog.visible = false;
+            } else {
+                errorText.text = error;
+            }
+        }
     }
 
     MouseArea { anchors.fill: parent }
@@ -185,6 +221,7 @@ Rectangle {
                     onActivated: {
                         if (currentIndex > 0 && currentSuggestedThreats.length >= currentIndex) {
                             var sel = currentSuggestedThreats[currentIndex - 1];
+                            riskDialog.selectedThreatCode = sel.code;
                             threatInput.text = sel.title;
                             vulnInput.text = sel.vuln;
                             impactSelector.selectedVal = sel.defImpact;
@@ -345,14 +382,14 @@ Rectangle {
                     anchors.centerIn: parent
                     spacing: 12
                     Text {
-                        text: qsTr("Расчетный балл: ") + (impactSelector.selectedVal * probSelector.selectedVal * (DataStore.assetsList[assetBox.currentIndex] ? DataStore.assetsList[assetBox.currentIndex].prio : 3))
+                        text: qsTr("Расчетный балл: ") + (impactSelector.selectedVal * probSelector.selectedVal * (AssetService.items[assetBox.currentIndex] ? AssetService.items[assetBox.currentIndex].prio : 3))
                         color: Theme.text
                         font.pixelSize: Theme.fontBody
                         font.weight: Font.Bold
                     }
                     StatusBadge {
-                        text: DataStore.getLevelName(DataStore.getLevelByScore(impactSelector.selectedVal * probSelector.selectedVal * (DataStore.assetsList[assetBox.currentIndex] ? DataStore.assetsList[assetBox.currentIndex].prio : 3)))
-                        level: DataStore.getLevelByScore(impactSelector.selectedVal * probSelector.selectedVal * (DataStore.assetsList[assetBox.currentIndex] ? DataStore.assetsList[assetBox.currentIndex].prio : 3))
+                        text: riskDialog.levelName(riskDialog.levelByScore(impactSelector.selectedVal * probSelector.selectedVal * (AssetService.items[assetBox.currentIndex] ? AssetService.items[assetBox.currentIndex].prio : 3)))
+                        level: riskDialog.levelByScore(impactSelector.selectedVal * probSelector.selectedVal * (AssetService.items[assetBox.currentIndex] ? AssetService.items[assetBox.currentIndex].prio : 3))
                     }
                 }
             }
@@ -423,12 +460,33 @@ Rectangle {
                                 errorText.text = qsTr("Укажите сценарий угрозы");
                                 return;
                             }
-                            if (riskDialog.isEditMode) {
-                                DataStore.updateRisk(riskDialog.editIndex, threatInput.text.trim(), vulnInput.text.trim(), impactSelector.selectedVal, probSelector.selectedVal);
-                            } else {
-                                DataStore.addRisk(threatInput.text.trim(), vulnInput.text.trim(), assetBox.currentIndex, impactSelector.selectedVal, probSelector.selectedVal);
+                            if (!riskDialog.isEditMode && !AssetService.items[assetBox.currentIndex]) {
+                                errorText.text = qsTr("Сначала загрузите или создайте актив");
+                                return;
                             }
-                            riskDialog.visible = false;
+                            var requestId;
+                            if (riskDialog.isEditMode) {
+                                requestId = RiskService.update(riskDialog.editRiskId, {
+                                    threat: threatInput.text.trim(),
+                                    threatCode: riskDialog.selectedThreatCode,
+                                    vuln: vulnInput.text.trim(),
+                                    impact: impactSelector.selectedVal,
+                                    probability: probSelector.selectedVal
+                                });
+                            } else {
+                                var asset = AssetService.items[assetBox.currentIndex];
+                                requestId = RiskService.create({
+                                    threat: threatInput.text.trim(),
+                                    threatCode: riskDialog.selectedThreatCode,
+                                    vuln: vulnInput.text.trim(),
+                                    assetId: asset.id,
+                                    assetName: asset.name,
+                                    assetPriority: asset.prio,
+                                    impact: impactSelector.selectedVal,
+                                    probability: probSelector.selectedVal
+                                });
+                            }
+                            riskDialog.pendingRequestId = requestId;
                         }
                     }
                 }

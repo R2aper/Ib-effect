@@ -35,6 +35,8 @@ private:
   QVariantMap m_user;
   bool m_authenticated = false;
   QHash<QString, QVariantList> m_collections;
+  QHash<QString, QString> m_passwords;
+  QHash<QString, QVariantMap> m_users;
 };
 
 class HttpDataProvider final : public DataProvider {
@@ -112,6 +114,7 @@ class EntityService : public ServiceBase {
 
 public:
   QVariantList items() const;
+  void syncCollections(const QVariantMap &collections);
 
   Q_INVOKABLE QString load();
   Q_INVOKABLE QString create(const QVariantMap &entity);
@@ -153,7 +156,8 @@ public:
   explicit RiskService(DataProvider *provider, QObject *parent = nullptr);
 
   Q_INVOKABLE QString importScenario(const QString &scenarioCode,
-                                     const QString &assetId);
+                                     const QString &assetId,
+                                     const QVariantMap &scenario);
   Q_INVOKABLE QString bindMeasure(const QString &riskId,
                                   const QString &measureId);
   Q_INVOKABLE QString unbindMeasure(const QString &riskId);
@@ -163,6 +167,8 @@ class MeasureService final : public EntityService {
   Q_OBJECT
 public:
   explicit MeasureService(DataProvider *provider, QObject *parent = nullptr);
+
+  Q_INVOKABLE QString addIndustrialPreset();
 };
 
 class DashboardService final : public ServiceBase {

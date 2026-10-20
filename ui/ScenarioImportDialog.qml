@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
+import "BduData.js" as BduData
 
 Rectangle {
     id: scenarioDialog
@@ -12,9 +13,12 @@ Rectangle {
     z: 999
 
     signal scenarioImported(int count)
+    property string pendingRequestId: ""
+    property string operationError: ""
 
     function openDialog() {
         populateAssets();
+        operationError = "";
         scenarioBox.currentIndex = 0;
         updateScenarioPreview();
         visible = true;
@@ -22,8 +26,8 @@ Rectangle {
 
     function populateAssets() {
         var names = [];
-        for (var a = 0; a < DataStore.assetsList.length; a++) {
-            var ast = DataStore.assetsList[a];
+        for (var a = 0; a < AssetService.items.length; a++) {
+            var ast = AssetService.items[a];
             var prefix = ast.oaCode ? ("[" + ast.oaCode + "] ") : "";
             names.push(prefix + ast.id + " · " + ast.name);
         }
@@ -32,13 +36,28 @@ Rectangle {
     }
 
     function updateScenarioPreview() {
-        var scList = DataStore.bduScenarios;
+        var scList = BduData.getAsutpScenarios();
         if (!scList || scList.length === 0) return;
         var sc = scList[scenarioBox.currentIndex];
         if (sc) {
             scenarioTitleText.text = sc.title;
             scenarioTypeText.text = sc.scenario_type || qsTr("Типовой сценарий АСУ ТП");
             stepsRepeater.model = sc.steps || [];
+        }
+    }
+
+    Connections {
+        target: RiskService
+        function onOperationFinished(requestId, operation, success, data, error) {
+            if (requestId !== scenarioDialog.pendingRequestId)
+                return;
+            scenarioDialog.pendingRequestId = "";
+            if (success) {
+                scenarioDialog.scenarioImported(data.count || 0);
+                scenarioDialog.visible = false;
+            } else {
+                scenarioDialog.operationError = error;
+            }
         }
     }
 
@@ -117,7 +136,7 @@ Rectangle {
                     Layout.fillWidth: true
                     model: {
                         var titles = [];
-                        var scList = DataStore.bduScenarios;
+                        var scList = BduData.getAsutpScenarios();
                         for (var i = 0; i < scList.length; i++) {
                             titles.push((scList[i].code ? ("[" + scList[i].code + "] ") : "") + scList[i].title);
                         }
@@ -246,6 +265,15 @@ Rectangle {
                 }
             }
 
+            Text {
+                visible: scenarioDialog.operationError !== "" || RiskService.loading
+                text: RiskService.loading ? qsTr("Импорт сценария…") : scenarioDialog.operationError
+                color: scenarioDialog.operationError !== "" ? Theme.riskCritical : Theme.muted
+                font.pixelSize: Theme.fontCaption
+                wrapMode: Text.Wrap
+                Layout.fillWidth: true
+            }
+
             // Кнопки действия
             RowLayout {
                 Layout.fillWidth: true
@@ -301,13 +329,15 @@ Rectangle {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            var scList = DataStore.bduScenarios;
+                            var scList = BduData.getAsutpScenarios();
                             var sc = scList[scenarioBox.currentIndex];
-                            if (sc) {
-                                var count = DataStore.importScenario(sc.code || sc.title, targetAssetBox.currentIndex);
-                                scenarioDialog.scenarioImported(count);
+                            var asset = AssetService.items[targetAssetBox.currentIndex];
+                            if (!sc || !asset) {
+                                scenarioDialog.operationError = qsTr("Выберите сценарий и актив");
+                                return;
                             }
-                            scenarioDialog.visible = false;
+                            scenarioDialog.pendingRequestId = RiskService.importScenario(
+                                sc.code || sc.title, asset.id, sc);
                         }
                     }
                 }

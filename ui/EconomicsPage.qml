@@ -202,8 +202,8 @@ ScrollView {
                     }
 
                     StatusBadge {
-                        text: DataStore.isIndustrialMode ? qsTr("Промышленный контур АСУ ТП") : qsTr("Корпоративный IT-контур")
-                        level: DataStore.isIndustrialMode ? "teal" : "info"
+                        text: AssetService.industrialMode ? qsTr("Промышленный контур АСУ ТП") : qsTr("Корпоративный IT-контур")
+                        level: AssetService.industrialMode ? "teal" : "info"
                     }
                 }
 
@@ -252,8 +252,8 @@ ScrollView {
                 var dateStr = now.toLocaleDateString() + " " + now.toLocaleTimeString();
 
                 md += "# МОДЕЛЬ УГРОЗ БЕЗОПАСНОСТИ ИНФОРМАЦИИ И РАСЧЕТ ЭКОНОМИЧЕСКОГО ЭФФЕКТА СУИБ\n\n";
-                md += "**Организация:** " + (DataStore.currentUser.org || "СибГУТИ / Промышленное предприятие") + "\n";
-                md += "**Ответственный исполнитель:** " + (DataStore.currentUser.name || "Иван Остренко") + " (" + (DataStore.currentUser.role || "Специалист ИБ") + ")\n";
+                md += "**Организация:** " + (AuthService.user.org || "СибГУТИ / Промышленное предприятие") + "\n";
+                md += "**Ответственный исполнитель:** " + (AuthService.user.name || "Иван Остренко") + " (" + (AuthService.user.role || "Специалист ИБ") + ")\n";
                 md += "**Дата формирования:** " + dateStr + "\n";
                 md += "**Нормативная основа:** ГОСТ 19.505-79 (Руководство оператора), Методика моделирования угроз ФСТЭК России от 05.02.2021, ГОСТ Р ИСО/МЭК 27005-2010, ГОСТ Р 57580.3-2022, Приказ ФСТЭК России № 239.\n\n";
                 md += "---\n\n";
@@ -297,7 +297,7 @@ ScrollView {
                 md += "* **Коэффициент окупаемости Net ROSI:** **" + (DataStore.rosi >= 0 ? "+" : "") + DataStore.rosi + "%**\n";
                 md += "* **Мультипликатор возврата инвестиций:** **" + DataStore.multiplier + "**\n\n";
 
-                if (DataStore.isIndustrialMode) {
+                if (AssetService.industrialMode) {
                     md += "### Экономика простоя технологического процесса (Downtime Economics):\n";
                     md += "* Стоимость 1 часа аварийного останова производственной линии: " + DataStore.downtimeHourlyCost.toLocaleString() + " ₽/час\n";
                     md += "* Среднее расчетное время восстановления АСУ ТП (MTTR): " + DataStore.mttrHours + " часов\n";

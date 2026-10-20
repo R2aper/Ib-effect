@@ -32,8 +32,6 @@ Item {
                 || String(item.oaCode || "").toLowerCase().indexOf(query) !== -1;
     }
 
-    Component.onCompleted: AssetService.load()
-
     ScrollView {
         anchors.fill: parent
         clip: true
