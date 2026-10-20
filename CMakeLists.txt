@@ -85,6 +85,8 @@ set(IBE_SVG_ICONS
 
 qt_add_executable(Ibe
     main.cpp
+    appservices.h
+    appservices.cpp
 )
 
 qt_add_qml_module(Ibe
@@ -95,8 +97,7 @@ qt_add_qml_module(Ibe
         ui/BduData.js
     RESOURCES
         ${IBE_SVG_ICONS}
-        bdu_it_threats.json
-        bdu_asutp_catalog.json
+
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
