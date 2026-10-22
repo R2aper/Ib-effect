@@ -188,6 +188,42 @@ private:
   QVariantMap m_summary;
 };
 
+class EconomicsService final : public ServiceBase {
+  Q_OBJECT
+  Q_PROPERTY(QVariantMap summary READ summary NOTIFY summaryChanged)
+  Q_PROPERTY(int riskAppetite READ riskAppetite NOTIFY criteriaChanged)
+  Q_PROPERTY(double pointCost READ pointCost NOTIFY criteriaChanged)
+  Q_PROPERTY(double downtimeHourlyCost READ downtimeHourlyCost CONSTANT)
+  Q_PROPERTY(int mttrHours READ mttrHours CONSTANT)
+
+public:
+  explicit EconomicsService(DataProvider *provider, QObject *parent = nullptr);
+
+  QVariantMap summary() const;
+  int riskAppetite() const;
+  double pointCost() const;
+  double downtimeHourlyCost() const;
+  int mttrHours() const;
+
+  Q_INVOKABLE QString refresh();
+  Q_INVOKABLE void saveCriteria(int appetite, double cost);
+
+signals:
+  void summaryChanged();
+  void criteriaChanged();
+
+private:
+  QVariantMap m_summary;
+  int m_riskAppetite = 16;
+  double m_pointCost = 250000;
+  double m_downtimeHourlyCost = 1500000;
+  int m_mttrHours = 8;
+  bool m_industrialMode = false;
+
+  void setIndustrialMode(bool industrial);
+  friend class AppServices;
+};
+
 class AppServices final : public QObject {
   Q_OBJECT
   Q_PROPERTY(QString providerMode READ providerMode CONSTANT)
@@ -196,6 +232,7 @@ class AppServices final : public QObject {
   Q_PROPERTY(RiskService *risks READ risks CONSTANT)
   Q_PROPERTY(MeasureService *measures READ measures CONSTANT)
   Q_PROPERTY(DashboardService *dashboard READ dashboard CONSTANT)
+  Q_PROPERTY(EconomicsService *economics READ economics CONSTANT)
 
 public:
   explicit AppServices(QObject *parent = nullptr);
@@ -206,6 +243,7 @@ public:
   RiskService *risks() const;
   MeasureService *measures() const;
   DashboardService *dashboard() const;
+  EconomicsService *economics() const;
 
 private:
   DataProvider *m_provider;
@@ -214,4 +252,5 @@ private:
   RiskService *m_risks;
   MeasureService *m_measures;
   DashboardService *m_dashboard;
+  EconomicsService *m_economics;
 };

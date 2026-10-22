@@ -45,6 +45,8 @@ int main(int argc, char *argv[]) {
                                            services->measures());
   engine.rootContext()->setContextProperty("DashboardService",
                                            services->dashboard());
+  engine.rootContext()->setContextProperty("EconomicsService",
+                                           services->economics());
   engine.rootContext()->setContextProperty("ReportExporter", exporter);
 
   qDebug() << services->providerMode();

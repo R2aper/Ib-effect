@@ -19,6 +19,7 @@ Window {
         AssetService.load();
         RiskService.load();
         MeasureService.load();
+        EconomicsService.refresh();
     }
 
     readonly property var sectionNames: [

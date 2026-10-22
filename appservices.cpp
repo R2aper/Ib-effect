@@ -27,6 +27,196 @@ QString riskLevel(int score) {
   return QStringLiteral("low");
 }
 
+QString riskLevelName(const QString &level) {
+  if (level == QStringLiteral("critical"))
+    return QStringLiteral("Критический");
+  if (level == QStringLiteral("high"))
+    return QStringLiteral("Высокий");
+  if (level == QStringLiteral("medium"))
+    return QStringLiteral("Средний");
+  return QStringLiteral("Низкий");
+}
+
+QVariantMap calculateEconomics(const QVariantMap &payload,
+                               const QHash<QString, QVariantList> &collections) {
+  const QVariantList assets = collections.value(QStringLiteral("assets"));
+  const QVariantList risks = collections.value(QStringLiteral("risks"));
+  const QVariantList measures = collections.value(QStringLiteral("measures"));
+  const double pointCost = payload.value(QStringLiteral("pointCost")).toDouble();
+  const double downtimeHourlyCost =
+      payload.value(QStringLiteral("downtimeHourlyCost")).toDouble();
+  const int riskAppetite = payload.value(QStringLiteral("riskAppetite")).toInt();
+  const bool industrial =
+      payload.value(QStringLiteral("industrialMode")).toBool();
+
+  double totalAssetsCost = 0;
+  for (const QVariant &value : assets)
+    totalAssetsCost += value.toMap().value(QStringLiteral("cost")).toDouble();
+
+  double totalMeasuresCost = 0;
+  for (const QVariant &value : measures)
+    totalMeasuresCost += value.toMap().value(QStringLiteral("cost")).toDouble();
+
+  double initialLosses = 0;
+  double residualLosses = 0;
+  double scoreTotal = 0;
+  int criticalRisksCount = 0;
+  int highRisksCount = 0;
+  int mediumRisksCount = 0;
+  int lowRisksCount = 0;
+
+  QVariantList calculatedRisks;
+  for (const QVariant &value : risks) {
+    QVariantMap risk = value.toMap();
+    const int impact = risk.value(QStringLiteral("impact")).toInt();
+    const int probability = risk.value(QStringLiteral("probability")).toInt();
+    const int priority = risk.value(QStringLiteral("assetPriority")).toInt();
+    const int score = impact * probability * priority;
+    const QString level = riskLevel(score);
+    const int riskScore = risk.value(QStringLiteral("score"), score).toInt();
+    const QString riskScoreLevel =
+        risk.value(QStringLiteral("scoreLevel"), level).toString();
+    risk.insert(QStringLiteral("score"), riskScore);
+    risk.insert(QStringLiteral("scoreLevel"), riskScoreLevel);
+    risk.insert(QStringLiteral("scoreLevelName"),
+                riskLevelName(riskScoreLevel));
+
+    double effectivePointCost = pointCost;
+    const QString threatCode = risk.value(QStringLiteral("threatCode")).toString();
+    if (industrial &&
+        (threatCode == QStringLiteral("УТП:05") ||
+         threatCode == QStringLiteral("УТП:08") ||
+         threatCode == QStringLiteral("УТП:06"))) {
+      effectivePointCost = qMax(pointCost, downtimeHourlyCost * 0.25);
+    }
+
+    const double baseLoss = score * effectivePointCost;
+    initialLosses += baseLoss;
+    scoreTotal += score;
+    if (level == QStringLiteral("critical"))
+      ++criticalRisksCount;
+    else if (level == QStringLiteral("high"))
+      ++highRisksCount;
+    else if (level == QStringLiteral("medium"))
+      ++mediumRisksCount;
+    else
+      ++lowRisksCount;
+
+    int residualScore = score;
+    const QString measureId =
+        risk.value(QStringLiteral("boundMeasureId")).toString();
+    for (const QVariant &measureValue : measures) {
+      const QVariantMap measure = measureValue.toMap();
+      if (measure.value(QStringLiteral("id")).toString() == measureId) {
+        const double residualImpact =
+            impact * (1.0 - measure.value(QStringLiteral("dmgRed")).toDouble() /
+                                100.0);
+        const double residualProbability =
+            probability *
+            (1.0 - measure.value(QStringLiteral("probRed")).toDouble() / 100.0);
+        residualScore =
+            qCeil(residualImpact * residualProbability * priority);
+        break;
+      }
+    }
+    residualLosses += residualScore * effectivePointCost;
+    calculatedRisks.append(risk);
+  }
+
+  const double avoidedDamage = qMax(0.0, initialLosses - residualLosses);
+  const double netBenefit = avoidedDamage - totalMeasuresCost;
+  const int rosi = totalMeasuresCost > 0
+                       ? qRound(netBenefit / totalMeasuresCost * 100.0)
+                       : 0;
+  const QString multiplier =
+      totalMeasuresCost > 0
+          ? QString::number(avoidedDamage / totalMeasuresCost, 'f', 1) +
+                QStringLiteral("x")
+          : QStringLiteral("0.0x");
+
+  QVariantList breakdown;
+  for (const QVariant &measureValue : measures) {
+    const QVariantMap measure = measureValue.toMap();
+    const QString measureId = measure.value(QStringLiteral("id")).toString();
+    QVariantMap row = measure;
+    QVariantMap matchedRisk;
+    for (const QVariant &riskValue : calculatedRisks) {
+      const QVariantMap risk = riskValue.toMap();
+      if (risk.value(QStringLiteral("boundMeasureId")).toString() == measureId) {
+        matchedRisk = risk;
+        break;
+      }
+    }
+
+    const bool hasRisk = !matchedRisk.isEmpty();
+    double avoided = 0;
+    double net = 0;
+    int measureRosi = 0;
+    if (hasRisk) {
+      double effectivePointCost = pointCost;
+      const QString threatCode =
+          matchedRisk.value(QStringLiteral("threatCode")).toString();
+      if (industrial &&
+          (threatCode == QStringLiteral("УТП:05") ||
+           threatCode == QStringLiteral("УТП:08") ||
+           threatCode == QStringLiteral("УТП:06"))) {
+        effectivePointCost = qMax(pointCost, downtimeHourlyCost * 0.25);
+      }
+      const double baseLoss =
+          matchedRisk.value(QStringLiteral("impact")).toDouble() *
+          matchedRisk.value(QStringLiteral("probability")).toDouble() *
+          matchedRisk.value(QStringLiteral("assetPriority")).toDouble() *
+          effectivePointCost;
+      const double residualImpact =
+          matchedRisk.value(QStringLiteral("impact")).toDouble() *
+          (1.0 - measure.value(QStringLiteral("dmgRed")).toDouble() / 100.0);
+      const double residualProbability =
+          matchedRisk.value(QStringLiteral("probability")).toDouble() *
+          (1.0 - measure.value(QStringLiteral("probRed")).toDouble() / 100.0);
+      const double residualLoss =
+          qCeil(residualImpact * residualProbability *
+                matchedRisk.value(QStringLiteral("assetPriority")).toDouble()) *
+          effectivePointCost;
+      avoided = qMax(0.0, baseLoss - residualLoss);
+      net = avoided - measure.value(QStringLiteral("cost")).toDouble();
+      const double cost = measure.value(QStringLiteral("cost")).toDouble();
+      measureRosi = cost > 0 ? qRound(net / cost * 100.0) : 0;
+    }
+
+    row.insert(QStringLiteral("hasRisk"), hasRisk);
+    row.insert(QStringLiteral("avoidedDamage"), avoided);
+    row.insert(QStringLiteral("netBenefit"), net);
+    row.insert(QStringLiteral("rosi"), measureRosi);
+    row.insert(QStringLiteral("riskId"),
+               matchedRisk.value(QStringLiteral("id")));
+    breakdown.append(row);
+  }
+
+  return {{QStringLiteral("assets"), assets},
+          {QStringLiteral("risks"), calculatedRisks},
+          {QStringLiteral("measures"), measures},
+          {QStringLiteral("measureBreakdown"), breakdown},
+          {QStringLiteral("totalAssetsCost"), totalAssetsCost},
+          {QStringLiteral("initialLosses"), initialLosses},
+          {QStringLiteral("residualLosses"), residualLosses},
+          {QStringLiteral("avoidedDamage"), avoidedDamage},
+          {QStringLiteral("totalMeasuresCost"), totalMeasuresCost},
+          {QStringLiteral("netBenefit"), netBenefit},
+          {QStringLiteral("rosi"), rosi},
+          {QStringLiteral("multiplier"), multiplier},
+          {QStringLiteral("riskAppetite"), riskAppetite},
+          {QStringLiteral("pointCost"), pointCost},
+          {QStringLiteral("downtimeHourlyCost"), downtimeHourlyCost},
+          {QStringLiteral("mttrHours"), payload.value(QStringLiteral("mttrHours"))},
+          {QStringLiteral("industrialMode"), industrial},
+          {QStringLiteral("criticalRisksCount"), criticalRisksCount},
+          {QStringLiteral("highRisksCount"), highRisksCount},
+          {QStringLiteral("mediumRisksCount"), mediumRisksCount},
+          {QStringLiteral("lowRisksCount"), lowRisksCount},
+          {QStringLiteral("averageScore"),
+           risks.isEmpty() ? 0.0 : scoreTotal / risks.size()}};
+}
+
 QVariantMap makeRisk(const QString &id, const QString &threat,
                      const QString &threatCode, const QString &vulnerability,
                      const QString &assetId, const QString &assetName,
@@ -258,6 +448,8 @@ void MockDataProvider::request(const QString &requestId,
   } else if (operation == QStringLiteral("auth.logout")) {
     m_authenticated = false;
     m_user.clear();
+  } else if (operation == QStringLiteral("economics.get")) {
+    result = calculateEconomics(payload, m_collections);
   } else if (operation == QStringLiteral("dashboard.get")) {
     const QVariantList risks = m_collections.value(QStringLiteral("risks"));
     const QVariantList measures = m_collections.value(QStringLiteral("measures"));
@@ -1141,6 +1333,77 @@ QString DashboardService::refresh() {
   return sendRequest(QStringLiteral("dashboard.get"));
 }
 
+EconomicsService::EconomicsService(DataProvider *provider, QObject *parent)
+    : ServiceBase(provider, parent) {
+  m_summary = {{QStringLiteral("assets"), QVariantList{}},
+               {QStringLiteral("risks"), QVariantList{}},
+               {QStringLiteral("measures"), QVariantList{}},
+               {QStringLiteral("measureBreakdown"), QVariantList{}},
+               {QStringLiteral("totalAssetsCost"), 0.0},
+               {QStringLiteral("initialLosses"), 0.0},
+               {QStringLiteral("residualLosses"), 0.0},
+               {QStringLiteral("avoidedDamage"), 0.0},
+               {QStringLiteral("totalMeasuresCost"), 0.0},
+               {QStringLiteral("netBenefit"), 0.0},
+               {QStringLiteral("rosi"), 0},
+               {QStringLiteral("multiplier"), QStringLiteral("0.0x")},
+               {QStringLiteral("riskAppetite"), m_riskAppetite},
+               {QStringLiteral("pointCost"), m_pointCost},
+               {QStringLiteral("downtimeHourlyCost"), m_downtimeHourlyCost},
+               {QStringLiteral("mttrHours"), m_mttrHours},
+               {QStringLiteral("industrialMode"), m_industrialMode},
+               {QStringLiteral("criticalRisksCount"), 0},
+               {QStringLiteral("highRisksCount"), 0},
+               {QStringLiteral("mediumRisksCount"), 0},
+               {QStringLiteral("lowRisksCount"), 0},
+               {QStringLiteral("averageScore"), 0.0}};
+
+  connect(this, &ServiceBase::operationFinished, this,
+          [this](const QString &, const QString &operation, bool success,
+                 const QVariant &data, const QString &) {
+            if (operation != QStringLiteral("economics.get") || !success)
+              return;
+            m_summary = data.toMap();
+            emit summaryChanged();
+          });
+}
+
+QVariantMap EconomicsService::summary() const { return m_summary; }
+
+int EconomicsService::riskAppetite() const { return m_riskAppetite; }
+
+double EconomicsService::pointCost() const { return m_pointCost; }
+
+double EconomicsService::downtimeHourlyCost() const {
+  return m_downtimeHourlyCost;
+}
+
+int EconomicsService::mttrHours() const { return m_mttrHours; }
+
+QString EconomicsService::refresh() {
+  return sendRequest(
+      QStringLiteral("economics.get"),
+      {{QStringLiteral("riskAppetite"), m_riskAppetite},
+       {QStringLiteral("pointCost"), m_pointCost},
+       {QStringLiteral("downtimeHourlyCost"), m_downtimeHourlyCost},
+       {QStringLiteral("mttrHours"), m_mttrHours},
+       {QStringLiteral("industrialMode"), m_industrialMode}});
+}
+
+void EconomicsService::saveCriteria(int appetite, double cost) {
+  m_riskAppetite = appetite;
+  m_pointCost = cost;
+  emit criteriaChanged();
+  refresh();
+}
+
+void EconomicsService::setIndustrialMode(bool industrial) {
+  if (m_industrialMode == industrial)
+    return;
+  m_industrialMode = industrial;
+  refresh();
+}
+
 AppServices::AppServices(QObject *parent) : QObject(parent) {
   const QString requestedMode =
       qEnvironmentVariable("IBE_DATA_PROVIDER", "mock").trimmed().toLower();
@@ -1157,6 +1420,27 @@ AppServices::AppServices(QObject *parent) : QObject(parent) {
   m_risks = new RiskService(m_provider, this);
   m_measures = new MeasureService(m_provider, this);
   m_dashboard = new DashboardService(m_provider, this);
+  m_economics = new EconomicsService(m_provider, this);
+
+  connect(m_assets, &AssetService::industrialModeChanged, this,
+          [this] {
+            m_economics->setIndustrialMode(m_assets->industrialMode());
+          });
+
+  const auto refreshEconomics =
+      [this](const QString &, const QString &operation, bool success,
+             const QVariant &, const QString &) {
+        if (!success || operation.endsWith(QStringLiteral(".list")))
+          return;
+        if (operation.startsWith(QStringLiteral("assets.")) ||
+            operation.startsWith(QStringLiteral("risks.")) ||
+            operation.startsWith(QStringLiteral("measures."))) {
+          m_economics->refresh();
+        }
+      };
+  connect(m_assets, &ServiceBase::operationFinished, this, refreshEconomics);
+  connect(m_risks, &ServiceBase::operationFinished, this, refreshEconomics);
+  connect(m_measures, &ServiceBase::operationFinished, this, refreshEconomics);
 
   connect(m_risks, &ServiceBase::operationFinished, this,
           [this](const QString &, const QString &, bool success,
@@ -1183,3 +1467,5 @@ RiskService *AppServices::risks() const { return m_risks; }
 MeasureService *AppServices::measures() const { return m_measures; }
 
 DashboardService *AppServices::dashboard() const { return m_dashboard; }
+
+EconomicsService *AppServices::economics() const { return m_economics; }

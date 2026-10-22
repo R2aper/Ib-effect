@@ -12,7 +12,6 @@ qt_standard_project_setup(REQUIRES 6.5)
 
 set(IBE_UI_QML_FILES
     ui/Theme.qml
-    ui/DataStore.qml
     ui/AppIcon.qml
     ui/AuthModal.qml
     ui/AssetDialog.qml
@@ -50,13 +49,8 @@ set_source_files_properties(ui/Theme.qml PROPERTIES
     QT_RESOURCE_ALIAS Theme.qml
 )
 
-set_source_files_properties(ui/DataStore.qml PROPERTIES
-    QT_QML_SINGLETON_TYPE TRUE
-    QT_RESOURCE_ALIAS DataStore.qml
-)
-
 foreach(qml_file IN LISTS IBE_UI_QML_FILES)
-    if(NOT qml_file STREQUAL "ui/Theme.qml" AND NOT qml_file STREQUAL "ui/DataStore.qml")
+    if(NOT qml_file STREQUAL "ui/Theme.qml")
         get_filename_component(qml_name "${qml_file}" NAME)
         set_source_files_properties("${qml_file}" PROPERTIES
             QT_RESOURCE_ALIAS "${qml_name}"

@@ -34,7 +34,7 @@ ScrollView {
 
             KpiStatCard {
                 label: qsTr("ПОТЕРИ ДО ВНЕДРЕНИЯ МЕР")
-                value: (DataStore.initialLosses >= 1000000 ? (DataStore.initialLosses / 1000000).toFixed(1) + "M ₽" : (DataStore.initialLosses / 1000).toFixed(0) + "K ₽")
+                value: (EconomicsService.summary.initialLosses >= 1000000 ? (EconomicsService.summary.initialLosses / 1000000).toFixed(1) + "M ₽" : (EconomicsService.summary.initialLosses / 1000).toFixed(0) + "K ₽")
                 delta: "Базовый риск"
                 deltaIsGood: false
                 note: qsTr("Суммарный вероятный ущерб без защиты")
@@ -44,8 +44,8 @@ ScrollView {
 
             KpiStatCard {
                 label: qsTr("ОСТАТОЧНЫЕ ПОТЕРИ")
-                value: (DataStore.residualLosses >= 1000000 ? (DataStore.residualLosses / 1000000).toFixed(1) + "M ₽" : (DataStore.residualLosses / 1000).toFixed(0) + "K ₽")
-                delta: DataStore.initialLosses > 0 ? ("-" + Math.round(((DataStore.initialLosses - DataStore.residualLosses) / DataStore.initialLosses) * 100) + "% ↓") : "0%"
+                value: (EconomicsService.summary.residualLosses >= 1000000 ? (EconomicsService.summary.residualLosses / 1000000).toFixed(1) + "M ₽" : (EconomicsService.summary.residualLosses / 1000).toFixed(0) + "K ₽")
+                delta: EconomicsService.summary.initialLosses > 0 ? ("-" + Math.round(((EconomicsService.summary.initialLosses - EconomicsService.summary.residualLosses) / EconomicsService.summary.initialLosses) * 100) + "% ↓") : "0%"
                 deltaIsGood: true
                 note: qsTr("Остаточный риск после внедрения мер")
                 accentColor: Theme.green
@@ -54,7 +54,7 @@ ScrollView {
 
             KpiStatCard {
                 label: qsTr("ИНВЕСТИЦИИ В ЗАЩИТУ")
-                value: (DataStore.totalMeasuresCost >= 1000000 ? (DataStore.totalMeasuresCost / 1000000).toFixed(1) + "M ₽" : (DataStore.totalMeasuresCost / 1000).toFixed(0) + "K ₽")
+                value: (EconomicsService.summary.totalMeasuresCost >= 1000000 ? (EconomicsService.summary.totalMeasuresCost / 1000000).toFixed(1) + "M ₽" : (EconomicsService.summary.totalMeasuresCost / 1000).toFixed(0) + "K ₽")
                 delta: "CAPEX+OPEX"
                 deltaIsGood: true
                 note: qsTr("Совокупная стоимость владения (TCO)")
@@ -64,9 +64,9 @@ ScrollView {
 
             KpiStatCard {
                 label: qsTr("КОЭФФИЦИЕНТ ROSI")
-                value: (DataStore.rosi >= 0 ? "+" : "") + DataStore.rosi + "%"
-                delta: DataStore.rosi >= 0 ? "Окупаем" : "Неокупаем"
-                deltaIsGood: DataStore.rosi >= 0
+                value: (EconomicsService.summary.rosi >= 0 ? "+" : "") + EconomicsService.summary.rosi + "%"
+                delta: EconomicsService.summary.rosi >= 0 ? "Окупаем" : "Неокупаем"
+                deltaIsGood: EconomicsService.summary.rosi >= 0
                 note: qsTr("Чистая выгода на каждый вложенный рубль")
                 accentColor: Theme.teal
                 valueColor: Theme.isDark ? Theme.tealLight : Theme.teal
@@ -87,8 +87,8 @@ ScrollView {
             Layout.fillWidth: true
             implicitHeight: 144
             radius: Theme.radiusMd
-            color: Theme.isDark ? (DataStore.netBenefit >= 0 ? "#14251d" : "#2a1515") : (DataStore.netBenefit >= 0 ? "#f0fdf4" : "#fef2f2")
-            border.color: Theme.isDark ? (DataStore.netBenefit >= 0 ? "#1d4b38" : "#592020") : (DataStore.netBenefit >= 0 ? "#bbf7d0" : "#fecaca")
+            color: Theme.isDark ? (EconomicsService.summary.netBenefit >= 0 ? "#14251d" : "#2a1515") : (EconomicsService.summary.netBenefit >= 0 ? "#f0fdf4" : "#fef2f2")
+            border.color: Theme.isDark ? (EconomicsService.summary.netBenefit >= 0 ? "#1d4b38" : "#592020") : (EconomicsService.summary.netBenefit >= 0 ? "#bbf7d0" : "#fecaca")
             border.width: 1
 
             RowLayout {
@@ -103,8 +103,8 @@ ScrollView {
                     RowLayout {
                         spacing: 8
                         StatusBadge {
-                            text: DataStore.netBenefit >= 0 ? qsTr("ПОЛОЖИТЕЛЬНЫЙ ЭФФЕКТ") : qsTr("ОТРИЦАТЕЛЬНЫЙ ЭФФЕКТ")
-                            level: DataStore.netBenefit >= 0 ? "success" : "critical"
+                            text: EconomicsService.summary.netBenefit >= 0 ? qsTr("ПОЛОЖИТЕЛЬНЫЙ ЭФФЕКТ") : qsTr("ОТРИЦАТЕЛЬНЫЙ ЭФФЕКТ")
+                            level: EconomicsService.summary.netBenefit >= 0 ? "success" : "critical"
                         }
                         Text {
                             text: qsTr("ROSI = ((Снижение потерь − Затраты) / Затраты) × 100%")
@@ -116,8 +116,8 @@ ScrollView {
                     RowLayout {
                         spacing: 12
                         Text {
-                            text: (DataStore.netBenefit >= 0 ? "+" : "") + (DataStore.netBenefit).toLocaleString(Qt.locale(), 'f', 0) + " ₽"
-                            color: DataStore.netBenefit >= 0 ? (Theme.isDark ? "#4ade80" : "#15803d") : (Theme.isDark ? "#f87171" : "#b91c1c")
+                            text: (EconomicsService.summary.netBenefit >= 0 ? "+" : "") + (EconomicsService.summary.netBenefit).toLocaleString(Qt.locale(), 'f', 0) + " ₽"
+                            color: EconomicsService.summary.netBenefit >= 0 ? (Theme.isDark ? "#4ade80" : "#15803d") : (Theme.isDark ? "#f87171" : "#b91c1c")
                             font.pixelSize: Theme.fontMetricBig
                             font.weight: Font.Bold
                         }
@@ -129,11 +129,11 @@ ScrollView {
 
                     Text {
                         text: qsTr("Предотвращенный ущерб (%1) сопоставлен с затратами на внедрение мер защиты (%2).").arg(
-                            (DataStore.avoidedDamage >= 1000000 ? (DataStore.avoidedDamage / 1000000).toFixed(1) + "M ₽" : (DataStore.avoidedDamage / 1000).toFixed(0) + "K ₽")
+                            (EconomicsService.summary.avoidedDamage >= 1000000 ? (EconomicsService.summary.avoidedDamage / 1000000).toFixed(1) + "M ₽" : (EconomicsService.summary.avoidedDamage / 1000).toFixed(0) + "K ₽")
                         ).arg(
-                            (DataStore.totalMeasuresCost >= 1000000 ? (DataStore.totalMeasuresCost / 1000000).toFixed(1) + "M ₽" : (DataStore.totalMeasuresCost / 1000).toFixed(0) + "K ₽")
+                            (EconomicsService.summary.totalMeasuresCost >= 1000000 ? (EconomicsService.summary.totalMeasuresCost / 1000000).toFixed(1) + "M ₽" : (EconomicsService.summary.totalMeasuresCost / 1000).toFixed(0) + "K ₽")
                         )
-                        color: DataStore.netBenefit >= 0 ? (Theme.isDark ? "#86efac" : "#166534") : (Theme.isDark ? "#fca5a5" : "#991b1b")
+                        color: EconomicsService.summary.netBenefit >= 0 ? (Theme.isDark ? "#86efac" : "#166534") : (Theme.isDark ? "#fca5a5" : "#991b1b")
                         font.pixelSize: Theme.fontBody
                     }
                 }
@@ -151,8 +151,8 @@ ScrollView {
                         anchors.centerIn: parent
                         spacing: 4
                         Text {
-                            text: DataStore.multiplier
-                            color: DataStore.netBenefit >= 0 ? (Theme.isDark ? "#34d399" : "#15803d") : (Theme.isDark ? "#f87171" : "#b91c1c")
+                            text: EconomicsService.summary.multiplier
+                            color: EconomicsService.summary.netBenefit >= 0 ? (Theme.isDark ? "#34d399" : "#15803d") : (Theme.isDark ? "#f87171" : "#b91c1c")
                             font.pixelSize: 28
                             font.weight: Font.Bold
                             Layout.alignment: Qt.AlignHCenter
@@ -215,21 +215,21 @@ ScrollView {
                         spacing: 4
                         Layout.fillWidth: true
                         Text { text: qsTr("Стоимость часа простоя линии (₽/ч):"); color: Theme.muted; font.pixelSize: Theme.fontCaption }
-                        Text { text: (DataStore.downtimeHourlyCost).toLocaleString(Qt.locale(), 'f', 0) + " ₽/ч"; color: Theme.text; font.pixelSize: Theme.fontH2; font.weight: Font.Bold }
+                        Text { text: (EconomicsService.summary.downtimeHourlyCost).toLocaleString(Qt.locale(), 'f', 0) + " ₽/ч"; color: Theme.text; font.pixelSize: Theme.fontH2; font.weight: Font.Bold }
                     }
 
                     ColumnLayout {
                         spacing: 4
                         Layout.fillWidth: true
                         Text { text: qsTr("Время восстановления (MTTR):"); color: Theme.muted; font.pixelSize: Theme.fontCaption }
-                        Text { text: DataStore.mttrHours + " " + qsTr("часов"); color: Theme.text; font.pixelSize: Theme.fontH2; font.weight: Font.Bold }
+                        Text { text: EconomicsService.summary.mttrHours + " " + qsTr("часов"); color: Theme.text; font.pixelSize: Theme.fontH2; font.weight: Font.Bold }
                     }
 
                     ColumnLayout {
                         spacing: 4
                         Layout.fillWidth: true
                         Text { text: qsTr("Предотвращенный ущерб от простоя:"); color: Theme.muted; font.pixelSize: Theme.fontCaption }
-                        Text { text: ((DataStore.downtimeHourlyCost * DataStore.mttrHours) / 1000000).toFixed(1) + "M ₽"; color: Theme.green; font.pixelSize: Theme.fontH2; font.weight: Font.Bold }
+                        Text { text: ((EconomicsService.summary.downtimeHourlyCost * EconomicsService.summary.mttrHours) / 1000000).toFixed(1) + "M ₽"; color: Theme.green; font.pixelSize: Theme.fontH2; font.weight: Font.Bold }
                     }
                 }
             }
@@ -243,8 +243,16 @@ ScrollView {
             implicitHeight: reportCol.implicitHeight + 32
             radius: Theme.radiusMd
             color: Theme.raised
-            border.color: statusMsg ? Theme.green : Theme.accent
+            border.color: statusMsg ? (reportBox.exportSucceeded ? Theme.green : Theme.riskCritical) : Theme.accent
+            property bool exportSucceeded: false
             border.width: 1
+
+            function getLevelName(level) {
+                if (level === "critical") return qsTr("Критический");
+                if (level === "high") return qsTr("Высокий");
+                if (level === "medium") return qsTr("Средний");
+                return qsTr("Низкий");
+            }
 
             function buildReportMarkdown() {
                 var md = "";
@@ -261,47 +269,50 @@ ScrollView {
                 md += "## 1. ПЕРЕЧЕНЬ И КАТЕГОРИРОВАНИЕ ЗАЩИЩАЕМЫХ АКТИВОВ\n\n";
                 md += "| ID | Наименование актива | Тип объекта ФСТЭК | Категория | Стоимость (₽) | Приоритет A (1..4) | Статус |\n";
                 md += "| :--- | :--- | :--- | :--- | :---: | :---: | :---: |\n";
-                for (var a = 0; a < DataStore.assetsList.length; a++) {
-                    var ast = DataStore.assetsList[a];
+                var assets = EconomicsService.summary.assets;
+                for (var a = 0; a < assets.length; a++) {
+                    var ast = assets[a];
                     md += "| " + ast.id + " | " + ast.name + " | " + (ast.oaCode ? (ast.oaCode + " (" + ast.oaTitle + ")") : "Общий IT") + " | " + ast.cat + " | " + (ast.cost ? ast.cost.toLocaleString() : "0") + " | " + ast.prio + " | " + (ast.status || "На защите") + " |\n";
                 }
-                md += "\n**Суммарная балансовая стоимость активов:** " + DataStore.totalAssetsCost.toLocaleString() + " ₽\n\n";
+                md += "\n**Суммарная балансовая стоимость активов:** " + EconomicsService.summary.totalAssetsCost.toLocaleString() + " ₽\n\n";
                 md += "---\n\n";
 
                 md += "## 2. ИДЕНТИФИЦИРОВАННЫЕ УГРОЗЫ БЕЗОПАСНОСТИ И РАСЧЕТ РИСКОВ\n\n";
                 md += "| ID | Код/Угроза (БДУ ФСТЭК) | Уязвимость / Способ атак (СПА) | Связанный актив | I (1..4) | P (1..4) | A (1..4) | Начальный балл | Уровень риска |\n";
                 md += "| :--- | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: |\n";
-                for (var r = 0; r < DataStore.risksList.length; r++) {
-                    var rsk = DataStore.risksList[r];
-                    md += "| " + rsk.id + " | " + rsk.threat + " | " + rsk.vuln + " | " + rsk.assetName + " | " + rsk.impact + " | " + rsk.probability + " | " + rsk.assetPriority + " | " + rsk.score + " | " + DataStore.getLevelName(rsk.scoreLevel) + " |\n";
+                var risks = EconomicsService.summary.risks;
+                for (var r = 0; r < risks.length; r++) {
+                    var rsk = risks[r];
+                    md += "| " + rsk.id + " | " + rsk.threat + " | " + rsk.vuln + " | " + rsk.assetName + " | " + rsk.impact + " | " + rsk.probability + " | " + rsk.assetPriority + " | " + rsk.score + " | " + reportBox.getLevelName(rsk.scoreLevel) + " |\n";
                 }
-                md += "\n**Критерии риск-аппетита:** Порог допустимого риска = " + DataStore.riskAppetite + " баллов. Стоимость балла = " + DataStore.pointCost.toLocaleString() + " ₽.\n\n";
+                md += "\n**Критерии риск-аппетита:** Порог допустимого риска = " + EconomicsService.riskAppetite + " баллов. Стоимость балла = " + EconomicsService.pointCost.toLocaleString() + " ₽.\n\n";
                 md += "---\n\n";
 
                 md += "## 3. ПОРТФЕЛЬ КОМПЕНСИРУЮЩИХ МЕР (ПРИКАЗ ФСТЭК № 239 / ГОСТ Р 57580.3-2022)\n\n";
                 md += "| ID | Наименование мероприятия / СЗИ | Тип | Затраты TCO (₽) | Снижение ΔI (%) | Снижение ΔP (%) | Связанный риск | Статус |\n";
                 md += "| :--- | :--- | :--- | :---: | :---: | :---: | :--- | :---: |\n";
-                for (var m = 0; m < DataStore.measuresList.length; m++) {
-                    var msr = DataStore.measuresList[m];
+                var measures = EconomicsService.summary.measures;
+                for (var m = 0; m < measures.length; m++) {
+                    var msr = measures[m];
                     md += "| " + msr.id + " | " + msr.name + " | " + msr.type + " | " + (msr.cost ? msr.cost.toLocaleString() : "0") + " | " + msr.dmgRed + "% | " + msr.probRed + "% | " + (msr.boundRiskId || "Не привязана") + " | " + msr.status + " |\n";
                 }
-                md += "\n**Совокупный бюджет мероприятий по защите:** " + DataStore.totalMeasuresCost.toLocaleString() + " ₽\n\n";
+                md += "\n**Совокупный бюджет мероприятий по защите:** " + EconomicsService.summary.totalMeasuresCost.toLocaleString() + " ₽\n\n";
                 md += "---\n\n";
 
                 md += "## 4. ФИНАНСОВО-ЭКОНОМИЧЕСКОЕ ОБОСНОВАНИЕ (NET ROSI)\n\n";
-                md += "* **Потенциальный ущерб до внедрения мер:** " + DataStore.initialLosses.toLocaleString() + " ₽\n";
-                md += "* **Остаточный ущерб после реализации мер:** " + DataStore.residualLosses.toLocaleString() + " ₽\n";
-                md += "* **Предотвращенный финансовый ущерб (ΔLoss):** " + DataStore.avoidedDamage.toLocaleString() + " ₽\n";
-                md += "* **Инвестиции в системы защиты информации (TCO):** " + DataStore.totalMeasuresCost.toLocaleString() + " ₽\n";
-                md += "* **Чистый экономический эффект (Net Benefit):** " + (DataStore.netBenefit >= 0 ? "+" : "") + DataStore.netBenefit.toLocaleString() + " ₽\n";
-                md += "* **Коэффициент окупаемости Net ROSI:** **" + (DataStore.rosi >= 0 ? "+" : "") + DataStore.rosi + "%**\n";
-                md += "* **Мультипликатор возврата инвестиций:** **" + DataStore.multiplier + "**\n\n";
+                md += "* **Потенциальный ущерб до внедрения мер:** " + EconomicsService.summary.initialLosses.toLocaleString() + " ₽\n";
+                md += "* **Остаточный ущерб после реализации мер:** " + EconomicsService.summary.residualLosses.toLocaleString() + " ₽\n";
+                md += "* **Предотвращенный финансовый ущерб (ΔLoss):** " + EconomicsService.summary.avoidedDamage.toLocaleString() + " ₽\n";
+                md += "* **Инвестиции в системы защиты информации (TCO):** " + EconomicsService.summary.totalMeasuresCost.toLocaleString() + " ₽\n";
+                md += "* **Чистый экономический эффект (Net Benefit):** " + (EconomicsService.summary.netBenefit >= 0 ? "+" : "") + EconomicsService.summary.netBenefit.toLocaleString() + " ₽\n";
+                md += "* **Коэффициент окупаемости Net ROSI:** **" + (EconomicsService.summary.rosi >= 0 ? "+" : "") + EconomicsService.summary.rosi + "%**\n";
+                md += "* **Мультипликатор возврата инвестиций:** **" + EconomicsService.summary.multiplier + "**\n\n";
 
                 if (AssetService.industrialMode) {
                     md += "### Экономика простоя технологического процесса (Downtime Economics):\n";
-                    md += "* Стоимость 1 часа аварийного останова производственной линии: " + DataStore.downtimeHourlyCost.toLocaleString() + " ₽/час\n";
-                    md += "* Среднее расчетное время восстановления АСУ ТП (MTTR): " + DataStore.mttrHours + " часов\n";
-                    md += "* Предотвращенный косвенный технологический ущерб: " + (DataStore.downtimeHourlyCost * DataStore.mttrHours).toLocaleString() + " ₽\n\n";
+                    md += "* Стоимость 1 часа аварийного останова производственной линии: " + EconomicsService.summary.downtimeHourlyCost.toLocaleString() + " ₽/час\n";
+                    md += "* Среднее расчетное время восстановления АСУ ТП (MTTR): " + EconomicsService.summary.mttrHours + " часов\n";
+                    md += "* Предотвращенный косвенный технологический ущерб: " + (EconomicsService.summary.downtimeHourlyCost * EconomicsService.summary.mttrHours).toLocaleString() + " ₽\n\n";
                 }
 
                 md += "---\n\n";
@@ -364,15 +375,10 @@ ScrollView {
                             onClicked: {
                                 var content = reportBox.buildReportMarkdown();
                                 var fileName = "Отчет_Модель_угроз_АСУ_ТП.md";
-                                var saved = false;
-                                try {
-                                    if (typeof ReportExporter !== "undefined") {
-                                        saved = ReportExporter.saveReport(fileName, content);
-                                    }
-                                } catch (e) {
-                                    saved = false;
-                                }
-                                reportBox.statusMsg = qsTr("✅ Отчет успешно сформирован по ГОСТ 19.505-79 и сохранен в файл «Отчет_Модель_угроз_АСУ_ТП.md»!");
+                                reportBox.exportSucceeded = ReportExporter.saveReport(fileName, content);
+                                reportBox.statusMsg = reportBox.exportSucceeded
+                                        ? qsTr("✅ Отчет успешно сформирован и сохранен в файл «%1».").arg(fileName)
+                                        : qsTr("Не удалось сохранить отчет в файл «%1». Проверьте доступ к папке приложения.").arg(fileName);
                             }
                         }
                     }
@@ -381,7 +387,7 @@ ScrollView {
                 Text {
                     visible: reportBox.statusMsg !== ""
                     text: reportBox.statusMsg
-                    color: Theme.green
+                    color: reportBox.exportSucceeded ? Theme.green : Theme.riskCritical
                     font.pixelSize: Theme.fontCaption
                     font.weight: Font.Bold
                 }
@@ -434,44 +440,12 @@ ScrollView {
 
                 // Строки
                 Repeater {
-                    model: DataStore.measuresList
+                    model: EconomicsService.summary.measureBreakdown
 
                     delegate: Rectangle {
                         id: econRow
                         required property var modelData
                         required property int index
-
-                        readonly property var calcData: {
-                            var targetRisk = null;
-                            for (var r = 0; r < DataStore.risksList.length; r++) {
-                                if (DataStore.risksList[r].boundMeasureId === econRow.modelData.id) {
-                                    targetRisk = DataStore.risksList[r];
-                                    break;
-                                }
-                            }
-                            if (targetRisk) {
-                                var baseDmg = targetRisk.impact * targetRisk.probability * targetRisk.assetPriority * DataStore.pointCost;
-                                var resI = targetRisk.impact * (1.0 - ((econRow.modelData.dmgRed || 0) / 100.0));
-                                var resP = targetRisk.probability * (1.0 - ((econRow.modelData.probRed || 0) / 100.0));
-                                var resDmg = Math.ceil(resI * resP * targetRisk.assetPriority) * DataStore.pointCost;
-                                var avoided = Math.max(0, baseDmg - resDmg);
-                                var net = avoided - (econRow.modelData.cost || 0);
-                                var rsi = (econRow.modelData.cost > 0) ? Math.round((net / econRow.modelData.cost) * 100) : 0;
-                                return {
-                                    avoidedStr: (avoided ? avoided.toLocaleString(Qt.locale(), 'f', 0) : "0") + " ₽",
-                                    netStr: (net >= 0 ? "+" : "") + (net ? net.toLocaleString(Qt.locale(), 'f', 0) : "0") + " ₽",
-                                    netPositive: net >= 0,
-                                    rosiStr: (rsi >= 0 ? "+" : "") + rsi + "%"
-                                };
-                            } else {
-                                return {
-                                    avoidedStr: qsTr("Не привязана"),
-                                    netStr: "—",
-                                    netPositive: false,
-                                    rosiStr: "—"
-                                };
-                            }
-                        }
 
                         Layout.fillWidth: true
                         implicitHeight: 46
@@ -501,7 +475,9 @@ ScrollView {
                             }
 
                             Text {
-                                text: econRow.calcData.avoidedStr
+                                text: econRow.modelData.hasRisk
+                                      ? econRow.modelData.avoidedDamage.toLocaleString(Qt.locale(), 'f', 0) + " ₽"
+                                      : qsTr("Не привязана")
                                 color: Theme.isDark ? Theme.tealLight : Theme.teal
                                 font.pixelSize: Theme.fontCaption
                                 font.weight: Font.DemiBold
@@ -509,16 +485,23 @@ ScrollView {
                             }
 
                             Text {
-                                text: econRow.calcData.netStr
-                                color: econRow.calcData.netPositive ? Theme.green : (Theme.isDark ? "#f87171" : "#b91c1c")
+                                text: econRow.modelData.hasRisk
+                                      ? (econRow.modelData.netBenefit >= 0 ? "+" : "") + econRow.modelData.netBenefit.toLocaleString(Qt.locale(), 'f', 0) + " ₽"
+                                      : "—"
+                                color: !econRow.modelData.hasRisk ? Theme.muted
+                                      : (econRow.modelData.netBenefit >= 0 ? Theme.green : (Theme.isDark ? "#f87171" : "#b91c1c"))
                                 font.pixelSize: Theme.fontCaption
                                 font.weight: Font.Bold
                                 Layout.preferredWidth: 130
                             }
 
                             StatusBadge {
-                                text: econRow.calcData.rosiStr
-                                level: econRow.calcData.netPositive ? "success" : (econRow.calcData.rosiStr === "—" ? "low" : "critical")
+                                text: econRow.modelData.hasRisk
+                                      ? (econRow.modelData.rosi >= 0 ? "+" : "") + econRow.modelData.rosi + "%"
+                                      : "—"
+                                level: econRow.modelData.hasRisk
+                                       ? (econRow.modelData.netBenefit >= 0 ? "success" : "critical")
+                                       : "low"
                                 showDot: false
                                 Layout.preferredWidth: 90
                             }

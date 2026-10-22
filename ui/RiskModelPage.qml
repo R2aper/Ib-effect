@@ -194,7 +194,7 @@ ScrollView {
                             from: 8
                             to: 36
                             stepSize: 2
-                            value: DataStore.riskAppetite
+                            value: EconomicsService.riskAppetite
                         }
                     }
 
@@ -236,7 +236,7 @@ ScrollView {
                                 id: pCostInput
                                 anchors.fill: parent
                                 anchors.margins: 10
-                                text: DataStore.pointCost.toString()
+                                text: EconomicsService.pointCost.toString()
                                 color: Theme.text
                                 font.pixelSize: Theme.fontBody
                                 font.weight: Font.DemiBold
@@ -283,7 +283,7 @@ ScrollView {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 var cost = parseFloat(pCostInput.text) || 250000;
-                                DataStore.saveCriteria(Math.round(appetiteSlider.value), cost);
+                                EconomicsService.saveCriteria(Math.round(appetiteSlider.value), cost);
                                 saveStatusText.text = qsTr("✓ Параметры сохранены и пересчитаны");
                                 saveTimer.restart();
                             }
