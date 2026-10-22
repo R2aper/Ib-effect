@@ -73,13 +73,10 @@ QVariantMap calculateEconomics(const QVariantMap &payload,
     const int priority = risk.value(QStringLiteral("assetPriority")).toInt();
     const int score = impact * probability * priority;
     const QString level = riskLevel(score);
-    const int riskScore = risk.value(QStringLiteral("score"), score).toInt();
-    const QString riskScoreLevel =
-        risk.value(QStringLiteral("scoreLevel"), level).toString();
-    risk.insert(QStringLiteral("score"), riskScore);
-    risk.insert(QStringLiteral("scoreLevel"), riskScoreLevel);
+    risk.insert(QStringLiteral("score"), score);
+    risk.insert(QStringLiteral("scoreLevel"), level);
     risk.insert(QStringLiteral("scoreLevelName"),
-                riskLevelName(riskScoreLevel));
+                riskLevelName(level));
 
     double effectivePointCost = pointCost;
     const QString threatCode = risk.value(QStringLiteral("threatCode")).toString();
@@ -119,6 +116,14 @@ QVariantMap calculateEconomics(const QVariantMap &payload,
         break;
       }
     }
+    const QString residualLevel = riskLevel(residualScore);
+    risk.insert(QStringLiteral("inherentScore"), score);
+    risk.insert(QStringLiteral("residualScore"), residualScore);
+    risk.insert(QStringLiteral("residualScoreLevel"), residualLevel);
+    risk.insert(QStringLiteral("residualScoreLevelName"),
+                riskLevelName(residualLevel));
+    risk.insert(QStringLiteral("appetiteExceeded"),
+                residualScore > riskAppetite);
     residualLosses += residualScore * effectivePointCost;
     calculatedRisks.append(risk);
   }
@@ -716,6 +721,9 @@ void MockDataProvider::request(const QString &requestId,
   } else if (operation.endsWith(QStringLiteral(".create"))) {
     QVariantMap item = payload;
     QVariantList items = m_collections.value(entity);
+    const int riskAppetite =
+        item.value(QStringLiteral("riskAppetite"), 16).toInt();
+    item.remove(QStringLiteral("riskAppetite"));
     bool industrial =
         item.value(QStringLiteral("domain")).toString() == QStringLiteral("OT");
     if (entity == QStringLiteral("risks")) {
@@ -773,11 +781,11 @@ void MockDataProvider::request(const QString &requestId,
       item.insert(QStringLiteral("boundMeasureName"),
                   QStringLiteral("Не назначена"));
       item.insert(QStringLiteral("status"),
-                  score > 16 ? QStringLiteral("В плане")
-                             : QStringLiteral("Принят"));
+                  score > riskAppetite ? QStringLiteral("В плане")
+                                       : QStringLiteral("Принят"));
       item.insert(QStringLiteral("statusLevel"),
-                  score > 16 ? QStringLiteral("high")
-                             : QStringLiteral("success"));
+                  score > riskAppetite ? QStringLiteral("high")
+                                       : QStringLiteral("success"));
     } else if (entity == QStringLiteral("measures")) {
       item.insert(QStringLiteral("boundRiskId"), QString());
       item.insert(QStringLiteral("status"), QStringLiteral("В плане"));
@@ -1034,6 +1042,8 @@ void MockDataProvider::request(const QString &requestId,
       QVariantList risks = m_collections.value(QStringLiteral("risks"));
       const QString scenarioCode =
           payload.value(QStringLiteral("scenarioCode")).toString();
+      const int riskAppetite =
+          payload.value(QStringLiteral("riskAppetite"), 16).toInt();
       const QString riskPrefix =
           asset.value(QStringLiteral("domain")).toString() == QStringLiteral("OT")
               ? QStringLiteral("RSK-OT-")
@@ -1070,16 +1080,17 @@ void MockDataProvider::request(const QString &requestId,
             QStringLiteral(" [") + scenarioCode + QStringLiteral(" · Шаг ") +
             step.value(QStringLiteral("step_number")).toString() +
             QStringLiteral("]");
-        const QString status = score > 16 ? QStringLiteral("В плане")
-                                          : QStringLiteral("Принят");
+        const bool appetiteExceeded = score > riskAppetite;
+        const QString status = appetiteExceeded ? QStringLiteral("В плане")
+                                                : QStringLiteral("Принят");
         QVariantMap risk =
             makeRisk(riskId, threat, threatCode,
                      step.value(QStringLiteral("description")).toString(),
                      assetId, asset.value(QStringLiteral("name")).toString(),
                      impact, probability, priority, QString(),
                      QStringLiteral("Не назначена"), status,
-                     score > 16 ? QStringLiteral("high")
-                                : QStringLiteral("success"));
+                     appetiteExceeded ? QStringLiteral("high")
+                                      : QStringLiteral("success"));
         risk.insert(QStringLiteral("scenarioCode"), scenarioCode);
         risks.append(risk);
       }
@@ -1289,11 +1300,13 @@ RiskService::RiskService(DataProvider *provider, QObject *parent)
 
 QString RiskService::importScenario(const QString &scenarioCode,
                                     const QString &assetId,
-                                    const QVariantMap &scenario) {
+                                    const QVariantMap &scenario,
+                                    int riskAppetite) {
   return sendRequest(QStringLiteral("risks.importScenario"),
                      {{QStringLiteral("scenarioCode"), scenarioCode},
                       {QStringLiteral("assetId"), assetId},
-                      {QStringLiteral("scenario"), scenario}});
+                      {QStringLiteral("scenario"), scenario},
+                      {QStringLiteral("riskAppetite"), riskAppetite}});
 }
 
 QString RiskService::bindMeasure(const QString &riskId,
@@ -1425,6 +1438,13 @@ AppServices::AppServices(QObject *parent) : QObject(parent) {
   connect(m_assets, &AssetService::industrialModeChanged, this,
           [this] {
             m_economics->setIndustrialMode(m_assets->industrialMode());
+          });
+
+  connect(m_economics, &ServiceBase::operationFinished, this,
+          [this](const QString &, const QString &operation, bool success,
+                 const QVariant &data, const QString &) {
+            if (success && operation == QStringLiteral("economics.get"))
+              m_risks->syncCollections(data.toMap());
           });
 
   const auto refreshEconomics =

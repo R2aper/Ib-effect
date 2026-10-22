@@ -337,7 +337,8 @@ Rectangle {
                                 return;
                             }
                             scenarioDialog.pendingRequestId = RiskService.importScenario(
-                                sc.code || sc.title, asset.id, sc);
+                                sc.code || sc.title, asset.id, sc,
+                                EconomicsService.riskAppetite);
                         }
                     }
                 }

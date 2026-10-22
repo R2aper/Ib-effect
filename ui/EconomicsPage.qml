@@ -278,14 +278,14 @@ ScrollView {
                 md += "---\n\n";
 
                 md += "## 2. ИДЕНТИФИЦИРОВАННЫЕ УГРОЗЫ БЕЗОПАСНОСТИ И РАСЧЕТ РИСКОВ\n\n";
-                md += "| ID | Код/Угроза (БДУ ФСТЭК) | Уязвимость / Способ атак (СПА) | Связанный актив | I (1..4) | P (1..4) | A (1..4) | Начальный балл | Уровень риска |\n";
-                md += "| :--- | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: |\n";
+                md += "| ID | Код/Угроза (БДУ ФСТЭК) | Уязвимость / Способ атак (СПА) | Связанный актив | I (1..4) | P (1..4) | A (1..4) | Начальный балл | Уровень риска | Остаточный балл | Риск-аппетит |\n";
+                md += "| :--- | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |\n";
                 var risks = EconomicsService.summary.risks;
                 for (var r = 0; r < risks.length; r++) {
                     var rsk = risks[r];
-                    md += "| " + rsk.id + " | " + rsk.threat + " | " + rsk.vuln + " | " + rsk.assetName + " | " + rsk.impact + " | " + rsk.probability + " | " + rsk.assetPriority + " | " + rsk.score + " | " + reportBox.getLevelName(rsk.scoreLevel) + " |\n";
+                    md += "| " + rsk.id + " | " + rsk.threat + " | " + rsk.vuln + " | " + rsk.assetName + " | " + rsk.impact + " | " + rsk.probability + " | " + rsk.assetPriority + " | " + rsk.score + " | " + reportBox.getLevelName(rsk.scoreLevel) + " | " + rsk.residualScore + " | " + (rsk.appetiteExceeded ? "Выше порога" : "В пределах") + " |\n";
                 }
-                md += "\n**Критерии риск-аппетита:** Порог допустимого риска = " + EconomicsService.riskAppetite + " баллов. Стоимость балла = " + EconomicsService.pointCost.toLocaleString() + " ₽.\n\n";
+                md += "\n**Критерии риск-аппетита:** Порог допустимого остаточного риска = " + EconomicsService.riskAppetite + " баллов. Остаточный балл не выше порога находится в пределах аппетита; превышение требует обработки или документированного принятия. Стоимость балла = " + EconomicsService.pointCost.toLocaleString() + " ₽.\n\n";
                 md += "---\n\n";
 
                 md += "## 3. ПОРТФЕЛЬ КОМПЕНСИРУЮЩИХ МЕР (ПРИКАЗ ФСТЭК № 239 / ГОСТ Р 57580.3-2022)\n\n";

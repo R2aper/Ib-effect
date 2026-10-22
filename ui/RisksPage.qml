@@ -57,7 +57,7 @@ Item {
                 stepNumber: "03"
                 stepTitle: qsTr("Этап 3: Идентификация угроз и оценка величины рисков")
                 purpose: qsTr("Оценка угроз безопасности информации с сопоставлением банку данных угроз БДУ ФСТЭК России и расчет начального риска Risk = I × P × A.")
-                whatToDo: qsTr("Идентифицируйте сценарии угроз, выберите защищаемый актив, определите вероятность реализации P (1..4) и потенциальный ущерб I (1..4). Особое внимание уделите рискам с баллом выше порога (18 баллов).")
+                whatToDo: qsTr("Идентифицируйте сценарии угроз, выберите защищаемый актив, определите вероятность реализации P (1..4) и потенциальный ущерб I (1..4). Для оценки приемлемости сравнивайте остаточный балл с настраиваемым риск-аппетитом (по умолчанию 16).")
             }
 
             // --- ВЕРХНИЕ KPI-КАРТОЧКИ ---
@@ -260,7 +260,7 @@ Item {
                             Text { text: qsTr("СЦЕНАРИЙ УГРОЗЫ И УЯЗВИМОСТЬ"); color: Theme.muted; font.pixelSize: Theme.fontCaption; font.weight: Font.Bold; Layout.fillWidth: true }
                             Text { text: qsTr("АКТИВ"); color: Theme.muted; font.pixelSize: Theme.fontCaption; font.weight: Font.Bold; Layout.preferredWidth: 140 }
                             Text { text: qsTr("I × P × A"); color: Theme.muted; font.pixelSize: Theme.fontCaption; font.weight: Font.Bold; Layout.preferredWidth: 70; horizontalAlignment: Text.AlignHCenter }
-                            Text { text: qsTr("БАЛЛ РИСКА"); color: Theme.muted; font.pixelSize: Theme.fontCaption; font.weight: Font.Bold; Layout.preferredWidth: 125 }
+                            Text { text: qsTr("РИСК / ОСТАТОК"); color: Theme.muted; font.pixelSize: Theme.fontCaption; font.weight: Font.Bold; Layout.preferredWidth: 145 }
                             Text { text: qsTr("МЕРА ЗАЩИТЫ"); color: Theme.muted; font.pixelSize: Theme.fontCaption; font.weight: Font.Bold; Layout.preferredWidth: 160 }
                             Text { text: qsTr("СТАТУС"); color: Theme.muted; font.pixelSize: Theme.fontCaption; font.weight: Font.Bold; Layout.preferredWidth: 95 }
                             Text { text: qsTr("ДЕЙСТВИЯ"); color: Theme.muted; font.pixelSize: Theme.fontCaption; font.weight: Font.Bold; Layout.preferredWidth: 70; horizontalAlignment: Text.AlignHCenter }
@@ -277,7 +277,7 @@ Item {
                             required property int index
 
                             Layout.fillWidth: true
-                            implicitHeight: 48
+                            implicitHeight: 58
                             radius: Theme.radiusSm
                             color: riskRowMouse.containsMouse ? Theme.panelHover : (index % 2 === 0 ? "transparent" : (Theme.isDark ? "#171a21" : "#f8f9fb"))
 
@@ -345,10 +345,25 @@ Item {
                                     }
                                 }
 
-                                StatusBadge {
-                                    text: riskRow.modelData.score + " · " + root.levelName(riskRow.modelData.scoreLevel)
-                                    level: riskRow.modelData.scoreLevel
-                                    Layout.preferredWidth: 125
+                                ColumnLayout {
+                                    Layout.preferredWidth: 145
+                                    spacing: 2
+
+                                    StatusBadge {
+                                        text: riskRow.modelData.score + " · " + root.levelName(riskRow.modelData.scoreLevel)
+                                        level: riskRow.modelData.scoreLevel
+                                    }
+
+                                    Text {
+                                        text: riskRow.modelData.residualScore === undefined
+                                            ? qsTr("Остаток: пересчёт…")
+                                            : qsTr("Остаток: %1 · %2").arg(riskRow.modelData.residualScore).arg(
+                                                riskRow.modelData.appetiteExceeded ? qsTr("выше порога") : qsTr("в пределах"))
+                                        color: riskRow.modelData.appetiteExceeded ? Theme.riskHigh : Theme.green
+                                        font.pixelSize: Theme.fontMicro
+                                        elide: Text.ElideRight
+                                        Layout.fillWidth: true
+                                    }
                                 }
 
                                 Text {

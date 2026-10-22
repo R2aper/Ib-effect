@@ -483,7 +483,8 @@ Rectangle {
                                     assetName: asset.name,
                                     assetPriority: asset.prio,
                                     impact: impactSelector.selectedVal,
-                                    probability: probSelector.selectedVal
+                                    probability: probSelector.selectedVal,
+                                    riskAppetite: EconomicsService.riskAppetite
                                 });
                             }
                             riskDialog.pendingRequestId = requestId;

@@ -157,7 +157,8 @@ public:
 
   Q_INVOKABLE QString importScenario(const QString &scenarioCode,
                                      const QString &assetId,
-                                     const QVariantMap &scenario);
+                                     const QVariantMap &scenario,
+                                     int riskAppetite);
   Q_INVOKABLE QString bindMeasure(const QString &riskId,
                                   const QString &measureId);
   Q_INVOKABLE QString unbindMeasure(const QString &riskId);
