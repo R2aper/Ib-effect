@@ -49,7 +49,7 @@ Rectangle {
             z: -1
         }
 
-        property bool isRegisterMode: false
+        property bool isRegisterMode: true
         property string audienceType: "student" // "student" | "company"
         property string errorMessage: ""
         property string pendingRequestId: ""
@@ -490,13 +490,7 @@ Rectangle {
                 }
             }
 
-            // Подсказка для быстрой демонстрации
-            Text {
-                text: card.audienceType === "student" ? qsTr("Для входа студента: логин ostrenko, пароль 123") : qsTr("Для входа организации: логин ciso, пароль 123")
-                color: Theme.subtle
-                font.pixelSize: Theme.fontMicro
-                Layout.alignment: Qt.AlignHCenter
-            }
+
         }
     }
 }

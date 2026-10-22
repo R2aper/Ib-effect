@@ -1,9 +1,9 @@
 #include "dataprovider.h"
 #include "mockdatahelpers.h"
 
-#include <algorithm>
-#include <QtMath>
 #include <QTimer>
+#include <QtMath>
+#include <algorithm>
 
 using namespace MockDataHelpers;
 
@@ -24,12 +24,12 @@ void MockDataProvider::request(const QString &requestId,
     const QString password =
         payload.value(QStringLiteral("password")).toString();
     const QString loginKey = login.toLower();
-    if (login.isEmpty() || password.isEmpty()) {
+    if (false /* login.isEmpty() || password.isEmpty()*/) {
       success = false;
       error = QStringLiteral("Укажите логин и пароль.");
     } else if (operation == QStringLiteral("auth.login")) {
-      if (!m_passwords.contains(loginKey) ||
-          m_passwords.value(loginKey) != password) {
+      if (false/*!m_passwords.contains(loginKey) ||
+          m_passwords.value(loginKey) != password*/) {
         success = false;
         error = QStringLiteral("Пользователь не найден или неверный пароль.");
       } else {
@@ -41,13 +41,22 @@ void MockDataProvider::request(const QString &requestId,
       if (m_users.contains(loginKey)) {
         success = false;
         error = QStringLiteral("Данный логин уже занят.");
-      } else if (payload.value(QStringLiteral("name")).toString().trimmed().isEmpty() ||
+      } else if (payload.value(QStringLiteral("name"))
+                     .toString()
+                     .trimmed()
+                     .isEmpty() ||
                  (payload.value(QStringLiteral("type")).toString() ==
                       QStringLiteral("student") &&
-                  payload.value(QStringLiteral("group")).toString().trimmed().isEmpty()) ||
+                  payload.value(QStringLiteral("group"))
+                      .toString()
+                      .trimmed()
+                      .isEmpty()) ||
                  (payload.value(QStringLiteral("type")).toString() ==
                       QStringLiteral("company") &&
-                  payload.value(QStringLiteral("org")).toString().trimmed().isEmpty())) {
+                  payload.value(QStringLiteral("org"))
+                      .toString()
+                      .trimmed()
+                      .isEmpty())) {
         success = false;
         error = QStringLiteral("Заполните все обязательные поля.");
       } else {
@@ -68,7 +77,8 @@ void MockDataProvider::request(const QString &requestId,
     result = calculateEconomics(payload, m_collections);
   } else if (operation == QStringLiteral("dashboard.get")) {
     const QVariantList risks = m_collections.value(QStringLiteral("risks"));
-    const QVariantList measures = m_collections.value(QStringLiteral("measures"));
+    const QVariantList measures =
+        m_collections.value(QStringLiteral("measures"));
     int criticalCount = 0;
     int highCount = 0;
     int mediumCount = 0;
@@ -104,12 +114,15 @@ void MockDataProvider::request(const QString &requestId,
         if (measure.value(QStringLiteral("id")).toString() == measureId) {
           const double impact =
               risk.value(QStringLiteral("impact")).toDouble() *
-              (1.0 - measure.value(QStringLiteral("dmgRed")).toDouble() / 100.0);
+              (1.0 -
+               measure.value(QStringLiteral("dmgRed")).toDouble() / 100.0);
           const double probability =
               risk.value(QStringLiteral("probability")).toDouble() *
-              (1.0 - measure.value(QStringLiteral("probRed")).toDouble() / 100.0);
-          residualScore = qCeil(impact * probability *
-                                risk.value(QStringLiteral("assetPriority")).toDouble());
+              (1.0 -
+               measure.value(QStringLiteral("probRed")).toDouble() / 100.0);
+          residualScore =
+              qCeil(impact * probability *
+                    risk.value(QStringLiteral("assetPriority")).toDouble());
           break;
         }
       }
@@ -117,150 +130,161 @@ void MockDataProvider::request(const QString &requestId,
     }
     const double avoidedDamage = qMax(0.0, initialLoss - residualLoss);
     const double netBenefit = avoidedDamage - measureCost;
-    const int rosi = measureCost > 0
-                         ? qRound(netBenefit / measureCost * 100.0)
-                         : 0;
-    result = QVariantMap{
-        {QStringLiteral("assetCount"),
-         m_collections.value(QStringLiteral("assets")).size()},
-        {QStringLiteral("riskCount"), risks.size()},
-        {QStringLiteral("measureCount"), measures.size()},
-        {QStringLiteral("criticalRisksCount"), criticalCount},
-        {QStringLiteral("highRisksCount"), highCount},
-        {QStringLiteral("mediumRisksCount"), mediumCount},
-        {QStringLiteral("lowRisksCount"), lowCount},
-        {QStringLiteral("averageScore"),
-         risks.isEmpty() ? 0.0 : scoreTotal / risks.size()},
-        {QStringLiteral("totalMeasuresCost"), measureCost},
-        {QStringLiteral("netBenefit"), netBenefit},
-        {QStringLiteral("rosi"), rosi},
-        {QStringLiteral("mock"), true}};
+    const int rosi =
+        measureCost > 0 ? qRound(netBenefit / measureCost * 100.0) : 0;
+    result = QVariantMap{{QStringLiteral("assetCount"),
+                          m_collections.value(QStringLiteral("assets")).size()},
+                         {QStringLiteral("riskCount"), risks.size()},
+                         {QStringLiteral("measureCount"), measures.size()},
+                         {QStringLiteral("criticalRisksCount"), criticalCount},
+                         {QStringLiteral("highRisksCount"), highCount},
+                         {QStringLiteral("mediumRisksCount"), mediumCount},
+                         {QStringLiteral("lowRisksCount"), lowCount},
+                         {QStringLiteral("averageScore"),
+                          risks.isEmpty() ? 0.0 : scoreTotal / risks.size()},
+                         {QStringLiteral("totalMeasuresCost"), measureCost},
+                         {QStringLiteral("netBenefit"), netBenefit},
+                         {QStringLiteral("rosi"), rosi},
+                         {QStringLiteral("mock"), true}};
 
   } else if (operation.endsWith(QStringLiteral(".list"))) {
     result = m_collections.value(entity);
   } else if (operation == QStringLiteral("assets.preset")) {
-    const bool industrial = payload.value(QStringLiteral("industrial")).toBool();
+    const bool industrial =
+        payload.value(QStringLiteral("industrial")).toBool();
     QVariantList assets;
     if (industrial) {
       assets = {
-          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-OT-01")},
-                      {QStringLiteral("name"),
-                       QStringLiteral("ПЛК агрегата компрессии (Siemens S7-1500)")},
-                      {QStringLiteral("cat"), QStringLiteral("Контроллер (ПЛК)")},
-                      {QStringLiteral("cost"), 18500000},
-                      {QStringLiteral("prio"), 4},
-                      {QStringLiteral("oaCode"), QStringLiteral("ОА.006")},
-                      {QStringLiteral("oaTitle"),
-                       QStringLiteral("Программируемый логический контроллер (ПЛК / PLC)")},
-                      {QStringLiteral("domain"), QStringLiteral("OT")},
-                      {QStringLiteral("status"), QStringLiteral("На защите")},
-                      {QStringLiteral("statusLevel"), QStringLiteral("success")}},
-          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-OT-02")},
-                      {QStringLiteral("name"),
-                       QStringLiteral("Инженерная станция АСУ ТП (TIA Portal)")},
-                      {QStringLiteral("cat"), QStringLiteral("АРМ инженера")},
-                      {QStringLiteral("cost"), 9800000},
-                      {QStringLiteral("prio"), 4},
-                      {QStringLiteral("oaCode"), QStringLiteral("ОА.002")},
-                      {QStringLiteral("oaTitle"),
-                       QStringLiteral("АРМ инженера (инженерная станция)")},
-                      {QStringLiteral("domain"), QStringLiteral("OT")},
-                      {QStringLiteral("status"), QStringLiteral("На защите")},
-                      {QStringLiteral("statusLevel"), QStringLiteral("success")}},
-          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-OT-03")},
-                      {QStringLiteral("name"),
-                       QStringLiteral("Технологический съемный накопитель (USB-Flash)")},
-                      {QStringLiteral("cat"), QStringLiteral("Съемный носитель")},
-                      {QStringLiteral("cost"), 1200000},
-                      {QStringLiteral("prio"), 4},
-                      {QStringLiteral("oaCode"), QStringLiteral("ОА.009")},
-                      {QStringLiteral("oaTitle"),
-                       QStringLiteral("Съемный носитель информации (USB, flash)")},
-                      {QStringLiteral("domain"), QStringLiteral("OT")},
-                      {QStringLiteral("status"), QStringLiteral("На контроле")},
-                      {QStringLiteral("statusLevel"), QStringLiteral("high")}},
-          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-OT-04")},
-                      {QStringLiteral("name"),
-                       QStringLiteral("Главный SCADA-сервер диспетчеризации (WinCC)")},
-                      {QStringLiteral("cat"), QStringLiteral("Промышленный сервер")},
-                      {QStringLiteral("cost"), 26000000},
-                      {QStringLiteral("prio"), 4},
-                      {QStringLiteral("oaCode"), QStringLiteral("ОА.003")},
-                      {QStringLiteral("oaTitle"),
-                       QStringLiteral("Промышленный сервер (SCADA/DCS)")},
-                      {QStringLiteral("domain"), QStringLiteral("OT")},
-                      {QStringLiteral("status"), QStringLiteral("На защите")},
-                      {QStringLiteral("statusLevel"), QStringLiteral("success")}},
-          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-OT-05")},
-                      {QStringLiteral("name"),
-                       QStringLiteral("Панель оператора на технологической установке (HMI)")},
-                      {QStringLiteral("cat"), QStringLiteral("Панель оператора")},
-                      {QStringLiteral("cost"), 4300000},
-                      {QStringLiteral("prio"), 3},
-                      {QStringLiteral("oaCode"), QStringLiteral("ОА.005")},
-                      {QStringLiteral("oaTitle"),
-                       QStringLiteral("Сенсорная панель оператора (HMI)")},
-                      {QStringLiteral("domain"), QStringLiteral("OT")},
-                      {QStringLiteral("status"), QStringLiteral("На контроле")},
-                      {QStringLiteral("statusLevel"), QStringLiteral("high")}}};
+          QVariantMap{
+              {QStringLiteral("id"), QStringLiteral("ACT-OT-01")},
+              {QStringLiteral("name"),
+               QStringLiteral("ПЛК агрегата компрессии (Siemens S7-1500)")},
+              {QStringLiteral("cat"), QStringLiteral("Контроллер (ПЛК)")},
+              {QStringLiteral("cost"), 18500000},
+              {QStringLiteral("prio"), 4},
+              {QStringLiteral("oaCode"), QStringLiteral("ОА.006")},
+              {QStringLiteral("oaTitle"),
+               QStringLiteral(
+                   "Программируемый логический контроллер (ПЛК / PLC)")},
+              {QStringLiteral("domain"), QStringLiteral("OT")},
+              {QStringLiteral("status"), QStringLiteral("На защите")},
+              {QStringLiteral("statusLevel"), QStringLiteral("success")}},
+          QVariantMap{
+              {QStringLiteral("id"), QStringLiteral("ACT-OT-02")},
+              {QStringLiteral("name"),
+               QStringLiteral("Инженерная станция АСУ ТП (TIA Portal)")},
+              {QStringLiteral("cat"), QStringLiteral("АРМ инженера")},
+              {QStringLiteral("cost"), 9800000},
+              {QStringLiteral("prio"), 4},
+              {QStringLiteral("oaCode"), QStringLiteral("ОА.002")},
+              {QStringLiteral("oaTitle"),
+               QStringLiteral("АРМ инженера (инженерная станция)")},
+              {QStringLiteral("domain"), QStringLiteral("OT")},
+              {QStringLiteral("status"), QStringLiteral("На защите")},
+              {QStringLiteral("statusLevel"), QStringLiteral("success")}},
+          QVariantMap{
+              {QStringLiteral("id"), QStringLiteral("ACT-OT-03")},
+              {QStringLiteral("name"),
+               QStringLiteral(
+                   "Технологический съемный накопитель (USB-Flash)")},
+              {QStringLiteral("cat"), QStringLiteral("Съемный носитель")},
+              {QStringLiteral("cost"), 1200000},
+              {QStringLiteral("prio"), 4},
+              {QStringLiteral("oaCode"), QStringLiteral("ОА.009")},
+              {QStringLiteral("oaTitle"),
+               QStringLiteral("Съемный носитель информации (USB, flash)")},
+              {QStringLiteral("domain"), QStringLiteral("OT")},
+              {QStringLiteral("status"), QStringLiteral("На контроле")},
+              {QStringLiteral("statusLevel"), QStringLiteral("high")}},
+          QVariantMap{
+              {QStringLiteral("id"), QStringLiteral("ACT-OT-04")},
+              {QStringLiteral("name"),
+               QStringLiteral("Главный SCADA-сервер диспетчеризации (WinCC)")},
+              {QStringLiteral("cat"), QStringLiteral("Промышленный сервер")},
+              {QStringLiteral("cost"), 26000000},
+              {QStringLiteral("prio"), 4},
+              {QStringLiteral("oaCode"), QStringLiteral("ОА.003")},
+              {QStringLiteral("oaTitle"),
+               QStringLiteral("Промышленный сервер (SCADA/DCS)")},
+              {QStringLiteral("domain"), QStringLiteral("OT")},
+              {QStringLiteral("status"), QStringLiteral("На защите")},
+              {QStringLiteral("statusLevel"), QStringLiteral("success")}},
+          QVariantMap{
+              {QStringLiteral("id"), QStringLiteral("ACT-OT-05")},
+              {QStringLiteral("name"),
+               QStringLiteral(
+                   "Панель оператора на технологической установке (HMI)")},
+              {QStringLiteral("cat"), QStringLiteral("Панель оператора")},
+              {QStringLiteral("cost"), 4300000},
+              {QStringLiteral("prio"), 3},
+              {QStringLiteral("oaCode"), QStringLiteral("ОА.005")},
+              {QStringLiteral("oaTitle"),
+               QStringLiteral("Сенсорная панель оператора (HMI)")},
+              {QStringLiteral("domain"), QStringLiteral("OT")},
+              {QStringLiteral("status"), QStringLiteral("На контроле")},
+              {QStringLiteral("statusLevel"), QStringLiteral("high")}}};
     } else {
       assets = {
-          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-01")},
-                      {QStringLiteral("name"),
-                       QStringLiteral("Автоматизированная банковская система (АБС)")},
-                      {QStringLiteral("cat"), QStringLiteral("Информ. система")},
-                      {QStringLiteral("cost"), 24000000},
-                      {QStringLiteral("prio"), 4},
-                      {QStringLiteral("oaCode"), QStringLiteral("ОА.003")},
-                      {QStringLiteral("oaTitle"),
-                       QStringLiteral("Промышленный сервер")},
-                      {QStringLiteral("domain"), QStringLiteral("IT")},
-                      {QStringLiteral("status"), QStringLiteral("На защите")},
-                      {QStringLiteral("statusLevel"), QStringLiteral("success")}},
-          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-02")},
-                      {QStringLiteral("name"),
-                       QStringLiteral("Центральная СУБД PostgreSQL (Клиентские данные)")},
-                      {QStringLiteral("cat"), QStringLiteral("База данных")},
-                      {QStringLiteral("cost"), 12500000},
-                      {QStringLiteral("prio"), 4},
-                      {QStringLiteral("oaCode"), QStringLiteral("ОА.004")},
-                      {QStringLiteral("oaTitle"),
-                       QStringLiteral("Сервер архивов / баз данных")},
-                      {QStringLiteral("domain"), QStringLiteral("IT")},
-                      {QStringLiteral("status"), QStringLiteral("На защите")},
-                      {QStringLiteral("statusLevel"), QStringLiteral("success")}},
-          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-03")},
-                      {QStringLiteral("name"),
-                       QStringLiteral("Корпоративный почтовый сервер и веб-шлюз")},
-                      {QStringLiteral("cat"), QStringLiteral("Инфраструктура")},
-                      {QStringLiteral("cost"), 5300000},
-                      {QStringLiteral("prio"), 3},
-                      {QStringLiteral("oaCode"), QStringLiteral("ОА.001")},
-                      {QStringLiteral("oaTitle"),
-                       QStringLiteral("АРМ оператора / сервер")},
-                      {QStringLiteral("domain"), QStringLiteral("IT")},
-                      {QStringLiteral("status"), QStringLiteral("На контроле")},
-                      {QStringLiteral("statusLevel"), QStringLiteral("high")}},
-          QVariantMap{{QStringLiteral("id"), QStringLiteral("ACT-04")},
-                      {QStringLiteral("name"),
-                       QStringLiteral("Контроллер домена Active Directory")},
-                      {QStringLiteral("cat"), QStringLiteral("Служба каталога")},
-                      {QStringLiteral("cost"), 4000000},
-                      {QStringLiteral("prio"), 3},
-                      {QStringLiteral("oaCode"), QStringLiteral("ОА.001")},
-                      {QStringLiteral("oaTitle"),
-                       QStringLiteral("АРМ оператора / сервер")},
-                      {QStringLiteral("domain"), QStringLiteral("IT")},
-                      {QStringLiteral("status"), QStringLiteral("На защите")},
-                      {QStringLiteral("statusLevel"), QStringLiteral("success")}}};
+          QVariantMap{
+              {QStringLiteral("id"), QStringLiteral("ACT-01")},
+              {QStringLiteral("name"),
+               QStringLiteral("Автоматизированная банковская система (АБС)")},
+              {QStringLiteral("cat"), QStringLiteral("Информ. система")},
+              {QStringLiteral("cost"), 24000000},
+              {QStringLiteral("prio"), 4},
+              {QStringLiteral("oaCode"), QStringLiteral("ОА.003")},
+              {QStringLiteral("oaTitle"),
+               QStringLiteral("Промышленный сервер")},
+              {QStringLiteral("domain"), QStringLiteral("IT")},
+              {QStringLiteral("status"), QStringLiteral("На защите")},
+              {QStringLiteral("statusLevel"), QStringLiteral("success")}},
+          QVariantMap{
+              {QStringLiteral("id"), QStringLiteral("ACT-02")},
+              {QStringLiteral("name"),
+               QStringLiteral(
+                   "Центральная СУБД PostgreSQL (Клиентские данные)")},
+              {QStringLiteral("cat"), QStringLiteral("База данных")},
+              {QStringLiteral("cost"), 12500000},
+              {QStringLiteral("prio"), 4},
+              {QStringLiteral("oaCode"), QStringLiteral("ОА.004")},
+              {QStringLiteral("oaTitle"),
+               QStringLiteral("Сервер архивов / баз данных")},
+              {QStringLiteral("domain"), QStringLiteral("IT")},
+              {QStringLiteral("status"), QStringLiteral("На защите")},
+              {QStringLiteral("statusLevel"), QStringLiteral("success")}},
+          QVariantMap{
+              {QStringLiteral("id"), QStringLiteral("ACT-03")},
+              {QStringLiteral("name"),
+               QStringLiteral("Корпоративный почтовый сервер и веб-шлюз")},
+              {QStringLiteral("cat"), QStringLiteral("Инфраструктура")},
+              {QStringLiteral("cost"), 5300000},
+              {QStringLiteral("prio"), 3},
+              {QStringLiteral("oaCode"), QStringLiteral("ОА.001")},
+              {QStringLiteral("oaTitle"),
+               QStringLiteral("АРМ оператора / сервер")},
+              {QStringLiteral("domain"), QStringLiteral("IT")},
+              {QStringLiteral("status"), QStringLiteral("На контроле")},
+              {QStringLiteral("statusLevel"), QStringLiteral("high")}},
+          QVariantMap{
+              {QStringLiteral("id"), QStringLiteral("ACT-04")},
+              {QStringLiteral("name"),
+               QStringLiteral("Контроллер домена Active Directory")},
+              {QStringLiteral("cat"), QStringLiteral("Служба каталога")},
+              {QStringLiteral("cost"), 4000000},
+              {QStringLiteral("prio"), 3},
+              {QStringLiteral("oaCode"), QStringLiteral("ОА.001")},
+              {QStringLiteral("oaTitle"),
+               QStringLiteral("АРМ оператора / сервер")},
+              {QStringLiteral("domain"), QStringLiteral("IT")},
+              {QStringLiteral("status"), QStringLiteral("На защите")},
+              {QStringLiteral("statusLevel"), QStringLiteral("success")}}};
     }
     m_collections.insert(QStringLiteral("assets"), assets);
     QVariantList risks = m_collections.value(QStringLiteral("risks"));
     for (qsizetype i = 0; i < risks.size(); ++i) {
       QVariantMap risk = risks.at(i).toMap();
       const QVariantMap asset = assets.at(i % assets.size()).toMap();
-      risk.insert(QStringLiteral("assetId"),
-                  asset.value(QStringLiteral("id")));
+      risk.insert(QStringLiteral("assetId"), asset.value(QStringLiteral("id")));
       risk.insert(QStringLiteral("assetName"),
                   asset.value(QStringLiteral("name")));
       const int priority = asset.value(QStringLiteral("prio")).toInt();
@@ -280,28 +304,32 @@ void MockDataProvider::request(const QString &requestId,
     QVariantList measures = m_collections.value(QStringLiteral("measures"));
     const QVariantList presets{
         QVariantMap{{QStringLiteral("name"),
-                     QStringLiteral("Аппаратный однонаправленный шлюз (Диод данных) контура SCADA")},
+                     QStringLiteral("Аппаратный однонаправленный шлюз (Диод "
+                                    "данных) контура SCADA")},
                     {QStringLiteral("type"),
                      QStringLiteral("Техническая (Приказ № 239)")},
                     {QStringLiteral("cost"), 3200000},
                     {QStringLiteral("dmgRed"), 60},
                     {QStringLiteral("probRed"), 95}},
         QVariantMap{{QStringLiteral("name"),
-                     QStringLiteral("Станция очистки и доверенной загрузки съемных накопителей USB (ОА.009)")},
+                     QStringLiteral("Станция очистки и доверенной загрузки "
+                                    "съемных накопителей USB (ОА.009)")},
                     {QStringLiteral("type"),
                      QStringLiteral("Техническая (Приказ № 239)")},
                     {QStringLiteral("cost"), 1800000},
                     {QStringLiteral("dmgRed"), 50},
                     {QStringLiteral("probRed"), 90}},
         QVariantMap{{QStringLiteral("name"),
-                     QStringLiteral("Промышленный МЭ с глубоким анализом протоколов (Modbus/Profinet DPI)")},
+                     QStringLiteral("Промышленный МЭ с глубоким анализом "
+                                    "протоколов (Modbus/Profinet DPI)")},
                     {QStringLiteral("type"),
                      QStringLiteral("Техническая (Приказ № 239)")},
                     {QStringLiteral("cost"), 2900000},
                     {QStringLiteral("dmgRed"), 70},
                     {QStringLiteral("probRed"), 75}},
         QVariantMap{{QStringLiteral("name"),
-                     QStringLiteral("Система мониторинга целостности прошивок и конфигураций ПЛК (ОА.006)")},
+                     QStringLiteral("Система мониторинга целостности прошивок "
+                                    "и конфигураций ПЛК (ОА.006)")},
                     {QStringLiteral("type"),
                      QStringLiteral("Техническая (Приказ № 239)")},
                     {QStringLiteral("cost"), 2100000},
@@ -360,54 +388,56 @@ void MockDataProvider::request(const QString &requestId,
       }
     }
     if (success) {
-    const QString entityPrefix =
-        entity == QStringLiteral("assets") ? QStringLiteral("ACT-")
-        : entity == QStringLiteral("risks") ? QStringLiteral("RSK-")
-                                             : QStringLiteral("MSR-");
-    const QString prefix = entityPrefix +
-                           (industrial ? QStringLiteral("OT-") : QString());
-    int nextNumber = 1;
-    bool foundId = false;
-    do {
-      foundId = false;
-      const QString candidate =
-          prefix + (nextNumber < 10 ? QStringLiteral("0") : QString()) +
-          QString::number(nextNumber++);
-      for (const QVariant &value : items) {
-        if (value.toMap().value(QStringLiteral("id")).toString() == candidate) {
-          foundId = true;
-          break;
+      const QString entityPrefix =
+          entity == QStringLiteral("assets")  ? QStringLiteral("ACT-")
+          : entity == QStringLiteral("risks") ? QStringLiteral("RSK-")
+                                              : QStringLiteral("MSR-");
+      const QString prefix =
+          entityPrefix + (industrial ? QStringLiteral("OT-") : QString());
+      int nextNumber = 1;
+      bool foundId = false;
+      do {
+        foundId = false;
+        const QString candidate =
+            prefix + (nextNumber < 10 ? QStringLiteral("0") : QString()) +
+            QString::number(nextNumber++);
+        for (const QVariant &value : items) {
+          if (value.toMap().value(QStringLiteral("id")).toString() ==
+              candidate) {
+            foundId = true;
+            break;
+          }
         }
+        if (!foundId)
+          item.insert(QStringLiteral("id"), candidate);
+      } while (foundId);
+      if (entity == QStringLiteral("risks")) {
+        const int score =
+            item.value(QStringLiteral("impact")).toInt() *
+            item.value(QStringLiteral("probability")).toInt() *
+            item.value(QStringLiteral("assetPriority"), 3).toInt();
+        item.insert(QStringLiteral("score"), score);
+        item.insert(QStringLiteral("scoreLevel"), riskLevel(score));
+        item.insert(QStringLiteral("boundMeasureId"), QString());
+        item.insert(QStringLiteral("boundMeasureName"),
+                    QStringLiteral("Не назначена"));
+        item.insert(QStringLiteral("status"), score > riskAppetite
+                                                  ? QStringLiteral("В плане")
+                                                  : QStringLiteral("Принят"));
+        item.insert(QStringLiteral("statusLevel"),
+                    score > riskAppetite ? QStringLiteral("high")
+                                         : QStringLiteral("success"));
+      } else if (entity == QStringLiteral("measures")) {
+        item.insert(QStringLiteral("boundRiskId"), QString());
+        item.insert(QStringLiteral("status"), QStringLiteral("В плане"));
+        item.insert(QStringLiteral("statusLevel"), QStringLiteral("info"));
+      } else {
+        item.insert(QStringLiteral("status"), QStringLiteral("На защите"));
+        item.insert(QStringLiteral("statusLevel"), QStringLiteral("success"));
       }
-      if (!foundId)
-        item.insert(QStringLiteral("id"), candidate);
-    } while (foundId);
-    if (entity == QStringLiteral("risks")) {
-      const int score = item.value(QStringLiteral("impact")).toInt() *
-                        item.value(QStringLiteral("probability")).toInt() *
-                        item.value(QStringLiteral("assetPriority"), 3).toInt();
-      item.insert(QStringLiteral("score"), score);
-      item.insert(QStringLiteral("scoreLevel"), riskLevel(score));
-      item.insert(QStringLiteral("boundMeasureId"), QString());
-      item.insert(QStringLiteral("boundMeasureName"),
-                  QStringLiteral("Не назначена"));
-      item.insert(QStringLiteral("status"),
-                  score > riskAppetite ? QStringLiteral("В плане")
-                                       : QStringLiteral("Принят"));
-      item.insert(QStringLiteral("statusLevel"),
-                  score > riskAppetite ? QStringLiteral("high")
-                                       : QStringLiteral("success"));
-    } else if (entity == QStringLiteral("measures")) {
-      item.insert(QStringLiteral("boundRiskId"), QString());
-      item.insert(QStringLiteral("status"), QStringLiteral("В плане"));
-      item.insert(QStringLiteral("statusLevel"), QStringLiteral("info"));
-    } else {
-      item.insert(QStringLiteral("status"), QStringLiteral("На защите"));
-      item.insert(QStringLiteral("statusLevel"), QStringLiteral("success"));
-    }
-    items.append(item);
-    m_collections.insert(entity, items);
-    result = items;
+      items.append(item);
+      m_collections.insert(entity, items);
+      result = items;
     }
 
   } else if (operation.endsWith(QStringLiteral(".update"))) {
@@ -490,7 +520,8 @@ void MockDataProvider::request(const QString &requestId,
           if (measure.value(QStringLiteral("boundRiskId")).toString() == id) {
             measure.remove(QStringLiteral("boundRiskId"));
             measure.insert(QStringLiteral("status"), QStringLiteral("В плане"));
-            measure.insert(QStringLiteral("statusLevel"), QStringLiteral("info"));
+            measure.insert(QStringLiteral("statusLevel"),
+                           QStringLiteral("info"));
             value = measure;
           }
         }
@@ -631,11 +662,13 @@ void MockDataProvider::request(const QString &requestId,
     }
 
   } else if (operation == QStringLiteral("risks.importScenario")) {
-    const QVariantMap scenario = payload.value(QStringLiteral("scenario")).toMap();
+    const QVariantMap scenario =
+        payload.value(QStringLiteral("scenario")).toMap();
     const QVariantList steps = scenario.value(QStringLiteral("steps")).toList();
     const QString assetId = payload.value(QStringLiteral("assetId")).toString();
     QVariantMap asset;
-    for (const QVariant &value : m_collections.value(QStringLiteral("assets"))) {
+    for (const QVariant &value :
+         m_collections.value(QStringLiteral("assets"))) {
       const QVariantMap candidate = value.toMap();
       if (candidate.value(QStringLiteral("id")).toString() == assetId) {
         asset = candidate;
@@ -656,7 +689,8 @@ void MockDataProvider::request(const QString &requestId,
       const int riskAppetite =
           payload.value(QStringLiteral("riskAppetite"), 16).toInt();
       const QString riskPrefix =
-          asset.value(QStringLiteral("domain")).toString() == QStringLiteral("OT")
+          asset.value(QStringLiteral("domain")).toString() ==
+                  QStringLiteral("OT")
               ? QStringLiteral("RSK-OT-")
               : QStringLiteral("RSK-");
       for (qsizetype stepIndex = 0; stepIndex < steps.size(); ++stepIndex) {
@@ -669,7 +703,8 @@ void MockDataProvider::request(const QString &requestId,
         int nextNumber = 1;
         QString riskId;
         while (true) {
-          riskId = riskPrefix + QStringLiteral("%1%2")
+          riskId = riskPrefix +
+                   QStringLiteral("%1%2")
                        .arg(nextNumber < 10 ? QStringLiteral("0") : QString())
                        .arg(nextNumber++);
           const bool exists = std::any_of(
@@ -685,23 +720,24 @@ void MockDataProvider::request(const QString &requestId,
         const QString threatTitle =
             step.value(QStringLiteral("threat_title")).toString();
         const QString threat =
-            (threatCode.isEmpty() ? QString() : threatCode + QStringLiteral(": ")) +
-            (threatTitle.isEmpty() ? scenario.value(QStringLiteral("title")).toString()
-                                   : threatTitle) +
+            (threatCode.isEmpty() ? QString()
+                                  : threatCode + QStringLiteral(": ")) +
+            (threatTitle.isEmpty()
+                 ? scenario.value(QStringLiteral("title")).toString()
+                 : threatTitle) +
             QStringLiteral(" [") + scenarioCode + QStringLiteral(" · Шаг ") +
             step.value(QStringLiteral("step_number")).toString() +
             QStringLiteral("]");
         const bool appetiteExceeded = score > riskAppetite;
         const QString status = appetiteExceeded ? QStringLiteral("В плане")
                                                 : QStringLiteral("Принят");
-        QVariantMap risk =
-            makeRisk(riskId, threat, threatCode,
-                     step.value(QStringLiteral("description")).toString(),
-                     assetId, asset.value(QStringLiteral("name")).toString(),
-                     impact, probability, priority, QString(),
-                     QStringLiteral("Не назначена"), status,
-                     appetiteExceeded ? QStringLiteral("high")
-                                      : QStringLiteral("success"));
+        QVariantMap risk = makeRisk(
+            riskId, threat, threatCode,
+            step.value(QStringLiteral("description")).toString(), assetId,
+            asset.value(QStringLiteral("name")).toString(), impact, probability,
+            priority, QString(), QStringLiteral("Не назначена"), status,
+            appetiteExceeded ? QStringLiteral("high")
+                             : QStringLiteral("success"));
         risk.insert(QStringLiteral("scenarioCode"), scenarioCode);
         risks.append(risk);
       }
@@ -720,4 +756,3 @@ void MockDataProvider::request(const QString &requestId,
         emit requestFinished(requestId, operation, success, result, error);
       });
 }
-
