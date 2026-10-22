@@ -103,12 +103,6 @@ Rectangle {
             spacing: 8
 
             Text {
-                text: "👉"
-                font.pixelSize: 12
-                Layout.alignment: Qt.AlignTop
-            }
-
-            Text {
                 Layout.fillWidth: true
                 text: guideRoot.whatToDo
                 color: Theme.textSecondary

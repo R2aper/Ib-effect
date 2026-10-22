@@ -332,8 +332,6 @@ ScrollView {
                     Layout.fillWidth: true
                     spacing: 16
 
-                    Text { text: "📑"; font.pixelSize: 24 }
-
                     ColumnLayout {
                         Layout.fillWidth: true
                         spacing: 2
@@ -359,7 +357,6 @@ ScrollView {
                         RowLayout {
                             anchors.centerIn: parent
                             spacing: 8
-                            Text { text: "📥"; font.pixelSize: 13 }
                             Text {
                                 id: exportBtnText
                                 text: qsTr("Сформировать отчет")
@@ -379,7 +376,7 @@ ScrollView {
                                 var fileName = "Отчет_Модель_угроз_АСУ_ТП.md";
                                 reportBox.exportSucceeded = ReportExporter.saveReport(fileName, content);
                                 reportBox.statusMsg = reportBox.exportSucceeded
-                                        ? qsTr("✅ Отчет успешно сформирован и сохранен в файл «%1».").arg(fileName)
+                                        ? qsTr("Отчет успешно сформирован и сохранен в файл «%1».").arg(fileName)
                                         : qsTr("Не удалось сохранить отчет в файл «%1». Проверьте доступ к папке приложения.").arg(fileName);
                             }
                         }

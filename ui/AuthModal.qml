@@ -189,10 +189,6 @@ Rectangle {
                             anchors.centerIn: parent
                             spacing: 6
                             Text {
-                                text: "🎓"
-                                font.pixelSize: 13
-                            }
-                            Text {
                                 text: qsTr("Студент / Вуз")
                                 color: card.audienceType === "student" ? Theme.accent : Theme.muted
                                 font.pixelSize: Theme.fontCaption
@@ -221,10 +217,6 @@ Rectangle {
                         RowLayout {
                             anchors.centerIn: parent
                             spacing: 6
-                            Text {
-                                text: "🏢"
-                                font.pixelSize: 13
-                            }
                             Text {
                                 text: qsTr("Организация")
                                 color: card.audienceType === "company" ? Theme.accent : Theme.muted

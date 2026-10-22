@@ -152,12 +152,6 @@ Rectangle {
                     spacing: 8
 
                     Text {
-                        text: "💡"
-                        font.pixelSize: 13
-                        Layout.alignment: Qt.AlignTop
-                    }
-
-                    Text {
                         id: noteText
                         Layout.fillWidth: true
                         text: root.practicalNote

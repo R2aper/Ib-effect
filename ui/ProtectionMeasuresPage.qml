@@ -164,7 +164,6 @@ Item {
                             RowLayout {
                                 anchors.centerIn: parent
                                 spacing: 6
-                                Text { text: "⚡"; color: Theme.accent; font.pixelSize: 12 }
                                 Text {
                                     id: addPresetMeasureBtn
                                     text: qsTr("Меры Приказа № 239 (АСУ ТП)")

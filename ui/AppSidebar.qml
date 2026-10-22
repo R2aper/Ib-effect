@@ -93,7 +93,7 @@ Rectangle {
 
                 Text {
                     anchors.centerIn: parent
-                    text: "◀"
+                    text: "<"
                     color: Theme.muted
                     font.pixelSize: 10
                 }
@@ -124,7 +124,7 @@ Rectangle {
 
             Text {
                 anchors.centerIn: parent
-                text: "▶"
+                text: ">"
                 color: Theme.muted
                 font.pixelSize: 10
             }

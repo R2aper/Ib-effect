@@ -77,11 +77,6 @@ Rectangle {
                 spacing: 8
 
                 Text {
-                    text: AssetService.industrialMode ? "⚡" : "🏢"
-                    font.pixelSize: 13
-                }
-
-                Text {
                     text: AssetService.industrialMode ? qsTr("Контур: АСУ ТП (КИИ)") : qsTr("Контур: IT-системы")
                     color: AssetService.industrialMode ? (Theme.isDark ? Theme.tealLight : Theme.teal) : Theme.text
                     font.pixelSize: Theme.fontCaption
@@ -126,11 +121,6 @@ Rectangle {
                 spacing: 6
 
                 Text {
-                    text: Theme.isDark ? "🌙" : "☀️"
-                    font.pixelSize: 13
-                }
-
-                Text {
                     text: Theme.isDark ? qsTr("Тёмная") : qsTr("Светлая")
                     color: Theme.text
                     font.pixelSize: Theme.fontCaption
@@ -153,7 +143,7 @@ Rectangle {
 
         // --- СТАТУС / ТИП ПРОФИЛЯ ---
         StatusBadge {
-            text: AuthService.user.type === "company" ? qsTr("🏢 Организация") : qsTr("🎓 Студент")
+            text: AuthService.user.type === "company" ? qsTr("Организация") : qsTr("Студент")
             level: AuthService.user.type === "company" ? "teal" : "info"
         }
 

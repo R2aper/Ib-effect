@@ -178,7 +178,6 @@ Item {
                             RowLayout {
                                 anchors.centerIn: parent
                                 spacing: 6
-                                Text { text: "⚡"; color: Theme.accent; font.pixelSize: 12 }
                                 Text {
                                     id: importScenBtnText
                                     text: qsTr("Сценарий ФСТЭК (С1–С3)")

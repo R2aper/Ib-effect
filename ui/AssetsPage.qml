@@ -163,7 +163,6 @@ Item {
                         RowLayout {
                             anchors.centerIn: parent
                             spacing: 6
-                            Text { text: "⚡"; color: Theme.accent; font.pixelSize: 12 }
                             Text {
                                 id: otPresetBtnText
                                 text: qsTr("Профиль АСУ ТП (КИИ)")
@@ -193,7 +192,6 @@ Item {
                         RowLayout {
                             anchors.centerIn: parent
                             spacing: 6
-                            Text { text: "🏢"; font.pixelSize: 12 }
                             Text {
                                 id: itPresetBtnText
                                 text: qsTr("Профиль IT-контура")
