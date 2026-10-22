@@ -22,15 +22,17 @@ Rectangle {
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: 20
-        anchors.rightMargin: 20
-        spacing: 16
+        anchors.leftMargin: header.width < 1000 ? 12 : 20
+        anchors.rightMargin: header.width < 1000 ? 12 : 20
+        spacing: header.width < 1000 ? 8 : 16
 
         // --- ХЛЕБНЫЕ КРОШКИ (Четкий контрастный текст) ---
         RowLayout {
             spacing: 8
+            Layout.maximumWidth: header.width < 1000 ? 160 : 300
 
             Text {
+                visible: header.width >= 1000
                 text: qsTr("Рабочее пространство")
                 color: Theme.muted
                 font.pixelSize: Theme.fontCaption
@@ -46,52 +48,14 @@ Rectangle {
                 color: Theme.text
                 font.pixelSize: Theme.fontBody
                 font.weight: Font.Bold
+                elide: Text.ElideRight
+                Layout.maximumWidth: 180
             }
         }
 
-        Item { Layout.preferredWidth: 20 }
+        Item { visible: header.width >= 1100; Layout.preferredWidth: 20 }
 
-        // --- ПОЛЕ ГЛОБАЛЬНОГО ПОИСКА (Строгий стиль, без неона) ---
-        Rectangle {
-            Layout.preferredWidth: Math.min(380, Math.max(220, parent.width * 0.3))
-            Layout.preferredHeight: 36
-            radius: Theme.radiusSm
-            color: searchInput.activeFocus ? (Theme.isDark ? Theme.panelHover : "#ffffff") : (Theme.isDark ? Theme.panel : "#f1f3f7")
-            border.color: searchInput.activeFocus ? Theme.accent : Theme.border
-            border.width: 1
 
-            Behavior on color { ColorAnimation { duration: 120 } }
-            Behavior on border.color { ColorAnimation { duration: 120 } }
-
-            RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: 12
-                anchors.rightMargin: 12
-                spacing: 8
-
-                Text {
-                    text: "⌕"
-                    color: searchInput.activeFocus ? Theme.accent : Theme.muted
-                    font.pixelSize: 16
-                }
-
-                TextInput {
-                    id: searchInput
-                    Layout.fillWidth: true
-                    color: Theme.text
-                    font.pixelSize: Theme.fontBody
-                    selectByMouse: true
-                    clip: true
-
-                    Text {
-                        visible: !searchInput.text && !searchInput.activeFocus
-                        text: qsTr("Поиск по активам, рискам, мерам...")
-                        color: Theme.subtle
-                        font.pixelSize: Theme.fontBody
-                    }
-                }
-            }
-        }
 
         Item { Layout.fillWidth: true }
 
@@ -243,6 +207,8 @@ Rectangle {
                         color: Theme.text
                         font.pixelSize: Theme.fontCaption
                         font.weight: Font.Bold
+                        elide: Text.ElideRight
+                        Layout.maximumWidth: 150
                     }
                     Text {
                         text: {
@@ -254,9 +220,13 @@ Rectangle {
                         }
                         color: Theme.muted
                         font.pixelSize: Theme.fontMicro
+                        elide: Text.ElideRight
+                        Layout.maximumWidth: 150
                     }
                 }
             }
+
+            Layout.maximumWidth: 210
 
             MouseArea {
                 id: profileMouse

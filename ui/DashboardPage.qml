@@ -23,8 +23,10 @@ ScrollView {
     clip: true
     padding: 24
     contentWidth: availableWidth
+    contentHeight: pageContent.implicitHeight
 
     ColumnLayout {
+        id: pageContent
         width: parent.width
         spacing: 24
         Item { Layout.preferredHeight: 2 }

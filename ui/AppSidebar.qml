@@ -7,12 +7,14 @@ Rectangle {
 
     property int currentTab: 0
     property bool collapsed: false
+    property bool compactMode: false
+    readonly property bool isCollapsed: collapsed || compactMode
     signal tabSelected(int index)
 
     color: Theme.sidebar
     border.color: Theme.border
     border.width: 1
-    Layout.preferredWidth: collapsed ? Theme.sidebarWidthCompact : Theme.sidebarWidthExpanded
+    Layout.preferredWidth: isCollapsed ? Theme.sidebarWidthCompact : Theme.sidebarWidthExpanded
     Layout.fillHeight: true
 
     Behavior on color { ColorAnimation { duration: 180 } }
@@ -34,7 +36,7 @@ Rectangle {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: sidebar.collapsed ? 8 : 14
+        anchors.margins: sidebar.isCollapsed ? 8 : 14
         spacing: 0
 
         // --- ШАПКА САЙДБАРА (ЛОГОТИП И КНОПКА СВОРАЧИВАНИЯ) ---
@@ -62,7 +64,7 @@ Rectangle {
             }
 
             ColumnLayout {
-                visible: !sidebar.collapsed
+                visible: !sidebar.isCollapsed
                 spacing: 2
                 Layout.fillWidth: true
 
@@ -81,7 +83,7 @@ Rectangle {
 
             // Кнопка сворачивания/разворачивания
             Rectangle {
-                visible: !sidebar.collapsed
+                visible: !sidebar.isCollapsed
                 width: 28
                 height: 28
                 radius: Theme.radiusXs
@@ -112,7 +114,7 @@ Rectangle {
 
         // Если свернуто — отдельная кнопка развернуть
         Rectangle {
-            visible: sidebar.collapsed
+            visible: sidebar.isCollapsed && !sidebar.compactMode
             Layout.alignment: Qt.AlignHCenter
             Layout.bottomMargin: 14
             width: 32
@@ -142,7 +144,7 @@ Rectangle {
 
         // Подзаголовок раздела
         Text {
-            visible: !sidebar.collapsed
+            visible: !sidebar.isCollapsed
             text: qsTr("РАБОЧЕЕ ПРОСТРАНСТВО")
             color: Theme.subtle
             font.pixelSize: Theme.fontMicro
@@ -153,7 +155,7 @@ Rectangle {
         }
 
         Rectangle {
-            visible: sidebar.collapsed
+            visible: sidebar.isCollapsed
             Layout.fillWidth: true
             height: 1
             color: Theme.border
@@ -170,7 +172,7 @@ Rectangle {
                 iconName: modelData.icon || ""
                 glyph: modelData.glyph || ""
                 label: modelData.label
-                compact: sidebar.collapsed
+                compact: sidebar.isCollapsed
                 checked: sidebar.currentTab === index
                 onClicked: sidebar.tabSelected(index)
             }
@@ -181,7 +183,7 @@ Rectangle {
         // --- НИЖНИЙ БЛОК СТАТУСА ПРОЕКТА ---
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: sidebar.collapsed ? 36 : 68
+            implicitHeight: sidebar.isCollapsed ? 36 : 68
             radius: Theme.radiusSm
             color: Theme.panel
             border.color: Theme.border
@@ -191,7 +193,7 @@ Rectangle {
             Behavior on border.color { ColorAnimation { duration: 180 } }
 
             ColumnLayout {
-                visible: !sidebar.collapsed
+                visible: !sidebar.isCollapsed
                 anchors.fill: parent
                 anchors.margins: 10
                 spacing: 3
@@ -222,7 +224,7 @@ Rectangle {
             }
 
             Rectangle {
-                visible: sidebar.collapsed
+                visible: sidebar.isCollapsed
                 anchors.centerIn: parent
                 width: 8
                 height: 8

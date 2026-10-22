@@ -49,7 +49,7 @@ Rectangle {
             z: -1
         }
 
-        property bool isRegisterMode: true
+        property bool isRegisterMode: false
         property string audienceType: "student" // "student" | "company"
         property string errorMessage: ""
         property string pendingRequestId: ""

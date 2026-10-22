@@ -38,6 +38,7 @@ Window {
 
         AppSidebar {
             currentTab: window.currentTab
+            compactMode: window.width < 1200
             onTabSelected: index => window.currentTab = index
         }
 
