@@ -81,6 +81,14 @@ qt_add_executable(Ibe
     main.cpp
     appservices.h
     appservices.cpp
+    dataprovider.h
+    dataprovider.cpp
+    mockdatahelpers.h
+    mockdatahelpers.cpp
+    mockdata.cpp
+    mockdataprovider.cpp
+    services.h
+    services.cpp
 )
 
 qt_add_qml_module(Ibe
