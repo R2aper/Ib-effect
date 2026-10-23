@@ -38,6 +38,7 @@ set(IBE_UI_QML_FILES
     ui/MethodologyPage.qml
     ui/NormativeExplanationCard.qml
     ui/WorkflowGuideBanner.qml
+    ui/DocumentLinks.js
 )
 
 set_source_files_properties(ui/BduData.js PROPERTIES

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import "DocumentLinks.js" as DocumentLinks
 
 Rectangle {
     id: badge
@@ -68,11 +69,13 @@ Rectangle {
         }
 
         Text {
-            text: badge.text
+            text: DocumentLinks.linkify(badge.text)
+            textFormat: Text.RichText
             color: badge.fgColor
             font.pixelSize: Theme.fontCaption
             font.weight: Font.Bold
             verticalAlignment: Text.AlignVCenter
+            onLinkActivated: link => Qt.openUrlExternally(link)
         }
     }
 }

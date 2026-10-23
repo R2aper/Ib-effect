@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Effects
 import QtQuick.Layouts
+import "DocumentLinks.js" as DocumentLinks
 
 ScrollView {
     clip: true
@@ -319,7 +320,7 @@ ScrollView {
 
                 md += "---\n\n";
                 md += "*Документ сгенерирован в Системе автоматизации оценки рисков и эффективности ИБ («ИБ-Эффект»). Соответствует требованиям ГОСТ 19.505-79 и ГОСТ 7.32.*\n";
-                return md;
+                return DocumentLinks.linkifyMarkdown(md);
             }
 
             ColumnLayout {
@@ -342,9 +343,11 @@ ScrollView {
                             font.weight: Font.Bold
                         }
                         Text {
-                            text: qsTr("Экспорт структурированного документа по ГОСТ 19.505-79 и Методике ФСТЭК России (2021)")
+                            text: DocumentLinks.linkify(qsTr("Экспорт структурированного документа по ГОСТ 19.505-79 и Методике ФСТЭК России (2021)"))
+                            textFormat: Text.RichText
                             color: Theme.muted
                             font.pixelSize: Theme.fontCaption
+                            onLinkActivated: link => Qt.openUrlExternally(link)
                         }
                     }
 

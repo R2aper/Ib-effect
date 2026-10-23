@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "DocumentLinks.js" as DocumentLinks
 
 Rectangle {
     id: root
@@ -128,12 +129,14 @@ Rectangle {
 
                 Text {
                     Layout.fillWidth: true
-                    text: root.quote
+                    text: DocumentLinks.linkify(root.quote)
+                    textFormat: Text.RichText
                     color: Theme.textSecondary
                     font.pixelSize: Theme.fontCaption
                     font.italic: true
                     wrapMode: Text.Wrap
                     lineHeight: 1.2
+                    onLinkActivated: link => Qt.openUrlExternally(link)
                 }
             }
 
@@ -154,11 +157,13 @@ Rectangle {
                     Text {
                         id: noteText
                         Layout.fillWidth: true
-                        text: root.practicalNote
+                        text: DocumentLinks.linkify(root.practicalNote)
+                        textFormat: Text.RichText
                         color: Theme.isDark ? "#93c5fd" : "#1e40af"
                         font.pixelSize: Theme.fontCaption
                         wrapMode: Text.Wrap
                         lineHeight: 1.2
+                        onLinkActivated: link => Qt.openUrlExternally(link)
                     }
                 }
             }

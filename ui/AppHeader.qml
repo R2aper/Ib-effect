@@ -73,6 +73,7 @@ Rectangle {
 
             RowLayout {
                 id: domainRow
+                z: 1
                 anchors.centerIn: parent
                 spacing: 8
 

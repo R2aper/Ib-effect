@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "DocumentLinks.js" as DocumentLinks
 import QtQuick.Effects
 
 Rectangle {
@@ -261,7 +262,14 @@ Rectangle {
                 Layout.fillWidth: true
                 spacing: 6
 
-                Text { text: qsTr("Приоритет актива A ∈ [1..4] (ГОСТ 27005 / Приказ № 239):"); color: Theme.textSecondary; font.pixelSize: Theme.fontCaption; font.weight: Font.DemiBold }
+                Text {
+                    text: DocumentLinks.linkify(qsTr("Приоритет актива A ∈ [1..4] (ГОСТ 27005 / Приказ № 239):"))
+                    textFormat: Text.RichText
+                    color: Theme.textSecondary
+                    font.pixelSize: Theme.fontCaption
+                    font.weight: Font.DemiBold
+                    onLinkActivated: link => Qt.openUrlExternally(link)
+                }
 
                 RowLayout {
                     spacing: 8

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import "DocumentLinks.js" as DocumentLinks
 
 ColumnLayout {
     required property string eyebrow
@@ -26,10 +27,12 @@ ColumnLayout {
     }
 
     Text {
-        text: parent.description
+        text: DocumentLinks.linkify(parent.description)
+        textFormat: Text.RichText
         color: Theme.muted
         font.pixelSize: Theme.fontBody
         wrapMode: Text.Wrap
         Layout.fillWidth: true
+        onLinkActivated: link => Qt.openUrlExternally(link)
     }
 }

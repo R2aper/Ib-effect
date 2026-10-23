@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Effects
 import QtQuick.Layouts
+import "DocumentLinks.js" as DocumentLinks
 
 ScrollView {
     clip: true
@@ -183,12 +184,14 @@ ScrollView {
                                 anchors.centerIn: parent
                                 anchors.leftMargin: 14
                                 anchors.rightMargin: 14
-                                text: methCard.modelData.formula
+                                text: DocumentLinks.linkify(methCard.modelData.formula)
+                                textFormat: Text.RichText
                                 color: Theme.isDark ? Theme.accentLight : Theme.accent
                                 font.pixelSize: Theme.fontBody
                                 font.weight: Font.DemiBold
                                 elide: Text.ElideRight
                                 width: parent.width - 28
+                                onLinkActivated: link => Qt.openUrlExternally(link)
                             }
                         }
 

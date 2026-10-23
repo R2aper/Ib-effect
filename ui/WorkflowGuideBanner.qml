@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "DocumentLinks.js" as DocumentLinks
 
 Rectangle {
     id: guideRoot
@@ -60,12 +61,14 @@ Rectangle {
                 }
 
                 Text {
-                    text: guideRoot.purpose
+                    text: DocumentLinks.linkify(guideRoot.purpose)
+                    textFormat: Text.RichText
                     color: Theme.text
                     font.pixelSize: Theme.fontBody
                     font.weight: Font.DemiBold
                     wrapMode: Text.Wrap
                     Layout.fillWidth: true
+                    onLinkActivated: link => Qt.openUrlExternally(link)
                 }
             }
 
@@ -104,11 +107,13 @@ Rectangle {
 
             Text {
                 Layout.fillWidth: true
-                text: guideRoot.whatToDo
+                text: DocumentLinks.linkify(guideRoot.whatToDo)
+                textFormat: Text.RichText
                 color: Theme.textSecondary
                 font.pixelSize: Theme.fontCaption
                 wrapMode: Text.Wrap
                 lineHeight: 1.2
+                onLinkActivated: link => Qt.openUrlExternally(link)
             }
         }
     }

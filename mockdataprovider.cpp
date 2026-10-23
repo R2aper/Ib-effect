@@ -341,7 +341,7 @@ void MockDataProvider::request(const QString &requestId,
       QString id;
       while (true) {
         id = QStringLiteral("MSR-OT-%1")
-                 .arg(nextNumber < 10 ? QStringLiteral("0") : QString())
+                 .arg(nextNumber < 10 ? QStringLiteral("0") : QString(""))
                  .arg(nextNumber++);
         const bool exists = std::any_of(
             measures.cbegin(), measures.cend(), [&id](const QVariant &value) {
