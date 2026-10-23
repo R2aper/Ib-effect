@@ -24,7 +24,7 @@ ScrollView {
         WorkflowGuideBanner {
             stepNumber: "05"
             stepTitle: qsTr("Этап 5: Расчет экономической эффективности мер ИБ")
-            purpose: qsTr("Финансовое сопоставление предотвращенного ущерба (ΔLoss) с совокупной стоимостью владения мерами (TCO) по ГОСТ Р 57580.3-2022.")
+            purpose: qsTr("Финансовое сопоставление предотвращенного ущерба (ΔLoss) с совокупной стоимостью владения мерами (TCO).")
             whatToDo: qsTr("Оцените показатели Net ROSI (коэффициент возврата инвестиций с учетом затрат) и Чистый финансовый эффект (ΔLoss - TCO). Меры с положительным эффектом и Net ROSI > 0% экономически оправданы.")
         }
 
@@ -198,7 +198,7 @@ ScrollView {
                             font.weight: Font.Bold
                         }
                         Text {
-                            text: qsTr("Оценка предотвращенного косвенного ущерба от остановки оборудования по Приказу ФСТЭК № 239")
+                            text: qsTr("Оценка предотвращенного косвенного ущерба от остановки оборудования")
                             color: Theme.muted
                             font.pixelSize: Theme.fontCaption
                         }
@@ -343,7 +343,7 @@ ScrollView {
                             font.weight: Font.Bold
                         }
                         Text {
-                            text: DocumentLinks.linkify(qsTr("Экспорт структурированного документа по ГОСТ 19.505-79 и Методике ФСТЭК России (2021)"))
+                            text: DocumentLinks.linkify(qsTr("Экспорт структурированного отчета"))
                             textFormat: Text.RichText
                             color: Theme.muted
                             font.pixelSize: Theme.fontCaption

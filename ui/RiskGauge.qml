@@ -86,7 +86,7 @@ Item {
                 font.weight: Font.Bold
             }
             Text {
-                text: "/ " + Math.round(gauge.maxScore) + " " + qsTr("баллов по ГОСТ")
+                text: "/ " + Math.round(gauge.maxScore) + " " + qsTr("баллов")
                 color: Theme.muted
                 font.pixelSize: Theme.fontCaption
                 font.weight: Font.Medium

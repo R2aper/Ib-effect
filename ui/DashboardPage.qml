@@ -88,14 +88,6 @@ ScrollView {
                     RowLayout {
                         spacing: 8
                         StatusBadge {
-                            text: qsTr("СУИБ · ГОСТ Р ИСО/МЭК 27005-2010")
-                            level: "teal"
-                        }
-                        StatusBadge {
-                            text: qsTr("ГОСТ Р 59339-2021")
-                            level: "info"
-                        }
-                        StatusBadge {
                             text: qsTr("Версия 0.1 · Корпоративный релиз")
                             level: "success"
                         }

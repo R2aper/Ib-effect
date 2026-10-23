@@ -150,7 +150,7 @@ Rectangle {
                 Layout.fillWidth: true
                 spacing: 6
                 RowLayout {
-                    Text { text: qsTr("Тип объекта по ФСТЭК (БДУ АСУ ТП):"); color: Theme.textSecondary; font.pixelSize: Theme.fontCaption; font.weight: Font.DemiBold }
+                    Text { text: qsTr("Тип объекта информатизации:"); color: Theme.textSecondary; font.pixelSize: Theme.fontCaption; font.weight: Font.DemiBold }
                     Item { Layout.fillWidth: true }
                     StatusBadge {
                         text: oaBox.currentIndex > 0 ? qsTr("Промышленный актив АСУ ТП") : qsTr("Общий IT-контур")
@@ -263,7 +263,7 @@ Rectangle {
                 spacing: 6
 
                 Text {
-                    text: DocumentLinks.linkify(qsTr("Приоритет актива A ∈ [1..4] (ГОСТ 27005 / Приказ № 239):"))
+                    text: DocumentLinks.linkify(qsTr("Приоритет актива A ∈ [1..4]:"))
                     textFormat: Text.RichText
                     color: Theme.textSecondary
                     font.pixelSize: Theme.fontCaption

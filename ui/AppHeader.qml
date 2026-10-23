@@ -85,7 +85,7 @@ Rectangle {
                 }
 
                 StatusBadge {
-                    text: AssetService.industrialMode ? "ФСТЭК № 239" : "ГОСТ 27005"
+                    text: AssetService.industrialMode ? qsTr("Промышленный профиль") : qsTr("Корпоративный профиль")
                     level: AssetService.industrialMode ? "teal" : "info"
                 }
             }

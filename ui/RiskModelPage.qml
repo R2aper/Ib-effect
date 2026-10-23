@@ -17,7 +17,7 @@ ScrollView {
         SectionHeading {
             eyebrow: qsTr("МОДЕЛЬ ОЦЕНКИ И БАЛЛЬНЫЕ ШКАЛЫ")
             heading: qsTr("Математическая модель рисков ИБ")
-            description: qsTr("Критерии, шкалы и базовые параметры расчета уровней рисков по ГОСТ Р ИСО/МЭК 27005-2010 и ГОСТ Р 59339-2021.")
+            description: qsTr("Критерии, шкалы и базовые параметры расчета уровней риска.")
         }
 
         WorkflowGuideBanner {
@@ -43,14 +43,6 @@ ScrollView {
 
                 RowLayout {
                     spacing: 8
-                    StatusBadge {
-                        text: qsTr("ГОСТ Р ИСО/МЭК 27005-2010")
-                        level: "teal"
-                    }
-                    StatusBadge {
-                        text: qsTr("ГОСТ Р 59339-2021")
-                        level: "info"
-                    }
                     StatusBadge {
                         text: qsTr("Диапазон: 1–64 баллов")
                         level: "success"

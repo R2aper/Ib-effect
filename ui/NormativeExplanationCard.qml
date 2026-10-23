@@ -39,6 +39,7 @@ Rectangle {
             spacing: 10
 
             Rectangle {
+                visible: root.isExpanded
                 Layout.preferredWidth: 28
                 Layout.preferredHeight: 28
                 radius: Theme.radiusSm
@@ -56,6 +57,7 @@ Rectangle {
             }
 
             ColumnLayout {
+                visible: root.isExpanded
                 Layout.fillWidth: true
                 spacing: 2
 
@@ -84,8 +86,9 @@ Rectangle {
 
             Button {
                 id: toggleBtn
+                Layout.alignment: Qt.AlignLeft
                 flat: true
-                text: root.isExpanded ? qsTr("Скрыть ▴") : qsTr("ГОСТ-справка ▾")
+                text: root.isExpanded ? qsTr("Скрыть ▴") : qsTr("Справка")
                 font.pixelSize: Theme.fontCaption
                 font.weight: Font.Medium
                 contentItem: Text {
@@ -170,10 +173,4 @@ Rectangle {
         }
     }
 
-    MouseArea {
-        anchors.fill: parent
-        enabled: !root.isExpanded
-        cursorShape: Qt.PointingHandCursor
-        onClicked: root.isExpanded = true
-    }
 }
