@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+
+<html lang="ru"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"secondary-fixed-dim":"#c8c6c6","surface-tint":"#5f5e5e","error":"#ba1a1a","on-error":"#ffffff","error-container":"#ffdad6","secondary":"#5e5e5e","surface-container":"#eeeeee","surface-container-lowest":"#ffffff","on-primary-fixed-variant":"#474646","secondary-container":"#e4e2e2","on-secondary":"#ffffff","inverse-surface":"#2f3131","on-primary-fixed":"#1c1b1b","tertiary":"#000000","inverse-on-surface":"#f0f1f1","tertiary-container":"#1b1c1c","primary-fixed-dim":"#c9c6c5","on-secondary-container":"#646464","on-tertiary-fixed-variant":"#464747","on-tertiary-fixed":"#1b1c1c","primary-fixed":"#e5e2e1","secondary-fixed":"#e4e2e2","primary":"#000000","surface-container-high":"#e8e8e8","outline-variant":"#c4c7c7","surface-bright":"#f9f9f9","background":"#f9f9f9","on-secondary-fixed-variant":"#474747","surface-dim":"#dadada","surface-container-highest":"#e2e2e2","outline":"#747878","surface":"#f9f9f9","on-tertiary-container":"#848484","on-primary":"#ffffff","tertiary-fixed-dim":"#c7c6c6","on-error-container":"#93000a","on-surface":"#1a1c1c","on-background":"#1a1c1c","on-secondary-fixed":"#1b1c1c","tertiary-fixed":"#e3e2e2","primary-container":"#1c1b1b","on-surface-variant":"#444748","inverse-primary":"#c9c6c5","surface-variant":"#e2e2e2","on-primary-container":"#858383","surface-container-low":"#f3f3f3","on-tertiary":"#ffffff"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"margin":"0rem","space-lg":"0.75rem","space-sm":"0.25rem","space-md":"0.5rem","space-xl":"1rem","space-xs":"0.125rem","gutter":"0.5rem"},"fontFamily":{"body-sm":["IBM Plex Sans"],"label-code-md":["JetBrains Mono"],"headline-md":["IBM Plex Sans"],"headline-lg":["IBM Plex Sans"],"label-code-sm":["JetBrains Mono"],"body-md":["IBM Plex Sans"],"metric-display":["JetBrains Mono"],"body-lg":["IBM Plex Sans"],"headline-sm":["IBM Plex Sans"]},"fontSize":{"body-sm":["11px",{"lineHeight":"14px","fontWeight":"400"}],"label-code-md":["12px",{"lineHeight":"16px","fontWeight":"500"}],"headline-md":["15px",{"lineHeight":"20px","fontWeight":"600"}],"headline-lg":["18px",{"lineHeight":"24px","fontWeight":"600"}],"label-code-sm":["11px",{"lineHeight":"14px","fontWeight":"400"}],"body-md":["12px",{"lineHeight":"16px","fontWeight":"400"}],"metric-display":["22px",{"lineHeight":"28px","fontWeight":"600"}],"body-lg":["13px",{"lineHeight":"18px","fontWeight":"400"}],"headline-sm":["13px",{"lineHeight":"18px","fontWeight":"600"}]}}}};</script></head><body class="bg-surface text-on-surface antialiased select-none"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-low border-b border-outline-variant/40"><div class="h-14 flex flex-col justify-between"><div class="h-7 px-space-md flex items-center justify-between border-b border-outline-variant/30 bg-surface-container"><div class="flex items-center gap-space-sm"><div class="flex items-center gap-space-xs"><span class="w-2.5 h-2.5 rounded-full bg-error inline-block"></span><span class="w-2.5 h-2.5 rounded-full bg-secondary-fixed-dim inline-block"></span><span class="w-2.5 h-2.5 rounded-full bg-outline-variant inline-block"></span></div><span class="ml-space-sm font-label-code-sm text-label-code-sm text-on-surface-variant font-medium">Net ROSI Calculator — ФСТЭК / ГОСТ Р ИСО/МЭК 27005</span><span class="font-label-code-sm text-label-code-sm text-outline">|</span><span class="font-label-code-sm text-label-code-sm text-on-surface font-semibold">Проект: Защита КИИ_ГК_2025.rosi</span></div><div class="flex items-center gap-space-md"><span class="font-label-code-sm text-label-code-sm text-outline">ARM64-DESKTOP-NODE</span><div class="w-5 h-5 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[14px]">person</span></div></div></div><div class="h-7 px-space-md flex items-center justify-between bg-surface-container-lowest"><nav class="flex items-center gap-space-xs font-body-sm text-body-sm text-on-surface-variant"><span class="px-space-sm py-0.5 hover:bg-surface-container-high hover:text-on-surface cursor-default">Файл</span><span class="px-space-sm py-0.5 hover:bg-surface-container-high hover:text-on-surface cursor-default">Правка</span><span class="px-space-sm py-0.5 hover:bg-surface-container-high hover:text-on-surface cursor-default">Вид</span><span class="px-space-sm py-0.5 hover:bg-surface-container-high hover:text-on-surface cursor-default">Расчёт</span><span class="px-space-sm py-0.5 hover:bg-surface-container-high hover:text-on-surface cursor-default">Инструменты</span><span class="px-space-sm py-0.5 hover:bg-surface-container-high hover:text-on-surface cursor-default">Справка</span></nav><div class="flex items-center gap-space-md font-label-code-sm text-label-code-sm text-outline"><span>Ctrl+N (Новый)</span><span>Ctrl+S (Сохранить)</span><span>F5 (Пересчёт)</span></div></div></div></header><aside class="fixed left-0 top-14 bottom-6 w-56 bg-surface-container-lowest border-r border-outline-variant/40 flex flex-col justify-between z-40"><div class="flex flex-col"><div class="h-6 px-space-md flex items-center bg-surface-container-low border-b border-outline-variant/30"><span class="font-label-code-sm text-label-code-sm text-outline font-semibold tracking-wider uppercase">МОДУЛИ</span></div><nav class="flex flex-col py-space-xs" data-active-classes="bg-surface-container-high text-on-surface font-semibold border-l-2 border-primary"><a aria-current="page" class="flex items-center gap-space-sm px-space-md py-1.5 transition-colors bg-surface-container-high text-on-surface font-semibold border-l-2 border-primary" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[16px]">dashboard</span><span>Dashboard</span></a><a class="flex items-center gap-space-sm px-space-md py-1.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md border-l-2 border-transparent" data-path="assets" href="#"><span class="material-symbols-outlined text-[16px]">dns</span><span>Активы</span></a><a class="flex items-center gap-space-sm px-space-md py-1.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md border-l-2 border-transparent" data-path="vulnerabilities" href="#"><span class="material-symbols-outlined text-[16px]">security</span><span>Уязвимости</span></a><a class="flex items-center gap-space-sm px-space-md py-1.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md border-l-2 border-transparent" data-path="countermeasures" href="#"><span class="material-symbols-outlined text-[16px]">verified_user</span><span>Меры</span></a><a class="flex items-center gap-space-sm px-space-md py-1.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md border-l-2 border-transparent" data-path="cvss-calculator" href="#"><span class="material-symbols-outlined text-[16px]">calculate</span><span>CVSS 3.1</span></a><a class="flex items-center gap-space-sm px-space-md py-1.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md border-l-2 border-transparent" data-path="economics" href="#"><span class="material-symbols-outlined text-[16px]">payments</span><span>Экономика</span></a><a class="flex items-center gap-space-sm px-space-md py-1.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md border-l-2 border-transparent" data-path="documentation" href="#"><span class="material-symbols-outlined text-[16px]">menu_book</span><span>Справка</span></a></nav></div><div class="p-space-md border-t border-outline-variant/30 bg-surface-container-low"><div class="flex flex-col gap-space-xs font-label-code-sm text-label-code-sm"><div class="flex justify-between items-center text-on-surface-variant"><span>Всего активов:</span><span class="font-semibold text-on-surface">14</span></div><div class="flex justify-between items-center text-on-surface-variant"><span>ROSI:</span><span class="font-semibold text-on-surface">+142.8%</span></div></div></div></aside><div class="pl-56 pb-6"><main class="w-full pt-14 bg-surface min-h-[calc(100vh-1.5rem)]"><div class="flex flex-col w-full">
+<!-- Desktop Action Bar & Context Controls -->
+<section class="bg-surface-container-lowest p-space-md shadow-sm">
+<div class="flex flex-wrap items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-sm">
+<button class="bg-primary text-on-primary font-headline-sm text-headline-sm px-space-md py-1 flex items-center gap-space-xs hover:bg-surface-tint active:bg-secondary transition-colors cursor-pointer" id="recalc-btn">
+<span class="material-symbols-outlined text-[15px]">refresh</span>
+<span>Пересчитать модель</span>
+<span class="bg-primary-container text-on-primary-container font-label-code-sm text-label-code-sm px-1 py-0.2 rounded">F5</span>
+</button>
+<button class="bg-surface-container text-on-surface font-body-md text-body-md px-space-md py-1 flex items-center gap-space-xs hover:bg-surface-container-high transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[15px]">file_download</span>
+<span>Экспорт отчёта</span>
+<span class="text-on-surface-variant font-label-code-sm text-label-code-sm">Ctrl+E</span>
+</button>
+<div class="h-4 w-px bg-surface-container-highest mx-space-xs"></div>
+<button class="bg-surface-container-low text-on-surface-variant hover:text-on-surface font-body-md text-body-md px-space-md py-1 flex items-center gap-space-xs transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[15px]">tune</span>
+<span>Фильтр по критичности</span>
+<span class="bg-surface-container-high text-on-surface font-label-code-sm text-label-code-sm px-1 rounded-full">4/4</span>
+</button>
+<button class="bg-surface-container-low text-on-surface-variant hover:text-on-surface font-body-md text-body-md px-space-md py-1 flex items-center gap-space-xs transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[15px]">compare_arrows</span>
+<span>Сравнение сценариев</span>
+</button>
+</div>
+<div class="flex items-center gap-space-md font-label-code-sm text-label-code-sm text-on-surface-variant">
+<span class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary inline-block"></span>
+<span>Расчётный профиль: <strong class="text-on-surface">Базовый (2025Q1)</strong></span>
+</span>
+<span class="text-secondary-fixed-dim">/</span>
+<span class="text-on-surface-variant">Норматив: <span class="text-on-surface">ГОСТ Р 27005 + БДУ-239</span></span>
+</div>
+</div>
+</section>
+<!-- KPI Row: 4 Precision Metric Cards -->
+<section class="p-space-md">
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-space-md">
+<!-- Card 1: Assets -->
+<div class="bg-surface-container-lowest p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="font-headline-sm text-headline-sm uppercase tracking-wide">Активы КИИ</span>
+<span class="material-symbols-outlined text-outline text-[16px]">dns</span>
+</div>
+<div class="my-space-sm flex items-baseline gap-space-sm">
+<span class="font-metric-display text-metric-display text-on-surface">14</span>
+<span class="font-label-code-sm text-label-code-sm text-on-surface-variant">единиц учёта</span>
+</div>
+<div class="pt-space-xs bg-surface-container-low px-space-sm py-1 flex justify-between items-center font-label-code-sm text-label-code-sm">
+<span class="text-on-surface-variant">Осн: <strong class="text-on-surface">6</strong> | Вспом: <strong class="text-on-surface">8</strong></span>
+<span class="font-semibold text-on-surface">84.5M ₽</span>
+</div>
+</div>
+<!-- Card 2: Vulnerabilities -->
+<div class="bg-surface-container-lowest p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="font-headline-sm text-headline-sm uppercase tracking-wide">Уязвимости БДУ</span>
+<span class="material-symbols-outlined text-outline text-[16px]">bug_report</span>
+</div>
+<div class="my-space-sm flex items-baseline gap-space-sm">
+<span class="font-metric-display text-metric-display text-on-surface">38</span>
+<span class="font-label-code-sm text-label-code-sm text-on-surface-variant">активных угроз</span>
+</div>
+<div class="flex items-center gap-1 font-label-code-sm text-label-code-sm">
+<span class="bg-error-container text-error px-1 py-0.5 rounded font-semibold">К: 4</span>
+<span class="bg-surface-container-high text-on-surface px-1 py-0.5 rounded font-semibold">В: 11</span>
+<span class="bg-surface-container text-on-surface-variant px-1 py-0.5 rounded font-semibold">С: 17</span>
+<span class="bg-surface-container-low text-secondary px-1 py-0.5 rounded font-semibold">Н: 6</span>
+</div>
+</div>
+<!-- Card 3: Countermeasures -->
+<div class="bg-surface-container-lowest p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="font-headline-sm text-headline-sm uppercase tracking-wide">Меры защиты (TCO)</span>
+<span class="material-symbols-outlined text-outline text-[16px]">verified_user</span>
+</div>
+<div class="my-space-sm flex items-baseline gap-space-sm">
+<span class="font-metric-display text-metric-display text-on-surface">12</span>
+<span class="font-label-code-sm text-label-code-sm text-on-surface-variant">комплексов СЗИ</span>
+</div>
+<div class="pt-space-xs bg-surface-container-low px-space-sm py-1 flex justify-between items-center font-label-code-sm text-label-code-sm">
+<span class="text-on-surface-variant">CAPEX+OPEX: <strong class="text-on-surface">12.8M ₽</strong></span>
+<span class="bg-surface-container-high text-on-surface px-1.5 py-0.5 font-semibold">Охват 86%</span>
+</div>
+</div>
+<!-- Card 4: Net ROSI -->
+<div class="bg-surface-container-lowest p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="font-headline-sm text-headline-sm uppercase tracking-wide">Суммарный Net ROSI</span>
+<span class="material-symbols-outlined text-on-surface text-[16px]">query_stats</span>
+</div>
+<div class="my-space-sm flex items-baseline gap-space-sm">
+<span class="font-metric-display text-metric-display text-on-surface tracking-tight">+142.8%</span>
+<span class="bg-primary text-on-primary font-label-code-sm text-label-code-sm px-1.5 py-0.5 font-semibold">ЭФФЕКТИВНО</span>
+</div>
+<div class="pt-space-xs bg-surface-container-low px-space-sm py-1 flex justify-between items-center font-label-code-sm text-label-code-sm">
+<span class="text-on-surface-variant">ΔALE экономия:</span>
+<span class="font-semibold text-on-surface">31.1M ₽ / год</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Analytical Split Workspace -->
+<section class="p-space-md pt-0 flex flex-col lg:flex-row gap-space-md items-start">
+<!-- Left Workspace Pane: 58% Width -->
+<div class="w-full lg:w-[58%] flex flex-col gap-space-md">
+<!-- Block 1: Severity Distribution Matrix -->
+<div class="bg-surface-container-lowest p-space-md shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-md text-headline-md text-on-surface">Распределение угроз по степени критичности</span>
+<span class="font-label-code-sm text-label-code-sm text-on-surface-variant">(N=38)</span>
+</div>
+<span class="font-label-code-sm text-label-code-sm text-on-surface-variant">Методика БДУ ФСТЭК</span>
+</div>
+<!-- Segmented Stacked Density Bar -->
+<div class="w-full h-5 bg-surface-container flex overflow-hidden">
+<div class="bg-error flex items-center justify-center text-on-error font-label-code-sm text-[10px]" style="width: 10.5%;" title="Критический: 4">4</div>
+<div class="bg-on-surface-variant flex items-center justify-center text-on-primary font-label-code-sm text-[10px]" style="width: 28.9%;" title="Высокий: 11">11</div>
+<div class="bg-secondary-fixed-dim flex items-center justify-center text-on-surface font-label-code-sm text-[10px]" style="width: 44.7%;" title="Средний: 17">17</div>
+<div class="bg-surface-container-high flex items-center justify-center text-on-surface font-label-code-sm text-[10px]" style="width: 15.9%;" title="Низкий: 6">6</div>
+</div>
+<!-- Legend with Precise Percentages -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-space-sm pt-space-xs font-label-code-sm text-label-code-sm">
+<div class="bg-surface-container-low p-space-xs flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-none bg-error"></span>
+<span class="text-error font-medium">Критический</span>
+</div>
+<div class="flex justify-between items-baseline mt-1 text-on-surface">
+<span class="font-semibold">4</span>
+<span class="text-on-surface-variant">10.5%</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-space-xs flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-none bg-on-surface-variant"></span>
+<span class="text-on-surface font-medium">Высокий</span>
+</div>
+<div class="flex justify-between items-baseline mt-1 text-on-surface">
+<span class="font-semibold">11</span>
+<span class="text-on-surface-variant">28.9%</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-space-xs flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-none bg-secondary-fixed-dim"></span>
+<span class="text-on-surface font-medium">Средний</span>
+</div>
+<div class="flex justify-between items-baseline mt-1 text-on-surface">
+<span class="font-semibold">17</span>
+<span class="text-on-surface-variant">44.7%</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-space-xs flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-none bg-surface-container-high"></span>
+<span class="text-on-surface-variant font-medium">Низкий</span>
+</div>
+<div class="flex justify-between items-baseline mt-1 text-on-surface">
+<span class="font-semibold">6</span>
+<span class="text-on-surface-variant">15.9%</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Block 2: Vulnerability Level Reduction Chart -->
+<div class="bg-surface-container-lowest p-space-md shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Снижение уровня уязвимости (V до мер → V после мер)</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Эквивалент коэффициента реализуемости по ГОСТ Р ИСО/МЭК 27005</p>
+</div>
+<div class="flex items-center gap-space-sm font-label-code-sm text-label-code-sm text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="w-2.5 h-2 bg-on-surface-variant inline-block"></span> До СЗИ</span>
+<span class="flex items-center gap-1"><span class="w-2.5 h-2 bg-secondary-fixed-dim inline-block"></span> После СЗИ</span>
+</div>
+</div>
+<!-- Comparative Pair Bars -->
+<div class="flex flex-col gap-space-sm font-label-code-sm text-label-code-sm">
+<!-- Row 1 -->
+<div class="bg-surface-container-low p-space-sm flex flex-col gap-1">
+<div class="flex items-center justify-between text-body-sm font-body-sm">
+<span class="text-on-surface font-semibold truncate">BDU:2024-01928 / Доступ к БД АСУ ТП (SCADA Node 01)</span>
+<span class="bg-surface-container-highest text-on-surface px-1 font-label-code-sm font-semibold text-[11px]">-75.0%</span>
+</div>
+<div class="flex flex-col gap-1 mt-0.5">
+<div class="flex items-center gap-2">
+<span class="w-12 text-on-surface-variant text-right font-label-code-sm text-[10px]">0.88</span>
+<div class="flex-1 bg-surface-container h-2.5">
+<div class="bg-on-surface-variant h-2.5" style="width: 88%;"></div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-12 text-on-surface-variant text-right font-label-code-sm text-[10px]">0.22</span>
+<div class="flex-1 bg-surface-container h-2.5">
+<div class="bg-secondary-fixed-dim h-2.5" style="width: 22%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="bg-surface-container-low p-space-sm flex flex-col gap-1">
+<div class="flex items-center justify-between text-body-sm font-body-sm">
+<span class="text-on-surface font-semibold truncate">CVE-2023-38606 / RCE в контроллере домена (AD-DC-01)</span>
+<span class="bg-surface-container-highest text-on-surface px-1 font-label-code-sm font-semibold text-[11px]">-68.4%</span>
+</div>
+<div class="flex flex-col gap-1 mt-0.5">
+<div class="flex items-center gap-2">
+<span class="w-12 text-on-surface-variant text-right font-label-code-sm text-[10px]">0.95</span>
+<div class="flex-1 bg-surface-container h-2.5">
+<div class="bg-on-surface-variant h-2.5" style="width: 95%;"></div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-12 text-on-surface-variant text-right font-label-code-sm text-[10px]">0.30</span>
+<div class="flex-1 bg-surface-container h-2.5">
+<div class="bg-secondary-fixed-dim h-2.5" style="width: 30%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="bg-surface-container-low p-space-sm flex flex-col gap-1">
+<div class="flex items-center justify-between text-body-sm font-body-sm">
+<span class="text-on-surface font-semibold truncate">BDU:2023-05441 / Эксфильтрация через API платёжного шлюза</span>
+<span class="bg-surface-container-highest text-on-surface px-1 font-label-code-sm font-semibold text-[11px]">-71.4%</span>
+</div>
+<div class="flex flex-col gap-1 mt-0.5">
+<div class="flex items-center gap-2">
+<span class="w-12 text-on-surface-variant text-right font-label-code-sm text-[10px]">0.70</span>
+<div class="flex-1 bg-surface-container h-2.5">
+<div class="bg-on-surface-variant h-2.5" style="width: 70%;"></div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-12 text-on-surface-variant text-right font-label-code-sm text-[10px]">0.20</span>
+<div class="flex-1 bg-surface-container h-2.5">
+<div class="bg-secondary-fixed-dim h-2.5" style="width: 20%;"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Block 3: Net ROSI by Countermeasure -->
+<div class="bg-surface-container-lowest p-space-md shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md text-on-surface">Net ROSI по внедряемым мерам защиты</h2>
+<span class="font-label-code-sm text-label-code-sm text-on-surface-variant">Сортировка по окупаемости</span>
+</div>
+<div class="flex flex-col gap-space-sm">
+<!-- Measure 1 -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between font-label-code-sm text-label-code-sm">
+<span class="text-on-surface font-medium truncate">М-03: Сегментация сети КИИ (Next-Gen Firewall / Микросегментация)</span>
+<span class="font-semibold text-on-surface font-label-code-md text-label-code-md">+215.4%</span>
+</div>
+<div class="w-full bg-surface-container h-4 flex overflow-hidden">
+<div class="bg-primary h-full" style="width: 78%;"></div>
+</div>
+<div class="flex justify-between items-center font-label-code-sm text-label-code-sm text-on-surface-variant text-[10px]">
+<span>TCO: 3.2M ₽</span>
+<span>ΔALE: 10.1M ₽ / год</span>
+</div>
+</div>
+<!-- Measure 2 -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between font-label-code-sm text-label-code-sm">
+<span class="text-on-surface font-medium truncate">М-01: Внедрение EDR-агентов на АРМ операторов КИИ</span>
+<span class="font-semibold text-on-surface font-label-code-md text-label-code-md">+168.0%</span>
+</div>
+<div class="w-full bg-surface-container h-4 flex overflow-hidden">
+<div class="bg-on-surface-variant h-full" style="width: 62%;"></div>
+</div>
+<div class="flex justify-between items-center font-label-code-sm text-label-code-sm text-on-surface-variant text-[10px]">
+<span>TCO: 2.5M ₽</span>
+<span>ΔALE: 6.7M ₽ / год</span>
+</div>
+</div>
+<!-- Measure 3 -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between font-label-code-sm text-label-code-sm">
+<span class="text-on-surface font-medium truncate">М-07: Защита веб-шлюза (WAF кластер для сервисов ИСПДн)</span>
+<span class="font-semibold text-on-surface font-label-code-md text-label-code-md">+112.5%</span>
+</div>
+<div class="w-full bg-surface-container h-4 flex overflow-hidden">
+<div class="bg-secondary h-full" style="width: 48%;"></div>
+</div>
+<div class="flex justify-between items-center font-label-code-sm text-label-code-sm text-on-surface-variant text-[10px]">
+<span>TCO: 4.0M ₽</span>
+<span>ΔALE: 8.5M ₽ / год</span>
+</div>
+</div>
+<!-- Measure 4 -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between font-label-code-sm text-label-code-sm">
+<span class="text-on-surface font-medium truncate">М-12: Система управления привилегированным доступом (PAM)</span>
+<span class="font-semibold text-on-surface font-label-code-md text-label-code-md">+74.2%</span>
+</div>
+<div class="w-full bg-surface-container h-4 flex overflow-hidden">
+<div class="bg-secondary-fixed-dim h-full" style="width: 32%;"></div>
+</div>
+<div class="flex justify-between items-center font-label-code-sm text-label-code-sm text-on-surface-variant text-[10px]">
+<span>TCO: 3.1M ₽</span>
+<span>ΔALE: 5.4M ₽ / год</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Workspace Pane: 42% Width -->
+<div class="w-full lg:w-[42%] flex flex-col gap-space-md">
+<!-- Desktop Ranked Matrix: Top-5 by ALE -->
+<div class="bg-surface-container-lowest p-space-md shadow-sm flex flex-col">
+<div class="flex items-center justify-between pb-space-sm">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Топ-5 по ожидаемому убытку (ALE)</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Ранжирование по ALE до внедрения мер</p>
+</div>
+<span class="font-label-code-sm text-label-code-sm bg-surface-container-high px-1.5 py-0.5 text-on-surface">Год 2025</span>
+</div>
+<!-- Dense Data Grid -->
+<div class="overflow-x-auto w-full">
+<table class="w-full border-collapse text-left">
+<thead>
+<tr class="bg-surface-container-low font-body-sm text-body-sm text-on-surface-variant uppercase">
+<th class="py-1 px-1.5 font-semibold">Угроза / Актив</th>
+<th class="py-1 px-1.5 font-semibold text-right">SLE</th>
+<th class="py-1 px-1.5 font-semibold text-right">ARO</th>
+<th class="py-1 px-1.5 font-semibold text-right">ALE до</th>
+<th class="py-1 px-1.5 font-semibold text-right">ALE после</th>
+<th class="py-1 px-1.5 font-semibold text-center">Статус</th>
+</tr>
+</thead>
+<tbody class="font-label-code-sm text-label-code-sm divide-y-0">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container transition-colors bg-surface-container-lowest">
+<td class="py-1 px-1.5 max-w-[130px]">
+<div class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-error flex-shrink-0"></span>
+<span class="truncate font-medium text-on-surface" title="BDU:2024-01928">BDU:01928</span>
+</div>
+<div class="text-[10px] text-on-surface-variant truncate font-body-sm">SCADA Node 01</div>
+</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums text-on-surface">18.5M</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums text-on-surface-variant">0.65</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums font-semibold text-on-surface">12.0M</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums text-on-surface-variant">3.0M</td>
+<td class="py-1 px-1.5 text-center">
+<span class="bg-error-container text-error px-1 py-0.2 rounded text-[10px] font-semibold">КРИТИЧ</span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container transition-colors bg-surface-container-low/40">
+<td class="py-1 px-1.5 max-w-[130px]">
+<div class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-error flex-shrink-0"></span>
+<span class="truncate font-medium text-on-surface" title="CVE-2023-38606">CVE-38606</span>
+</div>
+<div class="text-[10px] text-on-surface-variant truncate font-body-sm">AD-DC-01</div>
+</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums text-on-surface">11.0M</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums text-on-surface-variant">0.80</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums font-semibold text-on-surface">8.8M</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums text-on-surface-variant">2.8M</td>
+<td class="py-1 px-1.5 text-center">
+<span class="bg-error-container text-error px-1 py-0.2 rounded text-[10px] font-semibold">КРИТИЧ</span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container transition-colors bg-surface-container-lowest">
+<td class="py-1 px-1.5 max-w-[130px]">
+<div class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant flex-shrink-0"></span>
+<span class="truncate font-medium text-on-surface" title="BDU:2023-05441">BDU:05441</span>
+</div>
+<div class="text-[10px] text-on-surface-variant truncate font-body-sm">API Gateway Prod</div>
+</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums text-on-surface">14.2M</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums text-on-surface-variant">0.45</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums font-semibold text-on-surface">6.4M</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums text-on-surface-variant">1.8M</td>
+<td class="py-1 px-1.5 text-center">
+<span class="bg-surface-container-high text-on-surface px-1 py-0.2 rounded text-[10px] font-semibold">ВЫСОК</span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container transition-colors bg-surface-container-low/40">
+<td class="py-1 px-1.5 max-w-[130px]">
+<div class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant flex-shrink-0"></span>
+<span class="truncate font-medium text-on-surface" title="BDU:2024-00812">BDU:00812</span>
+</div>
+<div class="text-[10px] text-on-surface-variant truncate font-body-sm">ERP Core DB</div>
+</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums text-on-surface">22.0M</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums text-on-surface-variant">0.25</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums font-semibold text-on-surface">5.5M</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums text-on-surface-variant">1.4M</td>
+<td class="py-1 px-1.5 text-center">
+<span class="bg-surface-container-high text-on-surface px-1 py-0.2 rounded text-[10px] font-semibold">ВЫСОК</span>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-surface-container transition-colors bg-surface-container-lowest">
+<td class="py-1 px-1.5 max-w-[130px]">
+<div class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed-dim flex-shrink-0"></span>
+<span class="truncate font-medium text-on-surface" title="CVE-2024-21413">CVE-21413</span>
+</div>
+<div class="text-[10px] text-on-surface-variant truncate font-body-sm">Mail Exchange 02</div>
+</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums text-on-surface">4.5M</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums text-on-surface-variant">0.90</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums font-semibold text-on-surface">4.0M</td>
+<td class="py-1 px-1.5 text-right font-label-code-sm tabular-nums text-on-surface-variant">1.2M</td>
+<td class="py-1 px-1.5 text-center">
+<span class="bg-surface-container text-on-surface-variant px-1 py-0.2 rounded text-[10px] font-semibold">СРЕДН</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="mt-space-sm pt-space-xs bg-surface-container-low px-space-sm py-1 flex items-center justify-between font-label-code-sm text-label-code-sm">
+<span class="text-on-surface-variant">Итого Топ-5:</span>
+<div class="flex items-center gap-space-md">
+<span>ALE до: <strong class="text-on-surface">36.7M ₽</strong></span>
+<span>ALE после: <strong class="text-on-surface">10.2M ₽</strong></span>
+</div>
+</div>
+</div>
+<!-- Quick Insight Widget: FSTEC Regulatory Assessment -->
+<div class="bg-surface-container-lowest p-space-md shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px]">gavel</span>
+<span class="font-headline-md text-headline-md text-on-surface">Анализ окупаемости по методике ФСТЭК</span>
+</div>
+<span class="bg-surface-container-highest font-label-code-sm text-label-code-sm px-1.5 py-0.5 text-on-surface font-semibold">ГОСТ Р 27005</span>
+</div>
+<div class="bg-surface-container-low p-space-md flex flex-col gap-space-xs">
+<div class="flex justify-between items-baseline font-body-md text-body-md">
+<span class="text-on-surface-variant">Коэффициент снижения риска:</span>
+<span class="font-label-code-md text-label-code-md font-semibold text-on-surface">ΔALE / TCO = 2.43</span>
+</div>
+<div class="flex justify-between items-baseline font-body-md text-body-md">
+<span class="text-on-surface-variant">Срок окупаемости инвестиций (PBP):</span>
+<span class="font-label-code-md text-label-code-md font-semibold text-on-surface">4.9 месяца</span>
+</div>
+<div class="flex justify-between items-baseline font-body-md text-body-md">
+<span class="text-on-surface-variant">Чистая приведённая выгода (NPV, 3 года):</span>
+<span class="font-label-code-md text-label-code-md font-semibold text-on-surface">+52.8M ₽</span>
+</div>
+</div>
+<div class="bg-surface-container p-space-sm flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[16px] mt-0.5">check_circle</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">Инвестиции экономически эффективны</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+              Модель удовлетворяет критериям допустимого остаточного риска приказа ФСТЭК №239 для объектов КИИ 1 и 2 категории значимости.
+            </span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<script>
+  // Simple micro-interaction for model recalculation action
+  document.getElementById('recalc-btn')?.addEventListener('click', function() {
+    const btn = this;
+    const label = btn.querySelector('span:nth-child(2)');
+    const originalText = label.textContent;
+    label.textContent = 'Расчёт...';
+    btn.classList.add('opacity-75');
+    setTimeout(() => {
+      label.textContent = originalText;
+      btn.classList.remove('opacity-75');
+    }, 450);
+  });
+</script></main></div><footer class="fixed bottom-0 left-0 right-0 h-6 bg-surface-container border-t border-outline-variant/40 px-space-md flex items-center justify-between z-50 font-label-code-sm text-label-code-sm text-on-surface-variant"><div class="flex items-center gap-space-md"><span><span class="inline-block w-1.5 h-1.5 rounded-full bg-primary mr-1"></span>Подключено: База БДУ ФСТЭК от 12.02.2025</span><span class="text-outline">|</span><span>Проект: КИИ_ГК_2025.rosi</span></div><div class="hidden md:flex items-center text-outline"><span>Методика: ГОСТ Р ИСО/МЭК 27005-2018 / Приказ ФСТЭК №239</span></div><div class="flex items-center gap-space-md"><span>Сохранено (Ctrl+S)</span><span class="text-outline">|</span><span>v2.4.1-pro</span><span class="text-outline">|</span><span>UTF-8</span></div></footer></body></html>

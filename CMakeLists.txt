@@ -83,6 +83,29 @@ set(IBE_SVG_ICONS
     assets/icons/eye-off.svg
 )
 
+set(NET_ROSI_QML_FILES
+    qml/Main.qml
+    qml/Style.qml
+    qml/components/AppButton.qml
+    qml/components/CustomComboBox.qml
+    qml/components/CustomTextField.qml
+    qml/components/MetricCard.qml
+    qml/components/RiskBadge.qml
+    qml/components/SegmentedControl.qml
+    qml/components/TableHeaderCell.qml
+    qml/tabs/AssetsTab.qml
+    qml/tabs/CvssCalcTab.qml
+    qml/tabs/DashboardTab.qml
+    qml/tabs/EconomicsTab.qml
+    qml/tabs/HelpTab.qml
+    qml/tabs/MeasuresTab.qml
+    qml/tabs/VulnerabilitiesTab.qml
+)
+
+set_source_files_properties(qml/Style.qml PROPERTIES
+    QT_QML_SINGLETON_TYPE TRUE
+)
+
 qt_add_executable(Ibe
     main.cpp
 )
@@ -91,6 +114,7 @@ qt_add_qml_module(Ibe
     URI Ibe
     QML_FILES
         Main.qml
+        ${NET_ROSI_QML_FILES}
         ${IBE_UI_QML_FILES}
         ui/BduData.js
     RESOURCES

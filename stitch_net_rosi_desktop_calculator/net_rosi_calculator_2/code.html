@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+
+<html lang="ru"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"secondary-fixed-dim":"#c8c6c6","surface-tint":"#5f5e5e","error":"#ba1a1a","on-error":"#ffffff","error-container":"#ffdad6","secondary":"#5e5e5e","surface-container":"#eeeeee","surface-container-lowest":"#ffffff","on-primary-fixed-variant":"#474646","secondary-container":"#e4e2e2","on-secondary":"#ffffff","inverse-surface":"#2f3131","on-primary-fixed":"#1c1b1b","tertiary":"#000000","inverse-on-surface":"#f0f1f1","tertiary-container":"#1b1c1c","primary-fixed-dim":"#c9c6c5","on-secondary-container":"#646464","on-tertiary-fixed-variant":"#464747","on-tertiary-fixed":"#1b1c1c","primary-fixed":"#e5e2e1","secondary-fixed":"#e4e2e2","primary":"#000000","surface-container-high":"#e8e8e8","outline-variant":"#c4c7c7","surface-bright":"#f9f9f9","background":"#f9f9f9","on-secondary-fixed-variant":"#474747","surface-dim":"#dadada","surface-container-highest":"#e2e2e2","outline":"#747878","surface":"#f9f9f9","on-tertiary-container":"#848484","on-primary":"#ffffff","tertiary-fixed-dim":"#c7c6c6","on-error-container":"#93000a","on-surface":"#1a1c1c","on-background":"#1a1c1c","on-secondary-fixed":"#1b1c1c","tertiary-fixed":"#e3e2e2","primary-container":"#1c1b1b","on-surface-variant":"#444748","inverse-primary":"#c9c6c5","surface-variant":"#e2e2e2","on-primary-container":"#858383","surface-container-low":"#f3f3f3","on-tertiary":"#ffffff"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"margin":"0rem","space-lg":"0.75rem","space-sm":"0.25rem","space-md":"0.5rem","space-xl":"1rem","space-xs":"0.125rem","gutter":"0.5rem"},"fontFamily":{"body-sm":["IBM Plex Sans"],"label-code-md":["JetBrains Mono"],"headline-md":["IBM Plex Sans"],"headline-lg":["IBM Plex Sans"],"label-code-sm":["JetBrains Mono"],"body-md":["IBM Plex Sans"],"metric-display":["JetBrains Mono"],"body-lg":["IBM Plex Sans"],"headline-sm":["IBM Plex Sans"]},"fontSize":{"body-sm":["11px",{"lineHeight":"14px","fontWeight":"400"}],"label-code-md":["12px",{"lineHeight":"16px","fontWeight":"500"}],"headline-md":["15px",{"lineHeight":"20px","fontWeight":"600"}],"headline-lg":["18px",{"lineHeight":"24px","fontWeight":"600"}],"label-code-sm":["11px",{"lineHeight":"14px","fontWeight":"400"}],"body-md":["12px",{"lineHeight":"16px","fontWeight":"400"}],"metric-display":["22px",{"lineHeight":"28px","fontWeight":"600"}],"body-lg":["13px",{"lineHeight":"18px","fontWeight":"400"}],"headline-sm":["13px",{"lineHeight":"18px","fontWeight":"600"}]}}}};</script></head><body class="bg-surface text-on-surface antialiased select-none"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-low border-b border-outline-variant/40"><div class="h-14 flex flex-col justify-between"><div class="h-7 px-space-md flex items-center justify-between border-b border-outline-variant/30 bg-surface-container"><div class="flex items-center gap-space-sm"><div class="flex items-center gap-space-xs"><span class="w-2.5 h-2.5 rounded-full bg-error inline-block"></span><span class="w-2.5 h-2.5 rounded-full bg-secondary-fixed-dim inline-block"></span><span class="w-2.5 h-2.5 rounded-full bg-outline-variant inline-block"></span></div><span class="ml-space-sm font-label-code-sm text-label-code-sm text-on-surface-variant font-medium">Net ROSI Calculator — ФСТЭК / ГОСТ Р ИСО/МЭК 27005</span><span class="font-label-code-sm text-label-code-sm text-outline">|</span><span class="font-label-code-sm text-label-code-sm text-on-surface font-semibold">Проект: Защита КИИ_ГК_2025.rosi</span></div><div class="flex items-center gap-space-md"><span class="font-label-code-sm text-label-code-sm text-outline">ARM64-DESKTOP-NODE</span><div class="w-5 h-5 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[14px]">person</span></div></div></div><div class="h-7 px-space-md flex items-center justify-between bg-surface-container-lowest"><nav class="flex items-center gap-space-xs font-body-sm text-body-sm text-on-surface-variant"><span class="px-space-sm py-0.5 hover:bg-surface-container-high hover:text-on-surface cursor-default">Файл</span><span class="px-space-sm py-0.5 hover:bg-surface-container-high hover:text-on-surface cursor-default">Правка</span><span class="px-space-sm py-0.5 hover:bg-surface-container-high hover:text-on-surface cursor-default">Вид</span><span class="px-space-sm py-0.5 hover:bg-surface-container-high hover:text-on-surface cursor-default">Расчёт</span><span class="px-space-sm py-0.5 hover:bg-surface-container-high hover:text-on-surface cursor-default">Инструменты</span><span class="px-space-sm py-0.5 hover:bg-surface-container-high hover:text-on-surface cursor-default">Справка</span></nav><div class="flex items-center gap-space-md font-label-code-sm text-label-code-sm text-outline"><span>Ctrl+N (Новый)</span><span>Ctrl+S (Сохранить)</span><span>F5 (Пересчёт)</span></div></div></div></header><aside class="fixed left-0 top-14 bottom-6 w-56 bg-surface-container-lowest border-r border-outline-variant/40 flex flex-col justify-between z-40"><div class="flex flex-col"><div class="h-6 px-space-md flex items-center bg-surface-container-low border-b border-outline-variant/30"><span class="font-label-code-sm text-label-code-sm text-outline font-semibold tracking-wider uppercase">МОДУЛИ</span></div><nav class="flex flex-col py-space-xs" data-active-classes="bg-surface-container-high text-on-surface font-semibold border-l-2 border-primary"><a class="flex items-center gap-space-sm px-space-md py-1.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md border-l-2 border-transparent" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[16px]">dashboard</span><span>Dashboard</span></a><a aria-current="page" class="flex items-center gap-space-sm px-space-md py-1.5 transition-colors bg-surface-container-high text-on-surface font-semibold border-l-2 border-primary" data-path="assets" href="#"><span class="material-symbols-outlined text-[16px]">dns</span><span>Активы</span></a><a class="flex items-center gap-space-sm px-space-md py-1.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md border-l-2 border-transparent" data-path="vulnerabilities" href="#"><span class="material-symbols-outlined text-[16px]">security</span><span>Уязвимости</span></a><a class="flex items-center gap-space-sm px-space-md py-1.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md border-l-2 border-transparent" data-path="countermeasures" href="#"><span class="material-symbols-outlined text-[16px]">verified_user</span><span>Меры</span></a><a class="flex items-center gap-space-sm px-space-md py-1.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md border-l-2 border-transparent" data-path="cvss-calculator" href="#"><span class="material-symbols-outlined text-[16px]">calculate</span><span>CVSS 3.1</span></a><a class="flex items-center gap-space-sm px-space-md py-1.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md border-l-2 border-transparent" data-path="economics" href="#"><span class="material-symbols-outlined text-[16px]">payments</span><span>Экономика</span></a><a class="flex items-center gap-space-sm px-space-md py-1.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-body-md text-body-md border-l-2 border-transparent" data-path="documentation" href="#"><span class="material-symbols-outlined text-[16px]">menu_book</span><span>Справка</span></a></nav></div><div class="p-space-md border-t border-outline-variant/30 bg-surface-container-low"><div class="flex flex-col gap-space-xs font-label-code-sm text-label-code-sm"><div class="flex justify-between items-center text-on-surface-variant"><span>Всего активов:</span><span class="font-semibold text-on-surface">14</span></div><div class="flex justify-between items-center text-on-surface-variant"><span>ROSI:</span><span class="font-semibold text-on-surface">+142.8%</span></div></div></div></aside><div class="pl-56 pb-6"><main class="w-full pt-14 bg-surface min-h-[calc(100vh-1.5rem)]"><div class="flex flex-col w-full h-[calc(100vh-5rem)]">
+<!-- Top Utility Toolbar -->
+<div class="h-9 px-space-md bg-surface-container-lowest flex items-center justify-between shadow-sm select-none shrink-0">
+<div class="flex items-center gap-space-xs">
+<button class="flex items-center gap-space-xs px-2.5 py-1 bg-primary text-on-primary font-body-sm text-body-sm hover:bg-neutral-800 active:bg-neutral-900 transition-colors" id="btn-new-asset" type="button">
+<span class="material-symbols-outlined text-[15px]">add</span>
+<span>Новый актив</span>
+<span class="font-label-code-sm text-[10px] text-surface-container-high opacity-70 ml-1">Ctrl+N</span>
+</button>
+<button class="flex items-center gap-space-xs px-2 py-1 bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[15px]">content_copy</span>
+<span>Дублировать</span>
+<span class="font-label-code-sm text-[10px] text-on-surface-variant opacity-70 ml-0.5">Ctrl+D</span>
+</button>
+<button class="flex items-center gap-space-xs px-2 py-1 bg-surface-container hover:bg-error-container hover:text-error text-on-surface font-body-sm text-body-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[15px]">delete</span>
+<span>Удалить</span>
+<span class="font-label-code-sm text-[10px] opacity-70">Del</span>
+</button>
+<div class="w-2"></div>
+<button class="flex items-center gap-space-xs px-2 py-1 bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[15px]">sync_alt</span>
+<span>Импорт из CMDB</span>
+</button>
+<button class="flex items-center gap-space-xs px-2 py-1 bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[15px]">file_download</span>
+<span>Экспорт реестра</span>
+</button>
+</div>
+<!-- Quick Search Bar -->
+<div class="flex items-center gap-space-sm">
+<div class="relative flex items-center bg-surface-container px-2 py-0.5">
+<span class="material-symbols-outlined text-outline text-[16px] mr-1.5">search</span>
+<input class="bg-transparent font-label-code-sm text-label-code-sm text-on-surface placeholder:text-outline focus:outline-none w-64" id="asset-search" placeholder="Поиск по названию, хосту или IP..." type="text"/>
+<span class="font-label-code-sm text-[10px] text-outline ml-1">/</span>
+</div>
+<div class="h-4 w-px bg-surface-container-highest"></div>
+<span class="font-label-code-sm text-label-code-sm text-on-surface-variant">Всего: <strong class="text-on-surface font-semibold" id="assets-count">5</strong></span>
+</div>
+</div>
+<!-- Master-Detail Split Workspace -->
+<div class="flex flex-1 w-full min-h-0 overflow-hidden bg-surface-container-low p-space-xs gap-space-xs">
+<!-- LEFT PANE: Master Table (55% width) -->
+<div class="w-[55%] flex flex-col bg-surface-container-lowest shadow-sm overflow-hidden h-full">
+<!-- Table Filter Strip -->
+<div class="h-7 px-space-md bg-surface-container flex items-center justify-between shrink-0 select-none">
+<div class="flex items-center gap-space-md">
+<span class="font-label-code-sm text-label-code-sm font-semibold uppercase text-on-surface-variant tracking-wider">Реестр активов КИИ</span>
+<span class="px-1.5 py-0.2 bg-surface-container-highest text-on-surface-variant font-label-code-sm text-[10px]">ГОСТ Р 27005-2018</span>
+</div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-code-sm text-[11px]">
+<span class="cursor-pointer hover:text-on-surface">Все (5)</span>
+<span>·</span>
+<span class="cursor-pointer hover:text-on-surface text-error font-medium">Критич. (2)</span>
+<span>·</span>
+<span class="cursor-pointer hover:text-on-surface">Высокий (2)</span>
+</div>
+</div>
+<!-- Master Grid Container -->
+<div class="flex-1 overflow-auto">
+<table class="w-full text-left table-fixed select-none" id="assets-table">
+<thead class="sticky top-0 bg-surface-container-high z-10">
+<tr class="h-6 text-on-surface-variant font-body-sm text-body-sm">
+<th class="w-16 px-2 py-0 font-semibold tracking-wider uppercase text-left">ID</th>
+<th class="w-44 px-2 py-0 font-semibold tracking-wider uppercase">Основной актив</th>
+<th class="w-48 px-2 py-0 font-semibold tracking-wider uppercase">Вспомогательный актив</th>
+<th class="w-28 px-2 py-0 font-semibold tracking-wider uppercase">Категория</th>
+<th class="w-32 px-2 py-0 font-semibold tracking-wider uppercase text-right">Ущерб SLE</th>
+<th class="w-16 px-2 py-0 font-semibold tracking-wider uppercase text-center">I_infr</th>
+<th class="w-24 px-2 py-0 font-semibold tracking-wider uppercase text-center">Статус</th>
+</tr>
+</thead>
+<tbody class="divide-y-0" id="assets-tbody">
+<!-- Row AST-01 (Selected) -->
+<tr class="asset-row h-7 cursor-pointer bg-surface-container-high text-on-surface font-body-sm text-body-sm transition-colors relative" data-id="AST-01" style="box-shadow: inset 3px 0 0 0 #000000;">
+<td class="px-2 py-0 font-label-code-sm text-label-code-sm font-semibold">AST-01</td>
+<td class="px-2 py-0 truncate font-medium" title="БД Клиентов (ПДн)">БД Клиентов (ПДн)</td>
+<td class="px-2 py-0 truncate text-on-surface-variant font-label-code-sm text-[11px]" title="СУБД PostgreSQL cluster (srv-db01)">PostgreSQL (srv-db01)</td>
+<td class="px-2 py-0 truncate text-on-surface-variant">Сервер БД</td>
+<td class="px-2 py-0 text-right font-label-code-md text-label-code-md">18 500 000 ₽</td>
+<td class="px-2 py-0 text-center font-label-code-sm text-label-code-sm font-semibold">0.78</td>
+<td class="px-2 py-0 text-center">
+<span class="inline-block px-1.5 py-0.5 font-label-code-sm text-[10px] font-semibold bg-error-container text-on-error-container">КРИТИЧ.</span>
+</td>
+</tr>
+<!-- Row AST-02 -->
+<tr class="asset-row h-7 cursor-pointer bg-surface-container-lowest hover:bg-surface-container text-on-surface font-body-sm text-body-sm transition-colors" data-id="AST-02">
+<td class="px-2 py-0 font-label-code-sm text-label-code-sm font-semibold">AST-02</td>
+<td class="px-2 py-0 truncate font-medium" title="Процессинг платежей">Процессинг платежей</td>
+<td class="px-2 py-0 truncate text-on-surface-variant font-label-code-sm text-[11px]" title="Сервер авторизации (app-pay01)">Сервер авторизации (app-pay01)</td>
+<td class="px-2 py-0 truncate text-on-surface-variant">Сервер прилож.</td>
+<td class="px-2 py-0 text-right font-label-code-md text-label-code-md">32 000 000 ₽</td>
+<td class="px-2 py-0 text-center font-label-code-sm text-label-code-sm font-semibold">0.85</td>
+<td class="px-2 py-0 text-center">
+<span class="inline-block px-1.5 py-0.5 font-label-code-sm text-[10px] font-semibold bg-error-container text-on-error-container">КРИТИЧ.</span>
+</td>
+</tr>
+<!-- Row AST-03 -->
+<tr class="asset-row h-7 cursor-pointer bg-surface-container-low hover:bg-surface-container text-on-surface font-body-sm text-body-sm transition-colors" data-id="AST-03">
+<td class="px-2 py-0 font-label-code-sm text-label-code-sm font-semibold">AST-03</td>
+<td class="px-2 py-0 truncate font-medium" title="Исходный код ядра">Исходный код ядра</td>
+<td class="px-2 py-0 truncate text-on-surface-variant font-label-code-sm text-[11px]" title="Сервер Gitlab CI/CD (srv-git)">Gitlab CI/CD (srv-git)</td>
+<td class="px-2 py-0 truncate text-on-surface-variant">Репозиторий</td>
+<td class="px-2 py-0 text-right font-label-code-md text-label-code-md">12 000 000 ₽</td>
+<td class="px-2 py-0 text-center font-label-code-sm text-label-code-sm font-semibold">0.62</td>
+<td class="px-2 py-0 text-center">
+<span class="inline-block px-1.5 py-0.5 font-label-code-sm text-[10px] font-semibold bg-amber-100 text-amber-800">ВЫСОКИЙ</span>
+</td>
+</tr>
+<!-- Row AST-04 -->
+<tr class="asset-row h-7 cursor-pointer bg-surface-container-lowest hover:bg-surface-container text-on-surface font-body-sm text-body-sm transition-colors" data-id="AST-04">
+<td class="px-2 py-0 font-label-code-sm text-label-code-sm font-semibold">AST-04</td>
+<td class="px-2 py-0 truncate font-medium" title="АРМ Главного бухгалтера">АРМ Глав. бухгалтера</td>
+<td class="px-2 py-0 truncate text-on-surface-variant font-label-code-sm text-[11px]" title="Windows 11 Enterprise (ws-acc03)">Win 11 Pro (ws-acc03)</td>
+<td class="px-2 py-0 truncate text-on-surface-variant">АРМ</td>
+<td class="px-2 py-0 text-right font-label-code-md text-label-code-md">4 200 000 ₽</td>
+<td class="px-2 py-0 text-center font-label-code-sm text-label-code-sm font-semibold">0.45</td>
+<td class="px-2 py-0 text-center">
+<span class="inline-block px-1.5 py-0.5 font-label-code-sm text-[10px] font-semibold bg-yellow-100 text-yellow-800">СРЕДНИЙ</span>
+</td>
+</tr>
+<!-- Row AST-05 -->
+<tr class="asset-row h-7 cursor-pointer bg-surface-container-low hover:bg-surface-container text-on-surface font-body-sm text-body-sm transition-colors" data-id="AST-05">
+<td class="px-2 py-0 font-label-code-sm text-label-code-sm font-semibold">AST-05</td>
+<td class="px-2 py-0 truncate font-medium" title="Почтовый шлюз">Почтовый шлюз</td>
+<td class="px-2 py-0 truncate text-on-surface-variant font-label-code-sm text-[11px]" title="Exchange Edge (srv-mail)">Exchange Edge (srv-mail)</td>
+<td class="px-2 py-0 truncate text-on-surface-variant">Шлюз</td>
+<td class="px-2 py-0 text-right font-label-code-md text-label-code-md">6 800 000 ₽</td>
+<td class="px-2 py-0 text-center font-label-code-sm text-label-code-sm font-semibold">0.70</td>
+<td class="px-2 py-0 text-center">
+<span class="inline-block px-1.5 py-0.5 font-label-code-sm text-[10px] font-semibold bg-amber-100 text-amber-800">ВЫСОКИЙ</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Left Pane Summary Footer -->
+<div class="h-6 px-space-md bg-surface-container flex items-center justify-between text-on-surface-variant font-label-code-sm text-[11px] shrink-0">
+<div>Кумулятивный SLE портфеля: <strong class="text-on-surface font-semibold">73 500 000 ₽</strong></div>
+<div>Средний I_infr: <strong class="text-on-surface font-semibold">0.68</strong></div>
+</div>
+</div>
+<!-- RIGHT PANE: Detail / Inspector Panel (45% width) -->
+<div class="w-[45%] flex flex-col bg-surface-container-lowest shadow-sm overflow-hidden h-full">
+<!-- Detail Header / Inspector Top -->
+<div class="p-space-md bg-surface-container flex items-center justify-between shrink-0 select-none">
+<div class="flex items-center gap-space-sm">
+<span class="px-2 py-0.5 bg-primary text-on-primary font-label-code-sm text-label-code-sm font-semibold" id="inspector-badge">AST-01</span>
+<span class="font-headline-sm text-headline-sm text-on-surface truncate" id="inspector-title">БД Клиентов (ПДн)</span>
+<span class="inline-block px-1.5 py-0.5 font-label-code-sm text-[10px] font-semibold bg-error-container text-on-error-container" id="inspector-status-badge">КРИТИЧЕСКИЙ</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="p-1 hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors" title="Аудит изменений" type="button">
+<span class="material-symbols-outlined text-[16px]">history</span>
+</button>
+<button class="p-1 hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors" title="Привязать угрозу БДУ ФСТЭК" type="button">
+<span class="material-symbols-outlined text-[16px]">add_moderator</span>
+</button>
+</div>
+</div>
+<!-- Inspector Scrollable Body -->
+<div class="flex-1 overflow-y-auto p-space-md flex flex-col gap-space-md">
+<!-- Group 1: Идентификация актива -->
+<div class="bg-surface-container-low p-space-md flex flex-col gap-space-sm shadow-sm">
+<div class="flex items-center justify-between pb-1">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[16px] text-primary">fingerprint</span>
+<span class="font-headline-sm text-headline-sm text-on-surface uppercase tracking-wide">Группа 1. Идентификация актива</span>
+</div>
+<span class="font-label-code-sm text-[10px] text-outline">Реквизиты КИИ</span>
+</div>
+<div class="grid grid-cols-1 gap-space-sm pt-1">
+<div class="flex flex-col gap-0.5">
+<label class="font-body-sm text-body-sm text-on-surface-variant">Основной актив (Конфиденциальность / Процесс):</label>
+<div class="relative">
+<input class="w-full h-6 px-2 bg-surface-container-lowest font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-high" id="input-main-asset" type="text" value="Информация КТ / ПДн субъектов (152-ФЗ)"/>
+</div>
+</div>
+<div class="flex flex-col gap-0.5">
+<label class="font-body-sm text-body-sm text-on-surface-variant">Вспомогательный актив (Хост / ПО / Сеть):</label>
+<input class="w-full h-6 px-2 bg-surface-container-lowest font-label-code-sm text-label-code-sm text-on-surface focus:outline-none focus:bg-surface-container-high" id="input-sub-asset" type="text" value="СУБД PostgreSQL cluster (srv-db01, IP: 10.20.4.15)"/>
+</div>
+<div class="grid grid-cols-2 gap-space-sm">
+<div class="flex flex-col gap-0.5">
+<label class="font-body-sm text-body-sm text-on-surface-variant">Владелец процесса:</label>
+<input class="w-full h-6 px-2 bg-surface-container-lowest font-body-sm text-body-sm text-on-surface focus:outline-none focus:bg-surface-container-high" id="input-owner" type="text" value="Отдел клиентского сервиса / CISO"/>
+</div>
+<div class="flex flex-col gap-0.5">
+<label class="font-body-sm text-body-sm text-on-surface-variant">Категория значимости (187-ФЗ):</label>
+<select class="w-full h-6 px-1.5 bg-surface-container-lowest font-body-sm text-body-sm text-on-surface focus:outline-none">
+<option selected="">1 категория значимости КИИ</option>
+<option>2 категория значимости КИИ</option>
+<option>3 категория значимости КИИ</option>
+<option>Не категорируется</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<!-- Group 2: Расчёт единичного ущерба (SLE) -->
+<div class="bg-surface-container-low p-space-md flex flex-col gap-space-sm shadow-sm">
+<div class="flex items-center justify-between pb-1">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[16px] text-primary">account_balance_wallet</span>
+<span class="font-headline-sm text-headline-sm text-on-surface uppercase tracking-wide">Группа 2. Расчёт единичного ущерба (SLE)</span>
+</div>
+<span class="font-label-code-sm text-[10px] text-outline">Single Loss Expectancy</span>
+</div>
+<div class="grid grid-cols-2 gap-space-md pt-1">
+<div class="flex flex-col gap-1">
+<label class="font-body-sm text-body-sm text-on-surface-variant">Прямые затраты на восстановление:</label>
+<div class="relative flex items-center bg-surface-container-lowest px-2 py-0.5">
+<input class="w-full h-5 bg-transparent font-label-code-sm text-label-code-sm text-on-surface focus:outline-none" id="input-direct-loss" step="500000" type="number" value="4500000"/>
+<span class="font-label-code-sm text-[11px] text-outline ml-1">₽</span>
+</div>
+<span class="font-body-sm text-[10px] text-outline leading-tight">Трудозатраты инженеров, лицензии, бэкапы</span>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-body-sm text-body-sm text-on-surface-variant">Косвенные потери (152-ФЗ, простой, PR):</label>
+<div class="relative flex items-center bg-surface-container-lowest px-2 py-0.5">
+<input class="w-full h-5 bg-transparent font-label-code-sm text-label-code-sm text-on-surface focus:outline-none" id="input-indirect-loss" step="500000" type="number" value="14000000"/>
+<span class="font-label-code-sm text-[11px] text-outline ml-1">₽</span>
+</div>
+<span class="font-body-sm text-[10px] text-outline leading-tight">Штрафы Роскомнадзора, оборотный штраф</span>
+</div>
+</div>
+<!-- SLE Auto-calculated banner -->
+<div class="mt-space-xs p-space-md bg-surface-container-highest flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Полная ценность ущерба инцидента (SLE = Прямые + Косвенные)</span>
+<span class="font-label-code-sm text-[10px] text-outline">Используется в формуле ROSI: ALE = SLE × ARO</span>
+</div>
+<div class="text-right">
+<span class="font-metric-display text-metric-display text-on-surface tracking-tight" id="display-sle-total">18 500 000 ₽</span>
+</div>
+</div>
+</div>
+<!-- Group 3: Параметры инфраструктуры (ФСТЭК) -->
+<div class="bg-surface-container-low p-space-md flex flex-col gap-space-sm shadow-sm">
+<div class="flex items-center justify-between pb-1">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[16px] text-primary">security_update_good</span>
+<span class="font-headline-sm text-headline-sm text-on-surface uppercase tracking-wide">Группа 3. Параметры инфраструктуры (ФСТЭК)</span>
+</div>
+<span class="font-label-code-sm text-[10px] text-outline">Методика 2018 / Приказ №239</span>
+</div>
+<!-- 3.1 Тип компонента: Segmented control -->
+<div class="flex flex-col gap-1 pt-1">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Тип компонента инфраструктуры:</span>
+<div class="flex items-center gap-1">
+<span class="font-label-code-sm text-[11px] px-1.5 py-0.2 bg-surface-container-highest text-on-surface font-semibold" id="chip-k">k·K = 0.45</span>
+<span class="material-symbols-outlined text-[14px] text-outline cursor-help" title="Коэффициент критичности типа компонента по классификатору ФСТЭК">help</span>
+</div>
+</div>
+<!-- Segmented Control Grid -->
+<div class="grid grid-cols-4 gap-1 p-0.5 bg-surface-container">
+<button class="seg-btn py-1 font-label-code-sm text-label-code-sm text-on-surface-variant hover:text-on-surface transition-colors text-center" data-val="0.30" type="button">ОС</button>
+<button class="seg-btn py-1 font-label-code-sm text-label-code-sm bg-primary text-on-primary font-semibold transition-colors text-center" data-val="0.45" type="button">СУБД</button>
+<button class="seg-btn py-1 font-label-code-sm text-label-code-sm text-on-surface-variant hover:text-on-surface transition-colors text-center" data-val="0.35" type="button">ПО</button>
+<button class="seg-btn py-1 font-label-code-sm text-label-code-sm text-on-surface-variant hover:text-on-surface transition-colors text-center" data-val="0.25" type="button">Сеть</button>
+</div>
+</div>
+<!-- 3.2 Доля уязвимых узлов: Dropdown -->
+<div class="flex flex-col gap-1 pt-1">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Доля потенциально уязвимых компонентов:</span>
+<div class="flex items-center gap-1">
+<span class="font-label-code-sm text-[11px] px-1.5 py-0.2 bg-surface-container-highest text-on-surface font-semibold" id="chip-l">l·L = 0.50</span>
+<span class="material-symbols-outlined text-[14px] text-outline cursor-help" title="Масштаб охвата уязвимостей в пределах сегмента КИИ">help</span>
+</div>
+</div>
+<select class="w-full h-6 px-2 bg-surface-container-lowest font-body-sm text-body-sm text-on-surface focus:outline-none" id="select-vuln-share">
+<option value="0.20">Менее 10% узлов сегмента (l·L = 0.20)</option>
+<option value="0.35">От 10% до 50% узлов сегмента (l·L = 0.35)</option>
+<option selected="" value="0.50">Более 50% узлов сегмента (l·L = 0.50)</option>
+<option value="0.75">100% узлов сегмента / Тотальное поражение (l·L = 0.75)</option>
+</select>
+</div>
+<!-- 3.3 Доступность из сети Интернет: Toggle switch -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface font-medium">Доступность из сети Интернет (Внешний контур):</span>
+<span class="font-body-sm text-[10px] text-on-surface-variant">Наличие прямого NAT/DMZ-маршрута к компоненту</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<button aria-checked="true" class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full bg-primary transition-colors focus:outline-none" id="toggle-internet" role="switch" type="button">
+<span class="translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-on-primary shadow-sm ring-0 transition duration-150 ease-in-out mt-0.5 ml-0.5" id="toggle-dot"></span>
+</button>
+<div class="flex items-center gap-1">
+<span class="font-label-code-sm text-[11px] px-1.5 py-0.2 bg-surface-container-highest text-on-surface font-semibold" id="chip-p">p·P = 0.70</span>
+<span class="material-symbols-outlined text-[14px] text-outline cursor-help" title="Фактор удаленной доступности злоумышленника без привилегий">help</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Detail Footer: Live Calculation & Actions -->
+<div class="h-12 px-space-md bg-surface-container flex items-center justify-between shrink-0 shadow-sm">
+<div class="flex items-center gap-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Индекс инфраструктуры:</span>
+<div class="flex items-baseline gap-1 bg-surface-container-highest px-2 py-0.5">
+<span class="font-label-code-sm text-[10px] text-outline">I_infr =</span>
+<span class="font-label-code-md text-label-code-md font-bold text-on-surface" id="display-i-infr">0.78</span>
+</div>
+</div>
+<span class="font-label-code-sm text-[10px] text-outline hidden lg:inline">Норм: [k·K + l·L + p·P] / 2.1</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="px-2.5 py-1 bg-surface-container-highest hover:bg-surface-container text-on-surface font-body-sm text-body-sm transition-colors" id="btn-cancel" type="button">
+            Отмена
+          </button>
+<button class="flex items-center gap-space-xs px-3 py-1 bg-primary text-on-primary hover:bg-neutral-800 font-body-sm text-body-sm font-semibold transition-colors" id="btn-save" type="button">
+<span class="material-symbols-outlined text-[15px]">save</span>
+<span>Сохранить</span>
+<span class="font-label-code-sm text-[10px] opacity-70 ml-0.5">Ctrl+S</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function initAssetsModule() {
+    const assetsData = {
+      'AST-01': {
+        id: 'AST-01',
+        title: 'БД Клиентов (ПДн)',
+        mainAsset: 'Информация КТ / ПДн субъектов (152-ФЗ)',
+        subAsset: 'СУБД PostgreSQL cluster (srv-db01, IP: 10.20.4.15)',
+        category: 'Сервер БД',
+        owner: 'Отдел клиентского сервиса / CISO',
+        status: 'КРИТИЧЕСКИЙ',
+        directLoss: 4500000,
+        indirectLoss: 14000000,
+        kVal: 0.45,
+        lVal: 0.50,
+        pVal: 0.70,
+        internet: true
+      },
+      'AST-02': {
+        id: 'AST-02',
+        title: 'Процессинг платежей',
+        mainAsset: 'Транзакции и платёжные шлюзы ЦБ РФ',
+        subAsset: 'Сервер авторизации (app-pay01, IP: 10.20.1.20)',
+        category: 'Сервер прилож.',
+        owner: 'Финтех-департамент / DevOps',
+        status: 'КРИТИЧЕСКИЙ',
+        directLoss: 8000000,
+        indirectLoss: 24000000,
+        kVal: 0.35,
+        lVal: 0.75,
+        pVal: 0.70,
+        internet: true
+      },
+      'AST-03': {
+        id: 'AST-03',
+        title: 'Исходный код ядра',
+        mainAsset: 'Проприетарные алгоритмы ядра финмодели',
+        subAsset: 'Сервер Gitlab CI/CD (srv-git, IP: 10.10.8.4)',
+        category: 'Репозиторий',
+        owner: 'R&D отдел / Lead Architect',
+        status: 'ВЫСОКИЙ',
+        directLoss: 3000000,
+        indirectLoss: 9000000,
+        kVal: 0.35,
+        lVal: 0.35,
+        pVal: 0.20,
+        internet: false
+      },
+      'AST-04': {
+        id: 'AST-04',
+        title: 'АРМ Главного бухгалтера',
+        mainAsset: 'Финансовая тайна, ключи ЭЦП Клиент-Банк',
+        subAsset: 'Windows 11 Enterprise (ws-acc03, IP: 192.168.12.88)',
+        category: 'АРМ',
+        owner: 'Главная бухгалтерия',
+        status: 'СРЕДНИЙ',
+        directLoss: 1200000,
+        indirectLoss: 3000000,
+        kVal: 0.30,
+        lVal: 0.20,
+        pVal: 0.20,
+        internet: false
+      },
+      'AST-05': {
+        id: 'AST-05',
+        title: 'Почтовый шлюз',
+        mainAsset: 'Деловая переписка, маршрутизация писем',
+        subAsset: 'Exchange Edge (srv-mail, IP: 185.92.11.4)',
+        category: 'Шлюз',
+        owner: 'ИТ-департамент / SysAdmin',
+        status: 'ВЫСОКИЙ',
+        directLoss: 1800000,
+        indirectLoss: 5000000,
+        kVal: 0.25,
+        lVal: 0.50,
+        pVal: 0.70,
+        internet: true
+      }
+    };
+
+    let selectedAssetId = 'AST-01';
+
+    const formatCurrency = (val) => {
+      return new Intl.NumberFormat('ru-RU').format(val) + ' ₽';
+    };
+
+    function recalculateCurrent() {
+      const cur = assetsData[selectedAssetId];
+      if (!cur) return;
+
+      const direct = parseFloat(document.getElementById('input-direct-loss').value) || 0;
+      const indirect = parseFloat(document.getElementById('input-indirect-loss').value) || 0;
+      const totalSle = direct + indirect;
+
+      document.getElementById('display-sle-total').textContent = formatCurrency(totalSle);
+
+      // Formula: I_infr = (k + l + p) / 2.1 (normalized 0-1)
+      const rawI = (cur.kVal + cur.lVal + cur.pVal) / 2.1;
+      const finalI = Math.min(1.0, Math.max(0.1, rawI)).toFixed(2);
+
+      document.getElementById('display-i-infr').textContent = finalI;
+
+      // Update in memory
+      cur.directLoss = direct;
+      cur.indirectLoss = indirect;
+
+      // Update table cell
+      const activeRow = document.querySelector(`tr[data-id="${selectedAssetId}"]`);
+      if (activeRow) {
+        const sleCell = activeRow.querySelector('td:nth-child(5)');
+        const iCell = activeRow.querySelector('td:nth-child(6)');
+        if (sleCell) sleCell.textContent = formatCurrency(totalSle);
+        if (iCell) iCell.textContent = finalI;
+      }
+    }
+
+    function loadAssetIntoInspector(id) {
+      selectedAssetId = id;
+      const cur = assetsData[id];
+      if (!cur) return;
+
+      document.getElementById('inspector-badge').textContent = cur.id;
+      document.getElementById('inspector-title').textContent = cur.title;
+      
+      const statusBadge = document.getElementById('inspector-status-badge');
+      statusBadge.textContent = cur.status;
+      if (cur.status === 'КРИТИЧЕСКИЙ') {
+        statusBadge.className = 'inline-block px-1.5 py-0.5 font-label-code-sm text-[10px] font-semibold bg-error-container text-on-error-container';
+      } else if (cur.status === 'ВЫСОКИЙ') {
+        statusBadge.className = 'inline-block px-1.5 py-0.5 font-label-code-sm text-[10px] font-semibold bg-amber-100 text-amber-800';
+      } else {
+        statusBadge.className = 'inline-block px-1.5 py-0.5 font-label-code-sm text-[10px] font-semibold bg-yellow-100 text-yellow-800';
+      }
+
+      document.getElementById('input-main-asset').value = cur.mainAsset;
+      document.getElementById('input-sub-asset').value = cur.subAsset;
+      document.getElementById('input-owner').value = cur.owner;
+      document.getElementById('input-direct-loss').value = cur.directLoss;
+      document.getElementById('input-indirect-loss').value = cur.indirectLoss;
+
+      // Update k chips and segmented buttons
+      document.querySelectorAll('.seg-btn').forEach(btn => {
+        const val = parseFloat(btn.dataset.val);
+        if (Math.abs(val - cur.kVal) < 0.01) {
+          btn.className = 'seg-btn py-1 font-label-code-sm text-label-code-sm bg-primary text-on-primary font-semibold transition-colors text-center';
+        } else {
+          btn.className = 'seg-btn py-1 font-label-code-sm text-label-code-sm text-on-surface-variant hover:text-on-surface transition-colors text-center';
+        }
+      });
+      document.getElementById('chip-k').textContent = `k·K = ${cur.kVal.toFixed(2)}`;
+
+      // Update dropdown l
+      const selectL = document.getElementById('select-vuln-share');
+      selectL.value = cur.lVal.toFixed(2);
+      document.getElementById('chip-l').textContent = `l·L = ${cur.lVal.toFixed(2)}`;
+
+      // Update internet toggle
+      const toggleBtn = document.getElementById('toggle-internet');
+      const toggleDot = document.getElementById('toggle-dot');
+      if (cur.internet) {
+        toggleBtn.className = 'relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full bg-primary transition-colors focus:outline-none';
+        toggleDot.className = 'translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-on-primary shadow-sm ring-0 transition duration-150 ease-in-out mt-0.5 ml-0.5';
+        cur.pVal = 0.70;
+      } else {
+        toggleBtn.className = 'relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full bg-surface-container-highest transition-colors focus:outline-none';
+        toggleDot.className = 'translate-x-0.5 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-surface-container-lowest shadow-sm ring-0 transition duration-150 ease-in-out mt-0.5 ml-0.5';
+        cur.pVal = 0.20;
+      }
+      document.getElementById('chip-p').textContent = `p·P = ${cur.pVal.toFixed(2)}`;
+
+      recalculateCurrent();
+    }
+
+    // Row selection listener
+    const rows = document.querySelectorAll('.asset-row');
+    rows.forEach(row => {
+      row.addEventListener('click', () => {
+        rows.forEach(r => {
+          r.className = 'asset-row h-7 cursor-pointer bg-surface-container-lowest hover:bg-surface-container text-on-surface font-body-sm text-body-sm transition-colors';
+          r.style.boxShadow = 'none';
+        });
+        row.className = 'asset-row h-7 cursor-pointer bg-surface-container-high text-on-surface font-body-sm text-body-sm transition-colors relative';
+        row.style.boxShadow = 'inset 3px 0 0 0 #000000';
+        loadAssetIntoInspector(row.dataset.id);
+      });
+    });
+
+    // Inputs listener
+    document.getElementById('input-direct-loss').addEventListener('input', recalculateCurrent);
+    document.getElementById('input-indirect-loss').addEventListener('input', recalculateCurrent);
+
+    // Segmented button listener (k-value)
+    document.querySelectorAll('.seg-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.seg-btn').forEach(b => {
+          b.className = 'seg-btn py-1 font-label-code-sm text-label-code-sm text-on-surface-variant hover:text-on-surface transition-colors text-center';
+        });
+        btn.className = 'seg-btn py-1 font-label-code-sm text-label-code-sm bg-primary text-on-primary font-semibold transition-colors text-center';
+        const val = parseFloat(btn.dataset.val);
+        assetsData[selectedAssetId].kVal = val;
+        document.getElementById('chip-k').textContent = `k·K = ${val.toFixed(2)}`;
+        recalculateCurrent();
+      });
+    });
+
+    // Dropdown listener (l-value)
+    document.getElementById('select-vuln-share').addEventListener('change', (e) => {
+      const val = parseFloat(e.target.value);
+      assetsData[selectedAssetId].lVal = val;
+      document.getElementById('chip-l').textContent = `l·L = ${val.toFixed(2)}`;
+      recalculateCurrent();
+    });
+
+    // Toggle switch listener (p-value)
+    const toggleBtn = document.getElementById('toggle-internet');
+    const toggleDot = document.getElementById('toggle-dot');
+    toggleBtn.addEventListener('click', () => {
+      const cur = assetsData[selectedAssetId];
+      cur.internet = !cur.internet;
+      if (cur.internet) {
+        toggleBtn.className = 'relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full bg-primary transition-colors focus:outline-none';
+        toggleDot.className = 'translate-x-4 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-on-primary shadow-sm ring-0 transition duration-150 ease-in-out mt-0.5 ml-0.5';
+        cur.pVal = 0.70;
+      } else {
+        toggleBtn.className = 'relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full bg-surface-container-highest transition-colors focus:outline-none';
+        toggleDot.className = 'translate-x-0.5 pointer-events-none inline-block h-4 w-4 transform rounded-full bg-surface-container-lowest shadow-sm ring-0 transition duration-150 ease-in-out mt-0.5 ml-0.5';
+        cur.pVal = 0.20;
+      }
+      document.getElementById('chip-p').textContent = `p·P = ${cur.pVal.toFixed(2)}`;
+      recalculateCurrent();
+    });
+
+    // Simple search filtering
+    const searchInput = document.getElementById('asset-search');
+    searchInput.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      let visibleCount = 0;
+      rows.forEach(r => {
+        const text = r.innerText.toLowerCase();
+        if (text.includes(q)) {
+          r.style.display = '';
+          visibleCount++;
+        } else {
+          r.style.display = 'none';
+        }
+      });
+      document.getElementById('assets-count').textContent = visibleCount;
+    });
+
+    // Keyboard shortcuts (Save & New)
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        const saveBtn = document.getElementById('btn-save');
+        saveBtn.classList.add('bg-neutral-700');
+        setTimeout(() => saveBtn.classList.remove('bg-neutral-700'), 200);
+      }
+    });
+
+    // Save button toast simulation
+    document.getElementById('btn-save').addEventListener('click', () => {
+      const cur = assetsData[selectedAssetId];
+      cur.mainAsset = document.getElementById('input-main-asset').value;
+      cur.subAsset = document.getElementById('input-sub-asset').value;
+      cur.owner = document.getElementById('input-owner').value;
+      
+      const saveBtn = document.getElementById('btn-save');
+      const originalText = saveBtn.innerHTML;
+      saveBtn.innerHTML = '<span class="material-symbols-outlined text-[15px]">check</span><span>Сохранено!</span>';
+      setTimeout(() => {
+        saveBtn.innerHTML = originalText;
+      }, 1200);
+    });
+
+    // Initialize with first asset
+    loadAssetIntoInspector('AST-01');
+  })();
+</script></main></div><footer class="fixed bottom-0 left-0 right-0 h-6 bg-surface-container border-t border-outline-variant/40 px-space-md flex items-center justify-between z-50 font-label-code-sm text-label-code-sm text-on-surface-variant"><div class="flex items-center gap-space-md"><span><span class="inline-block w-1.5 h-1.5 rounded-full bg-primary mr-1"></span>Подключено: База БДУ ФСТЭК от 12.02.2025</span><span class="text-outline">|</span><span>Проект: КИИ_ГК_2025.rosi</span></div><div class="hidden md:flex items-center text-outline"><span>Методика: ГОСТ Р ИСО/МЭК 27005-2018 / Приказ ФСТЭК №239</span></div><div class="flex items-center gap-space-md"><span>Сохранено (Ctrl+S)</span><span class="text-outline">|</span><span>v2.4.1-pro</span><span class="text-outline">|</span><span>UTF-8</span></div></footer></body></html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+    }
+    th, td {
+        border: 1px solid #000;
+        padding: 8px;
+        vertical-align: top;
+        text-align: left;
+    }
+    th {
+        text-align: center;
+        font-weight: bold;
+        background-color: #f9f9f9;
+    }
+    .center-text {
+        text-align: center;
+    }
+    .section-header {
+        text-align: center;
+        font-weight: bold;
+        background-color: #f0f0f0;
+    }
+</style>
+</head>
+<body>
+
+
+<text> Таблица 1(ФСТЭК 2025) – Значения весовых коэффициентов и оценок показателей, определяющих влияние уязвимости на информационную систему </text>
+<table>
+    <!-- Шапка таблицы -->
+    <thead>
+        <tr>
+            <th style="width: 40px;">№ п/п</th>
+            <th>Наименование</th>
+            <th style="width: 80px;">Весовой коэффициент показателя (k, l, p, e, h)</th>
+            <th>Наименование возможных значений показателя</th>
+            <th style="width: 80px;">Значение показателя (Ki, Li, Pi, Ei, Hi)</th>
+            <th style="width: 100px;">Итог (k × Ki, l × Li, p × Pi, e × Ei, h × Hi)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Секция 1: Данные для расчета показателя I_inf -->
+        <tr>
+            <td colspan="6" class="section-header">Данные для расчета показателя I<sub>inf</sub></td>
+        </tr>
+        <tr>
+            <td rowspan="8" class="center-text">1</td>
+            <td rowspan="8">Тип компонента информационной системы, подверженного уязвимости (К)</td>
+            <td rowspan="8" class="center-text">0,5</td>
+            <td>Уязвимости подвержены компоненты системы, обеспечивающие реализацию важных процессов (бизнес-процессов), функций, полномочий</td>
+            <td class="center-text">1,1</td>
+            <td class="center-text">0,55</td>
+        </tr>
+        <tr>
+            <td>Уязвимости подвержены межсетевые экраны</td>
+            <td class="center-text">0,9</td>
+            <td class="center-text">0,45</td>
+        </tr>
+        <tr>
+            <td>Уязвимости подвержены сетевые устройства и шлюзы</td>
+            <td class="center-text">0,9</td>
+            <td class="center-text">0,45</td>
+        </tr>
+        <tr>
+            <td>Уязвимости подвержены телекоммуникационное оборудование, система управления сетью передачи данных</td>
+            <td class="center-text">0,8</td>
+            <td class="center-text">0,4</td>
+        </tr>
+        <tr>
+            <td>Уязвимости подвержены серверы (центральные вычислительные узлы)</td>
+            <td class="center-text">0,7</td>
+            <td class="center-text">0,35</td>
+        </tr>
+        <tr>
+            <td>Уязвимости подвержены пользовательские устройства (автоматизированные рабочие места)</td>
+            <td class="center-text">0,5</td>
+            <td class="center-text">0,25</td>
+        </tr>
+        <tr>
+            <td>Уязвимости подвержены системы хранения данных</td>
+            <td class="center-text">0,4</td>
+            <td class="center-text">0,2</td>
+        </tr>
+        <tr>
+            <td>Уязвимости подвержены другие компоненты</td>
+            <td class="center-text">0,1</td>
+            <td class="center-text">0,05</td>
+        </tr>
+
+        <!-- Секция 2: Продолжение пункта 2 -->
+        <tr>
+            <td rowspan="4" class="center-text">2</td>
+            <td rowspan="4">Количество уязвимых компонентов информационной системы (обеспечивающих реализацию критически х процессов, функций, полномочий, межсетевых экранов, сетевых устройств и шлюзов, автоматизированных рабочих мест, серверов, телекоммуникационного оборудования, средств защиты информации, систем хранения данных и других компонентов) (L)</td>
+            <td rowspan="4" class="center-text">0,2</td>
+            <td>Более 70% компонентов от общего числа компонентов в информационной системе</td>
+            <td class="center-text">1,0</td>
+            <td class="center-text">0,2</td>
+        </tr>
+        <tr>
+            <td>50-70% компонентов от общего числа компонентов в информационной системе</td>
+            <td class="center-text">0,8</td>
+            <td class="center-text">0,16</td>
+        </tr>
+        <tr>
+            <td>10-50% компонентов от общего числа компонентов в информационной системе</td>
+            <td class="center-text">0,6</td>
+            <td class="center-text">0,12</td>
+        </tr>
+        <tr>
+            <td>Менее 10% компонентов от общего числа компонентов в информационной системе</td>
+            <td class="center-text">0,5</td>
+            <td class="center-text">0,1</td>
+        </tr>
+
+        <!-- Секция 3: Пункт 3 -->
+        <tr>
+            <td rowspan="2" class="center-text">3</td>
+            <td rowspan="2">Влияние на эффективность защиты периметра информационной системы (Р)</td>
+            <td rowspan="2" class="center-text">0,3</td>
+            <td>Уязвимое программное, программно-аппаратное средство доступно из сети «Интернет»</td>
+            <td class="center-text">1,1</td>
+            <td class="center-text">0,33</td>
+        </tr>
+        <tr>
+            <td>Уязвимое программное, программно-аппаратное средство недоступно из сети «Интернет»</td>
+            <td class="center-text">0,6</td>
+            <td class="center-text">0,18</td>
+        </tr>
+
+        <!-- Секция 4: Данные для расчета показателя I_at -->
+        <tr>
+            <td colspan="6" class="section-header">Данные для расчета показателя I<sub>at</sub></td>
+        </tr>
+        <tr>
+            <td rowspan="3" class="center-text">4</td>
+            <td rowspan="3">Эксплуатация уязвимости (Е)</td>
+            <td rowspan="3" class="center-text">1,0</td>
+            <td>Эксплуатируется в реальных атаках</td>
+            <td class="center-text">0,6</td>
+            <td class="center-text">0,6</td>
+        </tr>
+        <tr>
+            <td>Имеются сведения о наличии средств эксплуатации (эксплойта) уязвимости</td>
+            <td class="center-text">0,3</td>
+            <td class="center-text">0,3</td>
+        </tr>
+        <tr>
+            <td>Отсутствуют сведения об эксплуатации в реальных атаках (наличии эксплойта)</td>
+            <td class="center-text">0,1</td>
+            <td class="center-text">0,1</td>
+        </tr>
+
+        <!-- Секция 5: Данные для расчета показателя I_imp -->
+        <tr>
+            <td colspan="6" class="section-header">Данные для расчета показателя I<sub>imp</sub></td>
+        </tr>
+        <tr>
+            <td rowspan="11" class="center-text">5</td>
+            <td rowspan="11">Последствия воздействий, которым подвергается информационная система при эксплуатации уязвимости (Н)</td>
+            <td rowspan="11" class="center-text">1,0</td>
+            <td>Выполнение произвольного кода (Arbitrary Code Execution)</td>
+            <td class="center-text">0,5</td>
+            <td class="center-text">0,5</td>
+        </tr>
+        <tr>
+            <td>Повышение привилегий (Privilege Escalation)</td>
+            <td class="center-text">0,5</td>
+            <td class="center-text">0,5</td>
+        </tr>
+        <tr>
+            <td>Обход механизмов безопасности (Security Bypass)</td>
+            <td class="center-text">0,4</td>
+            <td class="center-text">0,4</td>
+        </tr>
+        <tr>
+            <td>Внедрение кода (Code Injection)</td>
+            <td class="center-text">0,34</td>
+            <td class="center-text">0,34</td>
+        </tr>
+        <tr>
+            <td>Получение конфиденциальной информации (Obtain Sensitive Information)</td>
+            <td class="center-text">0,3</td>
+            <td class="center-text">0,3</td>
+        </tr>
+        <tr>
+            <td>Нарушение целостности данных (Loss of Integrity)</td>
+            <td class="center-text">0,3</td>
+            <td class="center-text">0,3</td>
+        </tr>
+        <tr>
+            <td>Отказ в обслуживании (DoS)</td>
+            <td class="center-text">0,26</td>
+            <td class="center-text">0,26</td>
+        </tr>
+        <tr>
+            <td>Перезапись произвольных файлов (Overwrite Arbitrary Files)</td>
+            <td class="center-text">0,22</td>
+            <td class="center-text">0,22</td>
+        </tr>
+        <tr>
+            <td>Запись локальных файлов (Write Local Files)</td>
+            <td class="center-text">0,2</td>
+            <td class="center-text">0,2</td>
+        </tr>
+        <tr>
+            <td>Чтение локальных файлов (Read Local Files)</td>
+            <td class="center-text">0,18</td>
+            <td class="center-text">0,18</td>
+        </tr>
+        <tr>
+            <td>Поддельный пользовательский интерфейс (Spoof User Interface)</td>
+            <td class="center-text">0,12</td>
+            <td class="center-text">0,12</td>
+        </tr>
+        <tr>
+            <td colspan="4"></td> <!-- Пустая ячейка для выравнивания, если нужно -->
+            <td class="center-text">0,1</td>
+            <td class="center-text">0,1</td>
+        </tr>
+    </tbody>
+</table>
+
+
+<text> Таблица 2(ФСТЭК 2025) – Значения итоговой оценки уровня критичности уязвимости </text>
+ <table>
+        <thead>
+            <tr>
+                <th>№<br>п/п</th>
+                <th>Итоговая оценка уровня<br>критичности уязвимости</th>
+                <th>Наименование уровня критичности<br>уязвимости</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>V &gt; 8,0</td>
+                <td>Критический</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>5,0 &le; V &le; 8,0</td>
+                <td>Высокий</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>2,0 &le; V &lt; 5,0</td>
+                <td>Средний</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>V &lt; 2,0</td>
+                <td>Низкий</td>
+            </tr>
+        </tbody>
+    </table>
+
+<text> Таблица 9.1(ФСТЭК 2021) – Примеры результата определения актуальных нарушителей при реализации угроз безопасности информации  соответствующие им возможности (для государственной информационной системы) </text>
+<table>
+    <thead>
+        <tr>
+            <th>№ п/п</th>
+            <th>Виды риска (ущерба) и возможные негативные последствия<sup>*</sup></th>
+            <th>Виды актуального нарушителя<sup>**</sup></th>
+            <th>Категория нарушителя</th>
+            <th>Уровень возможностей нарушителя</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Блок 1 -->
+        <tr>
+            <td rowspan="5" class="center-text">1</td>
+            <td rowspan="5">
+                У1:<br>
+                нарушение конфиденциальности персональных данных граждан;<br>
+                нарушение личной, семейной тайны, утрата чести и доброго имени;<br>
+                финансовый, иной материальный ущерб физических лиц
+            </td>
+            <td>Преступные группы (криминальные структуры)</td>
+            <td class="center-text">Внешний<br>Внутренний<sup>***</sup></td>
+            <td class="center-text">Н3</td>
+        </tr>
+        <tr>
+            <td>Отдельные физические лица (хакеры)</td>
+            <td class="center-text">Внешний</td>
+            <td class="center-text">Н2</td>
+        </tr>
+        <tr>
+            <td>Разработчики программных, программно-аппаратных средств</td>
+            <td class="center-text">Внутренний</td>
+            <td class="center-text">Н3</td>
+        </tr>
+        <tr>
+            <td>Системные администраторы и администраторы безопасности</td>
+            <td class="center-text">Внутренний</td>
+            <td class="center-text">Н2</td>
+        </tr>
+        <tr>
+            <td>Авторизованные пользователи систем и сетей</td>
+            <td class="center-text">Внутренний</td>
+            <td class="center-text">Н2</td>
+        </tr>
+
+        <!-- Блок 2 -->
+        <tr>
+            <td rowspan="4" class="center-text">2</td>
+            <td rowspan="4">
+                У2:<br>
+                невозможность заключения договоров, соглашений;<br>
+                утечка коммерческой тайны;<br>
+                потеря клиентов;<br>
+                нарушение деловой репутации;<br>
+                недополучение ожидаемой прибыли
+            </td>
+            <td>Преступные группы (криминальные структуры)</td>
+            <td class="center-text">Внешний</td>
+            <td class="center-text">Н3</td>
+        </tr>
+        <tr>
+            <td>Отдельные физические лица (хакеры)</td>
+            <td class="center-text">Внутренний</td>
+            <td class="center-text">Н2</td>
+        </tr>
+        <tr>
+            <td>Разработчики программных, программно-аппаратных средств</td>
+            <td class="center-text">Внутренний</td>
+            <td class="center-text">Н3</td>
+        </tr>
+        <tr>
+            <td>Системные администраторы и администраторы безопасности</td>
+            <td class="center-text">Внутренний</td>
+            <td class="center-text">Н2</td>
+        </tr>
+
+        <!-- Блок 3 (начинается на первом изображении и продолжается на втором) -->
+        <tr>
+            <td rowspan="8" class="center-text">3</td>
+            <td rowspan="8">
+                У3:<br>
+                нарушение функционирования государственного органа, дискредитация деятельности органа государственной власти;<br>
+                доступ к системам и сетям с целью незаконного использования вычислительных мощностей;<br>
+                утечка информации ограниченного доступа;<br>
+                организация митингов, забастовок из-за публикаций недостоверной информации;<br>
+                отсутствие доступа к социально значимым государственным услугам
+            </td>
+            <td>Специальные службы иностранных государств</td>
+            <td class="center-text">Внешний<br>Внутренний<sup>***</sup></td>
+            <td class="center-text">Н4</td>
+        </tr>
+        <tr>
+            <td>Террористические, экстремистские организации</td>
+            <td class="center-text">Внешний</td>
+            <td class="center-text">Н3</td>
+        </tr>
+        <tr>
+            <td>Преступные группы (криминальные структуры)</td>
+            <td class="center-text">Внешний<br>Внутренний<sup>***</sup></td>
+            <td class="center-text">Н3</td>
+        </tr>
+        <tr>
+            <td>Разработчики программных, программно-аппаратных средств</td>
+            <td class="center-text">Внутренний</td>
+            <td class="center-text">Н3</td>
+        </tr>
+        <tr>
+            <td>Системные администраторы и администраторы безопасности</td>
+            <td class="center-text">Внутренний</td>
+            <td class="center-text">Н3</td>
+        </tr>
+        <tr>
+            <td>Авторизованные пользователи систем и сетей</td>
+            <td class="center-text">Внутренний</td>
+            <td class="center-text">Н1</td>
+        </tr>
+        <tr>
+            <td>Бывшие (уволенные) работники (пользователи)</td>
+            <td class="center-text">Внутренний</td>
+            <td class="center-text">Н1</td>
+        </tr>
+    </tbody>
+</table>
+
+<text> 
+* - примеры возможных целей реализации угроз безопасности информации с учетом области деятельности, в которой функционируют системы и сети, определенные с учетом приложений 4 и 5 к настоящей Методике.
+<br>
+** - примеры видов актуальных нарушителей, определенные с учетом приложений 6 и 7 к настоящей Методике.
+<br>
+*** - при сговоре преступной группировки (криминальной структуры) с системными администраторами и администраторами безопасности, определенном в приложении 7 к настоящей Методике.	
+</text>
+
+
+
+</body>
+</html>
