@@ -11,98 +11,22 @@ ScrollView {
 
     property int selectedScenarioIndex: 0
 
-    readonly property var scenarios: [
-        {
-            asset: "Кейс 1: Клиентская база и контракты",
-            subAsset: "Центральный сервер СУБД PostgreSQL",
-            sle: "8 000 000 ₽",
-            sleNum: 8000000,
-            vBase: 4.75,
-            probBase: "59.4%",
-            aleBase: "4 750 000 ₽",
-            measure: "Изоляция СУБД (МЭ) + патчинг",
-            tco: "450 000 ₽",
-            tcoNum: 450000,
-            vRes: 1.54,
-            probRes: "19.3%",
-            aleRes: "1 540 000 ₽",
-            avoidedLoss: "3 210 000 ₽",
-            netBenefit: "2 760 000 ₽",
-            rosi: "+613.3%",
-            payback: "1.7 мес.",
-            bcr: "7.13",
-            formulaDetails: "Кейс 1 (БДУ BDU:2025-01611):\n" +
-                           "1. SLE = 1 200 000 + 6 800 000 = 8 000 000 ₽ (ст. 10 98-ФЗ = Да)\n" +
-                           "2. I_infr_base = 0.55 + 0.16 + 0.33 = 1.04\n" +
-                           "3. V_base = 8.8 × 1.04 × (0.30 + 0.50) = 4.75 (ВЫСОКИЙ, SLA до 7 дней)\n" +
-                           "4. Prob_base = 4.75 / 8.0 = 59.4%  ==>  ALE_base = 8 000 000 × 59.4% = 4 750 000 ₽\n" +
-                           "5. После меры: l·L -> 0.10, p·P -> 0.18  ==>  I_infr_res = 0.55 + 0.10 + 0.18 = 0.83\n" +
-                           "6. V_res = 8.8 × 0.83 × (0.30 + 0.50) = 1.54 (НИЗКИЙ, SLA до 4 мес.)\n" +
-                           "7. Prob_res = 1.54 / 8.0 = 19.3%  ==>  ALE_res = 8 000 000 × 19.3% = 1 540 000 ₽\n" +
-                           "8. Avoided Loss (ΔALE) = 4 750 000 - 1 540 000 = 3 210 000 ₽\n" +
-                           "9. Net Benefit = 3 210 000 - 450 000 = 2 760 000 ₽\n" +
-                           "10. Net ROSI = (2 760 000 / 450 000) × 100% = +613.3% [ОКУПАЕМО]"
-        },
-        {
-            asset: "Кейс 2: Исходный код и ноу-хау",
-            subAsset: "АРМ разработчиков и Git-сервер",
-            sle: "10 000 000 ₽",
-            sleNum: 10000000,
-            vBase: 5.50,
-            probBase: "68.8%",
-            aleBase: "6 880 000 ₽",
-            measure: "Endpoint DLP + блокировка USB и внешнего доступа",
-            tco: "600 000 ₽",
-            tcoNum: 600000,
-            vRes: 1.82,
-            probRes: "22.8%",
-            aleRes: "2 280 000 ₽",
-            avoidedLoss: "4 600 000 ₽",
-            netBenefit: "4 000 000 ₽",
-            rosi: "+666.7%",
-            payback: "1.6 мес.",
-            bcr: "7.67",
-            formulaDetails: "Кейс 2 (Конструктор УБИ п. 5.3.3 ФСТЭК 2021 + CVSS 3.1 AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N):\n" +
-                           "1. SLE = 3 000 000 + 7 000 000 = 10 000 000 ₽ (ст. 10 98-ФЗ = Да)\n" +
-                           "2. I_infr_base = 0.25 + 0.20 + 0.33 = 0.78, I_cvss = 5.5\n" +
-                           "3. V_base = 5.5 × 0.78 × (0.30 + 0.30) = 5.50 (ВЫСОКИЙ, SLA до 7 дней)\n" +
-                           "4. Prob_base = 5.50 / 8.0 = 68.8%  ==>  ALE_base = 10 000 000 × 68.8% = 6 880 000 ₽\n" +
-                           "5. После меры: l·L -> 0.10, p·P -> 0.18  ==>  I_infr_res = 0.25 + 0.10 + 0.18 = 0.53\n" +
-                           "6. V_res = 5.5 × 0.53 × (0.30 + 0.30) = 1.82 (НИЗКИЙ, SLA до 4 мес.)\n" +
-                           "7. Avoided Loss = 6 880 000 - 2 280 000 = 4 600 000 ₽\n" +
-                           "8. Net Benefit = 4 600 000 - 600 000 = 4 000 000 ₽\n" +
-                           "9. Net ROSI = (4 000 000 / 600 000) × 100% = +666.7% [ОКУПАЕМО]"
-        },
-        {
-            asset: "SCADA Node 01",
-            subAsset: "АСУ ТП Сервер ядра",
-            sle: "18 500 000 ₽",
-            sleNum: 18500000,
-            vBase: 8.80,
-            probBase: "100.0%",
-            aleBase: "18 500 000 ₽",
-            measure: "Внедрение WAF и микросегментации",
-            tco: "2 400 000 ₽",
-            tcoNum: 2400000,
-            vRes: 2.20,
-            probRes: "27.5%",
-            aleRes: "5 087 500 ₽",
-            avoidedLoss: "13 412 500 ₽",
-            netBenefit: "11 012 500 ₽",
-            rosi: "+458.9%",
-            payback: "2.1 мес.",
-            bcr: "5.59",
-            formulaDetails: "Сценарий SCADA Node 01:\n" +
-                           "1. SLE = 18 500 000 ₽, I_cvss = 9.8, I_infr_base = 0.88, I_at = 0.60, I_imp = 0.50\n" +
-                           "2. V_base = 9.8 × 0.88 × (0.60 + 0.50) = 8.80 (КРИТИЧЕСКИЙ, SLA до 24 ч)\n" +
-                           "3. Prob_base = min(8.8/8.0, 1.0) = 100%  ==>  ALE_base = 18 500 000 ₽\n" +
-                           "4. Avoided Loss = 18 500 000 - 5 087 500 = 13 412 500 ₽\n" +
-                           "5. Net Benefit = 13 412 500 - 2 400 000 = 11 012 500 ₽\n" +
-                           "6. Net ROSI = (11 012 500 / 2 400 000) × 100% = +458.9%"
-        }
-    ]
+    // Сценарии динамически рассчитываются из C++ RiskCalculator
+    readonly property var scenarios: (typeof riskCalculator !== "undefined") ? riskCalculator.economicScenarios : []
+    readonly property var currentScenario: (scenarios && scenarios.length > selectedScenarioIndex)
+                                            ? scenarios[selectedScenarioIndex]
+                                            : (scenarios && scenarios.length > 0 ? scenarios[0] : null)
 
-    readonly property var currentScenario: scenarios[selectedScenarioIndex]
+    Connections {
+        target: (typeof riskCalculator !== "undefined") ? riskCalculator : null
+        function onDataChanged() {
+            waterfallCanvas.requestPaint()
+        }
+    }
+
+    onSelectedScenarioIndexChanged: {
+        waterfallCanvas.requestPaint()
+    }
 
     ColumnLayout {
         width: root.width
@@ -119,10 +43,10 @@ ScrollView {
                 Layout.fillWidth: true
                 title: "СНИЖЕНИЕ КРИТИЧНОСТИ (V)"
                 iconText: "ΔV"
-                value: "-67.6%"
-                unitText: "в 3.1 раза"
-                footerLeft: "V: 4.75 → 1.54"
-                footerRight: "SLA: 4 мес."
+                value: root.currentScenario ? root.currentScenario.deltaVText : "—"
+                unitText: "по методике"
+                footerLeft: root.currentScenario ? ("V: " + root.currentScenario.vBase.toFixed(2) + " → " + root.currentScenario.vRes.toFixed(2)) : "V: —"
+                footerRight: root.currentScenario ? ("SLA: " + root.currentScenario.slaRes) : ""
                 badgeText: "ТАБЛИЦА 2"
             }
 
@@ -130,10 +54,10 @@ ScrollView {
                 Layout.fillWidth: true
                 title: "ВЕРОЯТНОСТЬ ИНЦИДЕНТА"
                 iconText: "PROB"
-                value: "19.3%"
-                unitText: "было: 59.4%"
+                value: root.currentScenario ? root.currentScenario.probRes : "—"
+                unitText: root.currentScenario ? ("было: " + root.currentScenario.probBase) : ""
                 footerLeft: "Снижение риска:"
-                footerRight: "-40.1%"
+                footerRight: root.currentScenario ? root.currentScenario.deltaProbText : "—"
                 badgeText: "ISO 27005"
             }
 
@@ -141,10 +65,10 @@ ScrollView {
                 Layout.fillWidth: true
                 title: "ПРЕДОТВРАЩЕННЫЙ УЩЕРБ"
                 iconText: "ΔALE"
-                value: "3.21M ₽"
+                value: root.currentScenario ? root.currentScenario.avoidedLoss : "—"
                 unitText: "в год"
                 footerLeft: "Базовый ALE:"
-                footerRight: "4.75M ₽"
+                footerRight: root.currentScenario ? root.currentScenario.aleBase : "—"
                 badgeText: "ЭКОНОМИЯ"
             }
 
@@ -152,10 +76,10 @@ ScrollView {
                 Layout.fillWidth: true
                 title: "ЗАТРАТЫ НА МЕРЫ (TCO)"
                 iconText: "TCO"
-                value: "450 000 ₽"
+                value: root.currentScenario ? root.currentScenario.tco : "—"
                 unitText: "CAPEX+OPEX"
                 footerLeft: "Срок окупаемости:"
-                footerRight: "1.7 мес."
+                footerRight: root.currentScenario ? root.currentScenario.payback : "—"
                 badgeText: "БЮДЖЕТ"
                 badgeColor: Style.surfaceContainerHighest
                 badgeTextColor: Style.textPrimary
@@ -207,11 +131,11 @@ ScrollView {
                         RowLayout {
                             spacing: 12
                             Text {
-                                text: root.currentScenario.rosi
+                                text: root.currentScenario ? root.currentScenario.rosi : (typeof riskCalculator !== "undefined" ? ((riskCalculator.netRosiPercent >= 0 ? "+" : "") + riskCalculator.formatNumber(riskCalculator.netRosiPercent, 1) + "%") : "+0.0%")
                                 font.family: Style.fontMono
                                 font.pixelSize: 42
                                 font.weight: Font.Bold
-                                color: Style.primary
+                                color: (root.currentScenario ? root.currentScenario.netBenefitNum >= 0 : true) ? Style.primary : Style.riskCriticalText
                             }
                             ColumnLayout {
                                 spacing: 0
@@ -223,7 +147,9 @@ ScrollView {
                                     color: Style.textPrimary
                                 }
                                 Text {
-                                    text: "Суммарный Net ROSI портфеля мер: +142.8%"
+                                    text: typeof riskCalculator !== "undefined"
+                                          ? ("Суммарный Net ROSI портфеля мер: " + (riskCalculator.netRosiPercent >= 0 ? "+" : "") + riskCalculator.formatNumber(riskCalculator.netRosiPercent, 1) + "%")
+                                          : "Суммарный Net ROSI портфеля мер: —"
                                     font.family: Style.fontMono
                                     font.pixelSize: Style.fontSizeCodeSm
                                     color: Style.textSecondary
@@ -238,8 +164,8 @@ ScrollView {
                     Rectangle {
                         implicitHeight: 52
                         implicitWidth: 260
-                        color: Style.riskLowBg
-                        border.color: Style.riskLowBorder
+                        color: (root.currentScenario ? root.currentScenario.netBenefitNum >= 0 : (typeof riskCalculator !== "undefined" && riskCalculator.netBenefit >= 0)) ? Style.riskLowBg : Style.riskCriticalBg
+                        border.color: (root.currentScenario ? root.currentScenario.netBenefitNum >= 0 : (typeof riskCalculator !== "undefined" && riskCalculator.netBenefit >= 0)) ? Style.riskLowBorder : Style.riskCriticalBorder
                         border.width: 1
                         radius: 2
 
@@ -249,24 +175,24 @@ ScrollView {
                             spacing: 8
 
                             Text {
-                                text: "✓"
+                                text: (root.currentScenario ? root.currentScenario.netBenefitNum >= 0 : true) ? "✓" : "⚠"
                                 font.family: Style.fontMono
                                 font.pixelSize: 22
                                 font.weight: Font.Bold
-                                color: Style.riskLowText
+                                color: (root.currentScenario ? root.currentScenario.netBenefitNum >= 0 : true) ? Style.riskLowText : Style.riskCriticalText
                             }
 
                             ColumnLayout {
                                 spacing: 0
                                 Text {
-                                    text: "ИНВЕСТИЦИЯ ВЫСОКОЭФФЕКТИВНА"
+                                    text: (root.currentScenario ? root.currentScenario.netBenefitNum >= 0 : (typeof riskCalculator !== "undefined" && riskCalculator.netBenefit >= 0)) ? "ИНВЕСТИЦИЯ ВЫСОКОЭФФЕКТИВНА" : "ТРЕБУЕТСЯ ОПТИМИЗАЦИЯ"
                                     font.family: Style.fontMono
                                     font.pixelSize: Style.fontSizeCodeSm
                                     font.weight: Font.Bold
-                                    color: Style.riskLowText
+                                    color: (root.currentScenario ? root.currentScenario.netBenefitNum >= 0 : true) ? Style.riskLowText : Style.riskCriticalText
                                 }
                                 Text {
-                                    text: "Рекомендовано к защите перед CEO / CFO"
+                                    text: (root.currentScenario ? root.currentScenario.netBenefitNum >= 0 : true) ? "Рекомендовано к защите перед CEO / CFO" : "Затраты превышают предотвращенный ущерб"
                                     font.family: Style.fontSans
                                     font.pixelSize: 10
                                     color: Style.textSecondary
@@ -290,7 +216,9 @@ ScrollView {
                         anchors.rightMargin: 8
 
                         Text {
-                            text: "Формула: Net ROSI = ((Avoided Loss - Cost_TCO) / Cost_TCO) × 100% = ((" + root.currentScenario.avoidedLoss + " - " + root.currentScenario.tco + ") / " + root.currentScenario.tco + ") × 100%"
+                            text: root.currentScenario
+                                  ? ("Формула: Net ROSI = ((Avoided Loss - TCO) / TCO) × 100% = ((" + root.currentScenario.avoidedLoss + " - " + root.currentScenario.tco + ") / " + root.currentScenario.tco + ") × 100% = " + root.currentScenario.rosi)
+                                  : "Формула: Net ROSI = ((Avoided Loss - Cost_TCO) / Cost_TCO) × 100%"
                             font.family: Style.fontMono
                             font.pixelSize: Style.fontSizeCodeSm
                             color: Style.textSecondary
@@ -315,10 +243,10 @@ ScrollView {
 
                     Repeater {
                         model: [
-                            { label: "Предотвращенный ущерб (ΔALE)", val: root.currentScenario.avoidedLoss, desc: "за 12 месяцев" },
-                            { label: "Чистая выгода (Net Benefit)", val: root.currentScenario.netBenefit, desc: "ΔALE - TCO" },
-                            { label: "Срок окупаемости (Payback)", val: root.currentScenario.payback, desc: "(TCO / ΔALE) × 12 мес." },
-                            { label: "Коэффициент выгоды (BCR)", val: root.currentScenario.bcr, desc: "ΔALE / TCO" }
+                            { label: "Предотвращенный ущерб (ΔALE)", val: root.currentScenario ? root.currentScenario.avoidedLoss : "—", desc: "за 12 месяцев" },
+                            { label: "Чистая выгода (Net Benefit)", val: root.currentScenario ? root.currentScenario.netBenefit : "—", desc: "ΔALE - TCO" },
+                            { label: "Срок окупаемости (Payback)", val: root.currentScenario ? root.currentScenario.payback : "—", desc: "(TCO / ΔALE) × 12 мес." },
+                            { label: "Коэффициент выгоды (BCR)", val: root.currentScenario ? root.currentScenario.bcr : "—", desc: "ΔALE / TCO" }
                         ]
 
                         Rectangle {
@@ -350,8 +278,8 @@ ScrollView {
             // Waterfall Chart Representation
             Rectangle {
                 Layout.fillWidth: true
-                Layout.preferredWidth: parent.width * 0.50
-                implicitHeight: 210
+                Layout.preferredWidth: parent.width * 0.45
+                implicitHeight: 220
                 color: Style.panelSurface
                 border.color: Style.hairlineBorder
                 border.width: 1
@@ -395,36 +323,53 @@ ScrollView {
                             ctx.strokeStyle = Style.hairlineBorder;
                             ctx.lineWidth = 1;
                             ctx.beginPath();
-                            ctx.moveTo(40, h - 24); ctx.lineTo(w - 10, h - 24);
-                            ctx.moveTo(40, h / 2);  ctx.lineTo(w - 10, h / 2);
+                            ctx.moveTo(30, h - 24); ctx.lineTo(w - 10, h - 24);
+                            ctx.moveTo(30, (h - 24) / 2);  ctx.lineTo(w - 10, (h - 24) / 2);
                             ctx.stroke();
 
-                            var barW = 50;
-                            var baseY = h - 24;
+                            if (!root.currentScenario) return;
 
-                            // Bar 1: Базовый ALE (15.5M / 4.75M)
-                            ctx.fillStyle = "#27272A";
-                            ctx.fillRect(50, 20, barW, baseY - 20);
+                            var barW = Math.max(30, Math.min(50, (w - 100) / 4));
+                            var baseY = h - 24;
+                            var maxVal = Math.max(1.0,
+                                                  root.currentScenario.aleBaseNum || 0,
+                                                  root.currentScenario.tcoNum || 0,
+                                                  root.currentScenario.avoidedLossNum || 0);
+                            var scaleH = (baseY - 30) / maxVal;
+
+                            var hAleBase = Math.max(4, (root.currentScenario.aleBaseNum || 0) * scaleH);
+                            var hAvoided = Math.max(4, (root.currentScenario.avoidedLossNum || 0) * scaleH);
+                            var hAleRes  = Math.max(4, (root.currentScenario.aleResNum || 0) * scaleH);
+                            var hTco     = Math.max(4, (root.currentScenario.tcoNum || 0) * scaleH);
+
+                            var x1 = 40;
+                            var x2 = x1 + barW + 30;
+                            var x3 = x2 + barW + 30;
+                            var x4 = x3 + barW + 30;
+
+                            // Bar 1: Базовый ALE
+                            ctx.fillStyle = "#3F3F46";
+                            ctx.fillRect(x1, baseY - hAleBase, barW, hAleBase);
 
                             // Bar 2: Avoided Loss (снижение)
-                            ctx.fillStyle = "#A1A1AA";
-                            ctx.fillRect(140, 20, barW, (baseY - 20) * 0.68);
+                            ctx.fillStyle = "#10B981";
+                            ctx.fillRect(x2, baseY - hAvoided, barW, hAvoided);
 
                             // Bar 3: Остаточный ALE
                             ctx.fillStyle = "#71717A";
-                            ctx.fillRect(230, 20 + ((baseY - 20) * 0.68), barW, (baseY - 20) * 0.32);
+                            ctx.fillRect(x3, baseY - hAleRes, barW, hAleRes);
 
                             // Bar 4: TCO Затраты
-                            ctx.fillStyle = "#18181B";
-                            ctx.fillRect(320, baseY - 35, barW, 35);
+                            ctx.fillStyle = "#EF4444";
+                            ctx.fillRect(x4, baseY - hTco, barW, hTco);
                         }
 
                         RowLayout {
                             anchors.bottom: parent.bottom
                             anchors.left: parent.left
                             anchors.right: parent.right
-                            anchors.leftMargin: 40
-                            spacing: 40
+                            anchors.leftMargin: 35
+                            spacing: 20
 
                             Text { text: "ALE до"; font.family: Style.fontSans; font.pixelSize: 10; color: Style.textSecondary }
                             Text { text: "-ΔALE"; font.family: Style.fontSans; font.pixelSize: 10; color: Style.textSecondary }
@@ -435,11 +380,11 @@ ScrollView {
                 }
             }
 
-            // Step-by-step formula details box (like test (2).go output)
+            // Step-by-step formula details box (Числовая подстановка по ФСТЭК и ГОСТ)
             Rectangle {
                 Layout.fillWidth: true
-                Layout.preferredWidth: parent.width * 0.50
-                implicitHeight: 210
+                Layout.preferredWidth: parent.width * 0.55
+                implicitHeight: 220
                 color: Style.panelSurface
                 border.color: Style.hairlineBorder
                 border.width: 1
@@ -460,7 +405,7 @@ ScrollView {
                         }
                         Item { Layout.fillWidth: true }
                         Text {
-                            text: "Протокол аудита"
+                            text: "Протокол аудита ФСТЭК / ГОСТ"
                             font.family: Style.fontMono
                             font.pixelSize: 10
                             color: Style.textSecondary
@@ -477,11 +422,12 @@ ScrollView {
                         ScrollView {
                             anchors.fill: parent
                             clip: true
+                            ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
 
                             Text {
-                                anchors.fill: parent
+                                width: parent.width - 16
                                 anchors.margins: 8
-                                text: root.currentScenario.formulaDetails
+                                text: root.currentScenario ? root.currentScenario.formulaDetails : "Выберите сценарий из таблицы ниже для просмотра детального протокола расчета."
                                 font.family: Style.fontMono
                                 font.pixelSize: 11
                                 color: Style.textPrimary
@@ -496,7 +442,7 @@ ScrollView {
         // Summary Data Grid for Portfolio
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: 180
+            implicitHeight: 220
             color: Style.panelSurface
             border.color: Style.hairlineBorder
             border.width: 1
@@ -528,11 +474,14 @@ ScrollView {
 
                         Item { Layout.fillWidth: true }
 
-                        RowLayout {
-                            spacing: 6
-                            AppButton { text: "PDF Отчет"; iconText: "📄" }
-                            AppButton { text: "Excel / CSV"; iconText: "📊" }
-                            AppButton { text: "Печать"; iconText: "🖨" }
+                        Text {
+                            text: typeof riskCalculator !== "undefined"
+                                  ? ("Суммарная чистая выгода: " + riskCalculator.formatRub(riskCalculator.netBenefit))
+                                  : ""
+                            font.family: Style.fontMono
+                            font.pixelSize: Style.fontSizeCodeSm
+                            font.weight: Font.Bold
+                            color: (typeof riskCalculator !== "undefined" && riskCalculator.netBenefit >= 0) ? Style.riskLowText : Style.riskCriticalText
                         }
                     }
                 }
@@ -544,15 +493,15 @@ ScrollView {
                     spacing: 0
 
                     TableHeaderCell { Layout.fillWidth: true; text: "Актив КТ / Мера" }
-                    TableHeaderCell { Layout.preferredWidth: 80; text: "SLE (₽)"; alignment: Text.AlignRight }
+                    TableHeaderCell { Layout.preferredWidth: 95; text: "SLE (₽)"; alignment: Text.AlignRight }
                     TableHeaderCell { Layout.preferredWidth: 50; text: "V до"; alignment: Text.AlignRight }
-                    TableHeaderCell { Layout.preferredWidth: 55; text: "Prob до"; alignment: Text.AlignRight }
-                    TableHeaderCell { Layout.preferredWidth: 80; text: "ALE до"; alignment: Text.AlignRight }
-                    TableHeaderCell { Layout.preferredWidth: 70; text: "TCO (₽)"; alignment: Text.AlignRight }
+                    TableHeaderCell { Layout.preferredWidth: 60; text: "Prob до"; alignment: Text.AlignRight }
+                    TableHeaderCell { Layout.preferredWidth: 95; text: "ALE до"; alignment: Text.AlignRight }
+                    TableHeaderCell { Layout.preferredWidth: 85; text: "TCO (₽)"; alignment: Text.AlignRight }
                     TableHeaderCell { Layout.preferredWidth: 50; text: "V пос"; alignment: Text.AlignRight }
-                    TableHeaderCell { Layout.preferredWidth: 80; text: "Avoided Loss"; alignment: Text.AlignRight }
-                    TableHeaderCell { Layout.preferredWidth: 80; text: "Net Benefit"; alignment: Text.AlignRight }
-                    TableHeaderCell { Layout.preferredWidth: 75; text: "Net ROSI"; alignment: Text.AlignRight; hasRightBorder: false }
+                    TableHeaderCell { Layout.preferredWidth: 95; text: "Avoided Loss"; alignment: Text.AlignRight }
+                    TableHeaderCell { Layout.preferredWidth: 95; text: "Net Benefit"; alignment: Text.AlignRight }
+                    TableHeaderCell { Layout.preferredWidth: 85; text: "Net ROSI"; alignment: Text.AlignRight; hasRightBorder: false }
                 }
 
                 // Table Rows
@@ -565,7 +514,7 @@ ScrollView {
 
                     delegate: Rectangle {
                         width: scenListView.width
-                        height: 36
+                        height: 38
                         color: {
                             if (root.selectedScenarioIndex === index) return Style.surfaceActive;
                             if (mouseArea.containsMouse) return Style.surfaceHover;
@@ -602,15 +551,15 @@ ScrollView {
                                 }
                             }
 
-                            Text { Layout.preferredWidth: 80; text: modelData.sle; font.family: Style.fontMono; font.pixelSize: Style.fontSizeCodeSm; horizontalAlignment: Text.AlignRight; color: Style.textPrimary }
+                            Text { Layout.preferredWidth: 95; text: modelData.sle; font.family: Style.fontMono; font.pixelSize: Style.fontSizeCodeSm; horizontalAlignment: Text.AlignRight; color: Style.textPrimary }
                             Text { Layout.preferredWidth: 50; text: modelData.vBase.toFixed(2); font.family: Style.fontMono; font.pixelSize: Style.fontSizeCodeSm; horizontalAlignment: Text.AlignRight; color: Style.textSecondary }
-                            Text { Layout.preferredWidth: 55; text: modelData.probBase; font.family: Style.fontMono; font.pixelSize: Style.fontSizeCodeSm; horizontalAlignment: Text.AlignRight; color: Style.textSecondary }
-                            Text { Layout.preferredWidth: 80; text: modelData.aleBase; font.family: Style.fontMono; font.pixelSize: Style.fontSizeCodeSm; horizontalAlignment: Text.AlignRight; color: Style.textPrimary }
-                            Text { Layout.preferredWidth: 70; text: modelData.tco; font.family: Style.fontMono; font.pixelSize: Style.fontSizeCodeSm; horizontalAlignment: Text.AlignRight; color: Style.textSecondary }
+                            Text { Layout.preferredWidth: 60; text: modelData.probBase; font.family: Style.fontMono; font.pixelSize: Style.fontSizeCodeSm; horizontalAlignment: Text.AlignRight; color: Style.textSecondary }
+                            Text { Layout.preferredWidth: 95; text: modelData.aleBase; font.family: Style.fontMono; font.pixelSize: Style.fontSizeCodeSm; horizontalAlignment: Text.AlignRight; color: Style.textPrimary }
+                            Text { Layout.preferredWidth: 85; text: modelData.tco; font.family: Style.fontMono; font.pixelSize: Style.fontSizeCodeSm; horizontalAlignment: Text.AlignRight; color: Style.textSecondary }
                             Text { Layout.preferredWidth: 50; text: modelData.vRes.toFixed(2); font.family: Style.fontMono; font.pixelSize: Style.fontSizeCodeSm; horizontalAlignment: Text.AlignRight; font.weight: Font.Bold; color: Style.riskLowText }
-                            Text { Layout.preferredWidth: 80; text: modelData.avoidedLoss; font.family: Style.fontMono; font.pixelSize: Style.fontSizeCodeSm; horizontalAlignment: Text.AlignRight; color: Style.textPrimary }
-                            Text { Layout.preferredWidth: 80; text: modelData.netBenefit; font.family: Style.fontMono; font.pixelSize: Style.fontSizeCodeSm; horizontalAlignment: Text.AlignRight; font.weight: Font.DemiBold; color: Style.textPrimary }
-                            Text { Layout.preferredWidth: 75; text: modelData.rosi; font.family: Style.fontMono; font.pixelSize: Style.fontSizeCodeSm; horizontalAlignment: Text.AlignRight; font.weight: Font.Bold; color: Style.riskLowText }
+                            Text { Layout.preferredWidth: 95; text: modelData.avoidedLoss; font.family: Style.fontMono; font.pixelSize: Style.fontSizeCodeSm; horizontalAlignment: Text.AlignRight; color: Style.textPrimary }
+                            Text { Layout.preferredWidth: 95; text: modelData.netBenefit; font.family: Style.fontMono; font.pixelSize: Style.fontSizeCodeSm; horizontalAlignment: Text.AlignRight; font.weight: Font.DemiBold; color: Style.textPrimary }
+                            Text { Layout.preferredWidth: 85; text: modelData.rosi; font.family: Style.fontMono; font.pixelSize: Style.fontSizeCodeSm; horizontalAlignment: Text.AlignRight; font.weight: Font.Bold; color: (modelData.netBenefitNum >= 0) ? Style.riskLowText : Style.riskCriticalText }
                         }
 
                         MouseArea {

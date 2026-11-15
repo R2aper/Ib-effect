@@ -1,48 +1,22 @@
 #include <QGuiApplication>
-#include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include <QFile>
-#include <QTextStream>
-#include <QDir>
-#include <QDateTime>
+#include <QQmlApplicationEngine>
 
-class ReportExporter : public QObject {
-    Q_OBJECT
-public:
-    explicit ReportExporter(QObject *parent = nullptr) : QObject(parent) {}
+#include "RiskCalculator.h"
 
-    Q_INVOKABLE bool saveReport(const QString &fileName, const QString &content) {
-        QFile file(fileName);
-        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            return false;
-        }
-        QTextStream out(&file);
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-        out.setEncoding(QStringConverter::Utf8);
-#endif
-        out << content;
-        file.close();
-        return true;
-    }
-};
-
-#include "main.moc"
-
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
 
+    RiskCalculator riskCalculator;
     QQmlApplicationEngine engine;
-    auto *exporter = new ReportExporter(&app);
-    engine.rootContext()->setContextProperty("ReportExporter", exporter);
-
+    engine.rootContext()->setContextProperty("riskCalculator", &riskCalculator);
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreationFailed,
         &app,
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
-    engine.loadFromModule("Ibe", "Main");
+    engine.loadFromModule("New", "Main");
 
-    return QCoreApplication::exec();
+    return QGuiApplication::exec();
 }

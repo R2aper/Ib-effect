@@ -24,10 +24,10 @@ ScrollView {
                 Layout.fillWidth: true
                 title: "АКТИВЫ КОММЕРЧЕСКОЙ ТАЙНЫ"
                 iconText: "КТ"
-                value: "14"
+                value: (typeof riskCalculator !== "undefined") ? riskCalculator.totalAssetsCount.toString() : "5"
                 unitText: "активов"
-                footerLeft: "Режим ст. 10 98-ФЗ: 12 из 14"
-                footerRight: "85.7%"
+                footerLeft: "Режим ст. 10 98-ФЗ: соблюден"
+                footerRight: "100%"
                 badgeText: "ЗАЩИЩЕНО"
             }
 
@@ -35,9 +35,10 @@ ScrollView {
                 Layout.fillWidth: true
                 title: "ОТСЛЕЖИВАЕМЫЕ УЯЗВИМОСТИ"
                 iconText: "УБИ"
-                value: "38"
+                value: (typeof riskCalculator !== "undefined") ? riskCalculator.totalVulnsCount.toString() : "5"
                 unitText: "сценариев угроз"
-                footerLeft: "Крит: 4 | Выс: 11 | Ср: 17 | Низ: 6"
+                footerLeft: "Методика ФСТЭК 2025"
+                footerRight: "БДУ ФСТЭК"
                 badgeText: "ФСТЭК 2025"
                 badgeColor: Style.surfaceContainerHighest
                 badgeTextColor: Style.textPrimary
@@ -47,10 +48,10 @@ ScrollView {
                 Layout.fillWidth: true
                 title: "ПЛАН ЗАЩИТНЫХ МЕР"
                 iconText: "СЗИ"
-                value: "12"
+                value: (typeof riskCalculator !== "undefined") ? riskCalculator.totalMeasuresCount.toString() : "4"
                 unitText: "комплексов мер"
-                footerLeft: "CAPEX+OPEX: 12.8M ₽"
-                footerRight: "Охват 86%"
+                footerLeft: (typeof riskCalculator !== "undefined") ? ("TCO: " + riskCalculator.formatRub(riskCalculator.totalTco)) : "TCO: —"
+                footerRight: "ГОСТ 27005"
                 badgeText: "В ПЛАНЕ"
                 badgeColor: Style.surfaceContainerHigh
                 badgeTextColor: Style.textPrimary
@@ -60,11 +61,11 @@ ScrollView {
                 Layout.fillWidth: true
                 title: "СУММАРНЫЙ NET ROSI"
                 iconText: "ROSI"
-                value: "+142.8%"
-                valueColor: Style.textPrimary
-                badgeText: "ЭФФЕКТИВНО"
+                value: (typeof riskCalculator !== "undefined") ? ((riskCalculator.netRosiPercent >= 0 ? "+" : "") + riskCalculator.formatNumber(riskCalculator.netRosiPercent, 1) + "%") : "+0.0%"
+                valueColor: (typeof riskCalculator !== "undefined" && riskCalculator.netBenefit >= 0) ? Style.riskLowText : Style.riskCriticalText
+                badgeText: (typeof riskCalculator !== "undefined" && riskCalculator.netBenefit >= 0) ? "ЭФФЕКТИВНО" : "УБЫТОЧНО"
                 footerLeft: "ΔALE экономия:"
-                footerRight: "31.1M ₽ / год"
+                footerRight: (typeof riskCalculator !== "undefined") ? (riskCalculator.formatRub(riskCalculator.totalAvoidedLoss) + " / год") : "—"
             }
         }
 
