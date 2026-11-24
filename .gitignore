@@ -82,3 +82,12 @@ CMakeLists.txt.user*
 .uic/
 /build*/
 /.qtcreator/
+/dist/
+/installer_output/
+
+# Databases & local cache
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.db

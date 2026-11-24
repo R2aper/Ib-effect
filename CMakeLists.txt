@@ -5,7 +5,7 @@ project(New VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(QT_QML_GENERATE_QMLLS_INI ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS Quick Sql)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
@@ -20,6 +20,8 @@ qt_add_executable(appNew
     main.cpp
     RiskCalculator.cpp
     RiskCalculator.h
+    BduDatabase.cpp
+    BduDatabase.h
 )
 
 qt_add_qml_module(appNew
@@ -44,6 +46,8 @@ qt_add_qml_module(appNew
         components/RiskBadge.qml
         components/SegmentedControl.qml
         components/TableHeaderCell.qml
+        components/BduImportModal.qml
+        components/SupportingAssetModal.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -58,11 +62,27 @@ set_target_properties(appNew PROPERTIES
 )
 
 target_link_libraries(appNew
-    PRIVATE Qt6::Quick
+    PRIVATE Qt6::Quick Qt6::Sql
 )
+
+include(GNUInstallDirs)
 
 install(TARGETS appNew
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/bdu.sqlite")
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/bdu.sqlite"
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+endif()
+
+if(COMMAND qt_generate_deploy_qml_app_script)
+    qt_generate_deploy_qml_app_script(
+        TARGET appNew
+        OUTPUT_SCRIPT deploy_script
+    )
+    install(SCRIPT ${deploy_script})
+endif()

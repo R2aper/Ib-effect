@@ -44,10 +44,8 @@ ScrollView {
                 title: "СНИЖЕНИЕ КРИТИЧНОСТИ (V)"
                 iconText: "ΔV"
                 value: root.currentScenario ? root.currentScenario.deltaVText : "—"
-                unitText: "по методике"
                 footerLeft: root.currentScenario ? ("V: " + root.currentScenario.vBase.toFixed(2) + " → " + root.currentScenario.vRes.toFixed(2)) : "V: —"
                 footerRight: root.currentScenario ? ("SLA: " + root.currentScenario.slaRes) : ""
-                badgeText: "ТАБЛИЦА 2"
             }
 
             MetricCard {
@@ -58,7 +56,6 @@ ScrollView {
                 unitText: root.currentScenario ? ("было: " + root.currentScenario.probBase) : ""
                 footerLeft: "Снижение риска:"
                 footerRight: root.currentScenario ? root.currentScenario.deltaProbText : "—"
-                badgeText: "ISO 27005"
             }
 
             MetricCard {
@@ -120,7 +117,6 @@ ScrollView {
                                 Text {
                                     id: isoTag
                                     anchors.centerIn: parent
-                                    text: "ГОСТ Р ИСО/МЭК 27005 / ENISA"
                                     font.family: Style.fontMono
                                     font.pixelSize: 10
                                     color: Style.textPrimary
@@ -140,7 +136,7 @@ ScrollView {
                             ColumnLayout {
                                 spacing: 0
                                 Text {
-                                    text: "Net ROSI (Чистая рентабельность инвестиций)"
+                                    text: "Net ROSI"
                                     font.family: Style.fontSans
                                     font.pixelSize: Style.fontSizeHeadlineMd
                                     font.weight: Font.DemiBold
@@ -217,8 +213,8 @@ ScrollView {
 
                         Text {
                             text: root.currentScenario
-                                  ? ("Формула: Net ROSI = ((Avoided Loss - TCO) / TCO) × 100% = ((" + root.currentScenario.avoidedLoss + " - " + root.currentScenario.tco + ") / " + root.currentScenario.tco + ") × 100% = " + root.currentScenario.rosi)
-                                  : "Формула: Net ROSI = ((Avoided Loss - Cost_TCO) / Cost_TCO) × 100%"
+                                  ? ("Формула: Net ROSI = ((Предотвращенный ущерб - TCO) / TCO) × 100% = ((" + root.currentScenario.avoidedLoss + " - " + root.currentScenario.tco + ") / " + root.currentScenario.tco + ") × 100% = " + root.currentScenario.rosi)
+                                  : "Формула: Net ROSI = ((Предотвращенный ущерб - TCO) / TCO) × 100%"
                             font.family: Style.fontMono
                             font.pixelSize: Style.fontSizeCodeSm
                             color: Style.textSecondary
@@ -243,10 +239,10 @@ ScrollView {
 
                     Repeater {
                         model: [
-                            { label: "Предотвращенный ущерб (ΔALE)", val: root.currentScenario ? root.currentScenario.avoidedLoss : "—", desc: "за 12 месяцев" },
-                            { label: "Чистая выгода (Net Benefit)", val: root.currentScenario ? root.currentScenario.netBenefit : "—", desc: "ΔALE - TCO" },
-                            { label: "Срок окупаемости (Payback)", val: root.currentScenario ? root.currentScenario.payback : "—", desc: "(TCO / ΔALE) × 12 мес." },
-                            { label: "Коэффициент выгоды (BCR)", val: root.currentScenario ? root.currentScenario.bcr : "—", desc: "ΔALE / TCO" }
+                            { label: "Предотвращенный ущерб", val: root.currentScenario ? root.currentScenario.avoidedLoss : "—", desc: "за 12 месяцев" },
+                            { label: "Чистая выгода", val: root.currentScenario ? root.currentScenario.netBenefit : "—", desc: "ΔALE - TCO" },
+                            { label: "Срок окупаемости", val: root.currentScenario ? root.currentScenario.payback : "—", desc: "(TCO / ΔALE) × 12 мес." },
+                            { label: "Коэффициент выгоды", val: root.currentScenario ? root.currentScenario.bcr : "—", desc: "ΔALE / TCO" }
                         ]
 
                         Rectangle {
@@ -292,7 +288,7 @@ ScrollView {
                     RowLayout {
                         Layout.fillWidth: true
                         Text {
-                            text: "WATERFALL-ДЕКОМПОЗИЦИЯ ДВИЖЕНИЯ РИСКА (₽)"
+                            text: "WATERFALL-ДЕКОМПОЗИЦИЯ ДВИЖЕНИЯ РИСКА"
                             font.family: Style.fontSans
                             font.pixelSize: Style.fontSizeHeadlineSm
                             font.weight: Font.DemiBold
@@ -300,7 +296,6 @@ ScrollView {
                         }
                         Item { Layout.fillWidth: true }
                         Text {
-                            text: "Финансовый поток"
                             font.family: Style.fontMono
                             font.pixelSize: 10
                             color: Style.textSecondary
@@ -371,10 +366,10 @@ ScrollView {
                             anchors.leftMargin: 35
                             spacing: 20
 
-                            Text { text: "ALE до"; font.family: Style.fontSans; font.pixelSize: 10; color: Style.textSecondary }
-                            Text { text: "-ΔALE"; font.family: Style.fontSans; font.pixelSize: 10; color: Style.textSecondary }
-                            Text { text: "ALE после"; font.family: Style.fontSans; font.pixelSize: 10; color: Style.textSecondary }
-                            Text { text: "TCO меры"; font.family: Style.fontSans; font.pixelSize: 10; color: Style.textSecondary }
+                            Text { text: "ALE до (ущерб)"; font.family: Style.fontSans; font.pixelSize: 10; color: Style.textSecondary }
+                            Text { text: "-ΔALE (экономия)"; font.family: Style.fontSans; font.pixelSize: 10; color: Style.textSecondary }
+                            Text { text: "ALE после (остаток)"; font.family: Style.fontSans; font.pixelSize: 10; color: Style.textSecondary }
+                            Text { text: "TCO (затраты)"; font.family: Style.fontSans; font.pixelSize: 10; color: Style.textSecondary }
                         }
                     }
                 }
@@ -397,7 +392,7 @@ ScrollView {
                     RowLayout {
                         Layout.fillWidth: true
                         Text {
-                            text: "ЧИСЛОВАЯ ПОДСТАНОВКА В ФОРМУЛЫ (МЕТОДИКА)"
+                            text: "ЧИСЛОВАЯ ПОДСТАНОВКА В ФОРМУЛЫ"
                             font.family: Style.fontSans
                             font.pixelSize: Style.fontSizeHeadlineSm
                             font.weight: Font.DemiBold
@@ -405,7 +400,6 @@ ScrollView {
                         }
                         Item { Layout.fillWidth: true }
                         Text {
-                            text: "Протокол аудита ФСТЭК / ГОСТ"
                             font.family: Style.fontMono
                             font.pixelSize: 10
                             color: Style.textSecondary
@@ -495,12 +489,12 @@ ScrollView {
                     TableHeaderCell { Layout.fillWidth: true; text: "Актив КТ / Мера" }
                     TableHeaderCell { Layout.preferredWidth: 95; text: "SLE (₽)"; alignment: Text.AlignRight }
                     TableHeaderCell { Layout.preferredWidth: 50; text: "V до"; alignment: Text.AlignRight }
-                    TableHeaderCell { Layout.preferredWidth: 60; text: "Prob до"; alignment: Text.AlignRight }
-                    TableHeaderCell { Layout.preferredWidth: 95; text: "ALE до"; alignment: Text.AlignRight }
+                    TableHeaderCell { Layout.preferredWidth: 60; text: "P до (%)"; alignment: Text.AlignRight }
+                    TableHeaderCell { Layout.preferredWidth: 95; text: "ALE до (₽)"; alignment: Text.AlignRight }
                     TableHeaderCell { Layout.preferredWidth: 85; text: "TCO (₽)"; alignment: Text.AlignRight }
                     TableHeaderCell { Layout.preferredWidth: 50; text: "V пос"; alignment: Text.AlignRight }
-                    TableHeaderCell { Layout.preferredWidth: 95; text: "Avoided Loss"; alignment: Text.AlignRight }
-                    TableHeaderCell { Layout.preferredWidth: 95; text: "Net Benefit"; alignment: Text.AlignRight }
+                    TableHeaderCell { Layout.preferredWidth: 95; text: "Пред. ущерб"; alignment: Text.AlignRight }
+                    TableHeaderCell { Layout.preferredWidth: 95; text: "Чистая выгода"; alignment: Text.AlignRight }
                     TableHeaderCell { Layout.preferredWidth: 85; text: "Net ROSI"; alignment: Text.AlignRight; hasRightBorder: false }
                 }
 

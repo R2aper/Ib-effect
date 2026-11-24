@@ -283,264 +283,6 @@ void RiskCalculator::initDefaultData() {
   m_assets.clear();
   m_vulnerabilities.clear();
   m_measures.clear();
-
-  // --- Активы ---
-  {
-    QVariantMap a;
-    a["id"] = "AST-01";
-    a["primaryAssetName"] = "Клиентская база и условия контрактов";
-    a["supportingAssetName"] = "srv-db01 (PostgreSQL)";
-    a["directRecoveryCost"] = 1200000.0;
-    a["indirectBusinessLoss"] = 6800000.0;
-    a["regime98FZCompliant"] = true;
-    a["componentType"] = 0; // CriticalBusiness (0.55)
-    a["share"] = 1;         // From50To70 (0.16)
-    a["perimeter"] = 0;     // Internet (0.33)
-    a["measures"] = QStringList{"SEC-01", "Шифрование БД", "Журналирование доступа"};
-    a["vulns"] = QStringList{"BDU:2025-01611"};
-    m_assets.append(a);
-  }
-  {
-    QVariantMap a;
-    a["id"] = "AST-02";
-    a["primaryAssetName"] = "Исходный код ядра системы и ноу-хау";
-    a["supportingAssetName"] = "srv-git (GitLab Server)";
-    a["directRecoveryCost"] = 3000000.0;
-    a["indirectBusinessLoss"] = 7000000.0;
-    a["regime98FZCompliant"] = true;
-    a["componentType"] = 4; // Workstation (0.25)
-    a["share"] = 0;         // Over70 (0.20)
-    a["perimeter"] = 0;     // Internet (0.33)
-    a["measures"] = QStringList{"SEC-02", "Двухфакторная аутентификация"};
-    a["vulns"] = QStringList{"Конструктор УБИ"};
-    m_assets.append(a);
-  }
-  {
-    QVariantMap a;
-    a["id"] = "AST-03";
-    a["primaryAssetName"] = "БД клиентов (ПДн)";
-    a["supportingAssetName"] = "srv-db02 (PostgreSQL Standby)";
-    a["directRecoveryCost"] = 4500000.0;
-    a["indirectBusinessLoss"] = 14000000.0;
-    a["regime98FZCompliant"] = true;
-    a["componentType"] = 3; // Server (0.35)
-    a["share"] = 1;         // From50To70 (0.16)
-    a["perimeter"] = 1;     // Internal (0.18)
-    a["measures"] = QStringList{};
-    a["vulns"] = QStringList{};
-    m_assets.append(a);
-  }
-  {
-    QVariantMap a;
-    a["id"] = "AST-04";
-    a["primaryAssetName"] = "Процессинг платежей и SCADA Node 01";
-    a["supportingAssetName"] = "app-pay01 (Core Cluster)";
-    a["directRecoveryCost"] = 8000000.0;
-    a["indirectBusinessLoss"] = 10500000.0;
-    a["regime98FZCompliant"] = true;
-    a["componentType"] = 0; // CriticalBusiness (0.55)
-    a["share"] = 0;         // Over70 (0.20)
-    a["perimeter"] = 0;     // Internet (0.33)
-    a["measures"] = QStringList{"SEC-03", "WAF", "Сегментация сети", "Резервное копирование"};
-    a["vulns"] = QStringList{"BDU:2024-01928", "BDU:2023-05441"};
-    m_assets.append(a);
-  }
-  {
-    QVariantMap a;
-    a["id"] = "AST-05";
-    a["primaryAssetName"] = "Ключи ЭЦП Клиент-Банк";
-    a["supportingAssetName"] = "ws-acc03 (АРМ бухгалтера)";
-    a["directRecoveryCost"] = 1200000.0;
-    a["indirectBusinessLoss"] = 3000000.0;
-    a["regime98FZCompliant"] = true;
-    a["componentType"] = 4; // Workstation (0.25)
-    a["share"] = 3;         // Under10 (0.10)
-    a["perimeter"] = 1;     // Internal (0.18)
-    a["measures"] = QStringList{"SEC-04"};
-    a["vulns"] = QStringList{"BDU:2023-05112"};
-    m_assets.append(a);
-  }
-
-  // --- Уязвимости ---
-  {
-    QVariantMap v;
-    v["id"] = "BDU:2025-01611";
-    v["cve"] = "CVE-2024-3094";
-    v["title"] = "RCE в модуле аутентификации PostgreSQL";
-    v["desc"] = "Удалённое выполнение произвольного кода без предварительной авторизации через внедрение байт-кодов в подсистему валидации ключей сессий.";
-    v["fromBdu"] = true;
-    v["cvss"] = 8.8;
-    v["vector"] = "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H";
-    v["exploitability"] = 1; // KnownExploit (0.30)
-    v["consequence"] = 0;    // CodeExecOrPrivEsc (0.50)
-    v["eVal"] = "0.30";
-    v["eStatus"] = "Есть эксплойт (0.30)";
-    v["hVal"] = "0.50";
-    v["hStatus"] = "H_01: Полное нарушение К, Ц, Д (0.50)";
-    v["vBase"] = "4.75";
-    v["level"] = "Высокий";
-    v["sla"] = "До 7 дней";
-    v["status"] = "Открыта";
-    m_vulnerabilities.append(v);
-  }
-  {
-    QVariantMap v;
-    v["id"] = "Конструктор УБИ";
-    v["cve"] = "Тактика Т9.10";
-    v["title"] = "Копирование исходного кода инсайдером на съемный носитель";
-    v["desc"] = "Несанкционированное копирование исходных кодов и ноу-хау увольняющимся сотрудником (нарушитель Н2) через интерфейс USB (п. 5.3.3 ФСТЭК 2021).";
-    v["fromBdu"] = false;
-    v["cvss"] = 5.5;
-    v["vector"] = "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N";
-    v["exploitability"] = 1; // KnownExploit (0.30)
-    v["consequence"] = 3;    // SensitiveLeak (0.30)
-    v["eVal"] = "0.30";
-    v["eStatus"] = "Есть эксплойт (0.30)";
-    v["hVal"] = "0.30";
-    v["hStatus"] = "H_04: Утечка критических данных КТ (0.30)";
-    v["vBase"] = "5.50";
-    v["level"] = "Высокий";
-    v["sla"] = "До 7 дней";
-    v["status"] = "В работе";
-    m_vulnerabilities.append(v);
-  }
-  {
-    QVariantMap v;
-    v["id"] = "BDU:2024-01928";
-    v["cve"] = "CVE-2024-21626";
-    v["title"] = "Несанкционированный доступ к БД АСУ ТП (SCADA Node 01)";
-    v["desc"] = "Побег из контейнера runc с получением привилегий root на хосте ядра SCADA-системы.";
-    v["fromBdu"] = true;
-    v["cvss"] = 9.8;
-    v["vector"] = "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H";
-    v["exploitability"] = 0; // RealAttacks (0.60)
-    v["consequence"] = 0;    // CodeExecOrPrivEsc (0.50)
-    v["eVal"] = "0.60";
-    v["eStatus"] = "Реальные атаки (0.60)";
-    v["hVal"] = "0.50";
-    v["hStatus"] = "H_01: Полное нарушение критических процессов (0.50)";
-    v["vBase"] = "8.80";
-    v["level"] = "Критический";
-    v["sla"] = "До 24 часов";
-    v["status"] = "Открыта";
-    m_vulnerabilities.append(v);
-  }
-  {
-    QVariantMap v;
-    v["id"] = "BDU:2023-05441";
-    v["cve"] = "CVE-2023-38606";
-    v["title"] = "Эксфильтрация через API платёжного шлюза";
-    v["desc"] = "Обход многофакторной аутентификации Kerberos SSO и выгрузка логов транзакций.";
-    v["fromBdu"] = true;
-    v["cvss"] = 7.5;
-    v["vector"] = "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N";
-    v["exploitability"] = 2; // Unknown (0.10)
-    v["consequence"] = 1;    // SecurityBypass (0.40)
-    v["eVal"] = "0.10";
-    v["eStatus"] = "Нет сведений (0.10)";
-    v["hVal"] = "0.40";
-    v["hStatus"] = "H_02: Существенный сбой сервисов обработки (0.40)";
-    v["vBase"] = "4.20";
-    v["level"] = "Средний";
-    v["sla"] = "До 4 недель";
-    v["status"] = "В работе";
-    m_vulnerabilities.append(v);
-  }
-  {
-    QVariantMap v;
-    v["id"] = "BDU:2023-05112";
-    v["cve"] = "CVE-2023-27476";
-    v["title"] = "Раскрытие отладочной информации Nginx";
-    v["desc"] = "Утечка служебных метаданных конфигурации через ошибочную обработку заголовков HTTP/2.";
-    v["fromBdu"] = true;
-    v["cvss"] = 5.3;
-    v["vector"] = "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N";
-    v["exploitability"] = 2; // Unknown (0.10)
-    v["consequence"] = 7;    // LocalFileRead (0.18)
-    v["eVal"] = "0.10";
-    v["eStatus"] = "Нет сведений (0.10)";
-    v["hVal"] = "0.18";
-    v["hStatus"] = "H_08: Незначительное влияние (0.18)";
-    v["vBase"] = "1.90";
-    v["level"] = "Низкий";
-    v["sla"] = "До 4 месяцев";
-    v["status"] = "Принято";
-    m_vulnerabilities.append(v);
-  }
-
-  // --- Меры ---
-  {
-    QVariantMap m;
-    m["id"] = "SEC-01";
-    m["title"] = "Изоляция СУБД во внутренний сегмент + патчинг";
-    m["targetVuln"] = "BDU:2025-01611";
-    m["asset"] = "AST-01";
-    m["measureType"] = "Архитектурная + Патч-менеджмент (п. 22, 25)";
-    m["fstecClass"] = "ЗИС.2 — Межсетевое экранирование";
-    m["costTCO"] = 450000.0;
-    m["tcoNum"] = 450000.0;
-    m["tco"] = "450 000 ₽";
-    m["affectsShare"] = true;
-    m["newShare"] = 3; // Under10 (0.10)
-    m["affectsPerimeter"] = true;
-    m["newPerimeter"] = 1; // Internal (0.18)
-    m["status"] = "Внедрено";
-    m_measures.append(m);
-  }
-  {
-    QVariantMap m;
-    m["id"] = "SEC-02";
-    m["title"] = "Внедрение Endpoint DLP + блокировка USB-носителей";
-    m["targetVuln"] = "Конструктор УБИ";
-    m["asset"] = "AST-02";
-    m["measureType"] = "Endpoint DLP + Контроль съемных носителей (п. 25)";
-    m["fstecClass"] = "УПД.3 — Управление правами доступа и контроль утечек";
-    m["costTCO"] = 600000.0;
-    m["tcoNum"] = 600000.0;
-    m["tco"] = "600 000 ₽";
-    m["affectsShare"] = true;
-    m["newShare"] = 3; // Under10 (0.10)
-    m["affectsPerimeter"] = true;
-    m["newPerimeter"] = 1; // Internal (0.18)
-    m["status"] = "В плане";
-    m_measures.append(m);
-  }
-  {
-    QVariantMap m;
-    m["id"] = "SEC-03";
-    m["title"] = "Внедрение Web Application Firewall (WAF кластер) и микросегментации";
-    m["targetVuln"] = "BDU:2024-01928";
-    m["asset"] = "AST-04";
-    m["measureType"] = "WAF L7 Inspection + Микросегментация";
-    m["fstecClass"] = "ЗИС.2 — Межсетевое экранирование";
-    m["costTCO"] = 2400000.0;
-    m["tcoNum"] = 2400000.0;
-    m["tco"] = "2 400 000 ₽";
-    m["affectsShare"] = true;
-    m["newShare"] = 3; // Under10 (0.10)
-    m["affectsPerimeter"] = true;
-    m["newPerimeter"] = 1; // Internal (0.18)
-    m["status"] = "Внедрено";
-    m_measures.append(m);
-  }
-  {
-    QVariantMap m;
-    m["id"] = "SEC-04";
-    m["title"] = "Защищенный ключевой носитель Рутокен ЭЦП 3.0";
-    m["targetVuln"] = "BDU:2023-05112";
-    m["asset"] = "AST-05";
-    m["measureType"] = "Аппаратная криптография + ПИН-код";
-    m["fstecClass"] = "ИАФ.1 — Аутентификация";
-    m["costTCO"] = 120000.0;
-    m["tcoNum"] = 120000.0;
-    m["tco"] = "120 000 ₽";
-    m["affectsShare"] = true;
-    m["newShare"] = 3; // Under10 (0.10)
-    m["affectsPerimeter"] = false;
-    m["newPerimeter"] = 1; // Internal (0.18)
-    m["status"] = "Внедрено";
-    m_measures.append(m);
-  }
 }
 
 // ---------------------------- Расчет экономических сценариев ----------------------------
@@ -702,17 +444,34 @@ void RiskCalculator::updateEconomicScenarios() {
     sc["bcr"] = QString::number(bcr, 'f', 2);
 
     const QString details = QString(
-        "Сценарий: %1 / %2\n"
-        "1. SLE = %3 + %4 = %5 ₽ (ст. 10 98-ФЗ: %6)\n"
-        "2. I_infr_base = %7, I_cvss = %8, (I_at + I_imp) = %9\n"
-        "3. V_base = %8 × %7 × %9 = %10 (%11, SLA %12)\n"
-        "4. Prob_base = %10 / 8.0 = %13%  ==>  ALE_base = %5 × %13% = %14 ₽\n"
-        "5. После внедрения меры: I_infr_res = %15\n"
-        "6. V_res = %8 × %15 × %9 = %16 (%17, SLA %18)\n"
-        "7. Prob_res = %16 / 8.0 = %19%  ==>  ALE_res = %5 × %19% = %20 ₽\n"
-        "8. Предотвращенный ущерб (ΔALE) = %14 - %20 = %21 ₽\n"
-        "9. Чистая выгода (Net Benefit) = %21 - %22 = %23 ₽\n"
-        "10. Net ROSI = ((%21 - %22) / %22) × 100% = %24")
+        "Сценарий: %1 / %2\n\n"
+        "1. Единичный ущерб от инцидента (SLE):\n"
+        "   SLE = Прямой ущерб (%3 ₽) + Косвенный ущерб (%4 ₽) = %5 ₽\n"
+        "   (соблюдение режима коммерческой тайны по ст. 10 98-ФЗ: %6)\n\n"
+        "2. Параметры риска до внедрения меры:\n"
+        "   • Параметр инфраструктуры (I_инфр_до) = %7 (Таблица 1 ФСТЭК 2025)\n"
+        "   • Базовая метрика CVSS (I_cvss) = %8\n"
+        "   • Метрики реализации атаки и последствий (I_экспл + I_посл) = %9\n\n"
+        "3. Базовый уровень критичности уязвимости (V_базовый):\n"
+        "   V_баз = %8 × %7 × %9 = %10 (%11, регламентный срок устранения SLA: %12)\n\n"
+        "4. Ожидаемый годовой ущерб до внедрения меры (ALE_до):\n"
+        "   • Вероятность реализации в год (P_до) = %10 / 8.0 = %13%\n"
+        "   • Ожидаемые годовые потери (ALE_до) = %5 ₽ × %13% = %14 ₽/год\n\n"
+        "5. Изменение инфраструктуры после внедрения меры:\n"
+        "   • Новый параметр инфраструктуры (I_инфр_после) = %15 (снижение доли уязвимых узлов / изоляция)\n\n"
+        "6. Остаточный уровень критичности уязвимости (V_остаточный):\n"
+        "   V_ост = %8 × %15 × %9 = %16 (%17, регламентный срок устранения SLA: %18)\n\n"
+        "7. Ожидаемый годовой ущерб после применения меры (ALE_после):\n"
+        "   • Новая вероятность реализации в год (P_после) = %16 / 8.0 = %19%\n"
+        "   • Остаточные годовые потери (ALE_после) = %5 ₽ × %19% = %20 ₽/год\n\n"
+        "8. Предотвращенный годовой ущерб (ΔALE / Avoided Loss):\n"
+        "   Предотвращенный ущерб = ALE_до (%14 ₽) - ALE_после (%20 ₽) = %21 ₽/год\n\n"
+        "9. Совокупная годовая стоимость владения мерой защиты (TCO):\n"
+        "   Затраты на меру (TCO) = %22 ₽/год\n\n"
+        "10. Чистая экономическая выгода от внедрения (Net Benefit):\n"
+        "   Чистая выгода = Предотвращенный ущерб (%21 ₽) - TCO (%22 ₽) = %23 ₽/год\n\n"
+        "11. Рентабельность инвестиций в ИБ (Net ROSI):\n"
+        "   Net ROSI = ((Предотвращенный ущерб - TCO) / TCO) × 100% = %24")
         .arg(asset.value("primaryAssetName").toString(), measureTitle)
         .arg(formatRub(directCost), formatRub(indirectLoss), formatRub(sle),
              asset.value("regime98FZCompliant").toBool() ? "Да" : "Нет")
@@ -740,6 +499,8 @@ void RiskCalculator::updateEconomicScenarios() {
     measure["rosi"] = QString((rosiPercent >= 0 ? "+" : "") + formatNumber(rosiPercent, 1) + "%");
     measure["iInfrOld"] = QString::number(iInfrBase, 'f', 2);
     measure["iInfrNew"] = QString::number(iInfrRes, 'f', 2);
+    measure["oldShare"] = share == 0 ? QStringLiteral("> 70% (0.20)") : (share == 1 ? QStringLiteral("50-70% (0.16)") : (share == 2 ? QStringLiteral("10-50% (0.12)") : QStringLiteral("< 10% (0.10)")));
+    measure["oldPerimeter"] = perimeter == 0 ? QStringLiteral("Доступно (0.33)") : QStringLiteral("Недоступно (0.18)");
     m_measures[mIdx] = measure;
   }
 
@@ -1098,11 +859,41 @@ bool RiskCalculator::updateMeasure(const QVariantMap &measureData) {
       for (auto it = measureData.cbegin(); it != measureData.cend(); ++it) {
         existing[it.key()] = it.value();
       }
-      if (existing.contains("costTCO")) {
-        existing["tcoNum"] = existing["costTCO"];
-        existing["tco"] = formatRub(existing["costTCO"].toDouble());
+      if (measureData.contains("costTCO")) {
+        double cost = measureData["costTCO"].toDouble();
+        existing["costTCO"] = cost;
+        existing["tcoNum"] = cost;
+        existing["tco"] = formatRub(cost);
+      } else if (measureData.contains("tcoNum")) {
+        double cost = measureData["tcoNum"].toDouble();
+        existing["costTCO"] = cost;
+        existing["tcoNum"] = cost;
+        existing["tco"] = formatRub(cost);
+      } else if (measureData.contains("tco")) {
+        QString str = measureData["tco"].toString();
+        str.remove(' ').remove(QString::fromUtf8("₽"));
+        double cost = str.toDouble();
+        existing["costTCO"] = cost;
+        existing["tcoNum"] = cost;
+        existing["tco"] = formatRub(cost);
       }
       m_measures[i] = existing;
+
+      QString assetId = existing.value("asset").toString();
+      if (!assetId.isEmpty()) {
+        for (int aIdx = 0; aIdx < m_assets.size(); ++aIdx) {
+          QVariantMap a = m_assets[aIdx].toMap();
+          if (a.value("id").toString() != assetId) {
+            QStringList ml = a.value("measures").toStringList();
+            if (ml.removeAll(id) > 0) {
+              a["measures"] = ml;
+              m_assets[aIdx] = a;
+            }
+          }
+        }
+        linkMeasureToAsset(assetId, id);
+      }
+
       recalculateAll();
       emit measuresChanged();
       return true;
@@ -1140,3 +931,98 @@ QVariantMap RiskCalculator::getMeasure(const QString &id) const {
   }
   return {};
 }
+
+// ---------------------------- Интеграция с БДУ ФСТЭК (bdu.sqlite) ----------------------------
+
+QVariantList RiskCalculator::searchBdu(const QString &query, int severityFilter, int limit) {
+  QVariantList list = m_bduDb.search(query, severityFilter, limit);
+  for (int i = 0; i < list.size(); ++i) {
+    QVariantMap item = list[i].toMap();
+    const QString id = item.value(QStringLiteral("id")).toString();
+    item[QStringLiteral("alreadyImported")] = isBduVulnerabilityImported(id);
+    list[i] = item;
+  }
+  return list;
+}
+
+QVariantMap RiskCalculator::getBduDetails(const QString &bduId) {
+  QVariantMap details = m_bduDb.getVulnerability(bduId);
+  details[QStringLiteral("alreadyImported")] = isBduVulnerabilityImported(bduId);
+  return details;
+}
+
+bool RiskCalculator::isBduVulnerabilityImported(const QString &bduId) const {
+  const QString target = bduId.trimmed().toUpper();
+  if (target.isEmpty()) return false;
+  for (const QVariant &item : m_vulnerabilities) {
+    const QString id = item.toMap().value(QStringLiteral("id")).toString().trimmed().toUpper();
+    if (id == target) return true;
+  }
+  return false;
+}
+
+QVariantMap RiskCalculator::importFromBdu(const QString &bduId) {
+  const QString id = bduId.trimmed();
+  if (id.isEmpty()) return {};
+
+  // Если уже импортирована, возвращаем существующую
+  for (const QVariant &item : m_vulnerabilities) {
+    QVariantMap v = item.toMap();
+    if (v.value(QStringLiteral("id")).toString().compare(id, Qt::CaseInsensitive) == 0) {
+      return v;
+    }
+  }
+
+  // Получаем запись из базы данных БДУ
+  QVariantMap bduRec = m_bduDb.getVulnerability(id);
+  if (bduRec.isEmpty()) {
+    qWarning() << "[RiskCalculator] BDU vulnerability not found in database:" << id;
+    return {};
+  }
+
+  QVariantMap v;
+  v[QStringLiteral("id")] = bduRec.value(QStringLiteral("id")).toString();
+  v[QStringLiteral("title")] = bduRec.value(QStringLiteral("title")).toString();
+  v[QStringLiteral("desc")] = bduRec.value(QStringLiteral("description")).toString();
+  v[QStringLiteral("cve")] = bduRec.value(QStringLiteral("cve")).toString();
+  if (v[QStringLiteral("cve")].toString().isEmpty() || v[QStringLiteral("cve")].toString() == QStringLiteral("—")) {
+    v[QStringLiteral("cve")] = QStringLiteral("Тактика Т.00");
+  }
+  v[QStringLiteral("fromBdu")] = true;
+
+  const double cvss = bduRec.value(QStringLiteral("cvss")).toDouble();
+  v[QStringLiteral("cvss")] = cvss > 0.0 ? cvss : 7.5;
+  v[QStringLiteral("vector")] = bduRec.value(QStringLiteral("cvssVector")).toString();
+  if (v[QStringLiteral("vector")].toString().isEmpty()) {
+    v[QStringLiteral("vector")] = QStringLiteral("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H");
+  }
+
+  const bool hasExploit = bduRec.value(QStringLiteral("hasExploit")).toBool();
+  v[QStringLiteral("exploitability")] = hasExploit ? 1 : 2;
+  v[QStringLiteral("consequence")] = 0;
+
+  const double eCoeff = hasExploit ? 0.30 : 0.10;
+  const double hCoeff = 0.50;
+  v[QStringLiteral("eVal")] = QString::number(eCoeff, 'f', 2);
+  v[QStringLiteral("eStatus")] = hasExploit ? QStringLiteral("Есть эксплойт (0.30)") : QStringLiteral("Нет сведений (0.10)");
+  v[QStringLiteral("hVal")] = QString::number(hCoeff, 'f', 2);
+  v[QStringLiteral("hStatus")] = QStringLiteral("H_01: Полное нарушение К, Ц, Д (0.50)");
+
+  // Вычисляем V_base согласно методике ФСТЭК 2025
+  const double vBase = vulnerabilityLevel(v[QStringLiteral("cvss")].toDouble(), 0.5, eCoeff, hCoeff);
+  v[QStringLiteral("vBase")] = QString::number(vBase, 'f', 2);
+  v[QStringLiteral("level")] = criticalityText(vBase);
+  v[QStringLiteral("sla")] = slaFromV(vBase);
+  v[QStringLiteral("status")] = QStringLiteral("Открыта");
+
+  v[QStringLiteral("software")] = bduRec.value(QStringLiteral("software")).toString();
+  v[QStringLiteral("vendor")] = bduRec.value(QStringLiteral("vendor")).toString();
+  v[QStringLiteral("solution")] = bduRec.value(QStringLiteral("solution")).toString();
+  v[QStringLiteral("identifyDate")] = bduRec.value(QStringLiteral("identifyDate")).toString();
+
+  m_vulnerabilities.append(v);
+  recalculateAll();
+  emit vulnerabilitiesChanged();
+  return v;
+}
+

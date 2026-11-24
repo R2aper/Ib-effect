@@ -7,6 +7,8 @@
 #include <QVariantList>
 #include <QVariantMap>
 
+#include "BduDatabase.h"
+
 namespace RiskModel {
 Q_NAMESPACE
 
@@ -204,6 +206,11 @@ class RiskCalculator : public QObject {
   Q_PROPERTY(int totalVulnsCount READ totalVulnsCount NOTIFY vulnerabilitiesChanged FINAL)
   Q_PROPERTY(int totalMeasuresCount READ totalMeasuresCount NOTIFY measuresChanged FINAL)
 
+  // Интеграция с БДУ ФСТЭК (bdu.sqlite)
+  Q_PROPERTY(bool isBduAvailable READ isBduAvailable NOTIFY bduAvailabilityChanged FINAL)
+  Q_PROPERTY(int bduTotalCount READ bduTotalCount NOTIFY bduAvailabilityChanged FINAL)
+  Q_PROPERTY(QString bduDatabasePath READ bduDatabasePath NOTIFY bduAvailabilityChanged FINAL)
+
 public:
   explicit RiskCalculator(QObject *parent = nullptr);
 
@@ -246,6 +253,12 @@ public:
   Q_INVOKABLE bool deleteMeasure(const QString &id);
   Q_INVOKABLE QVariantMap getMeasure(const QString &id) const;
 
+  // --- Интеграция с БДУ ФСТЭК (bdu.sqlite) ---
+  Q_INVOKABLE QVariantList searchBdu(const QString &query = QString(), int severityFilter = 0, int limit = 50);
+  Q_INVOKABLE QVariantMap getBduDetails(const QString &bduId);
+  Q_INVOKABLE QVariantMap importFromBdu(const QString &bduId);
+  Q_INVOKABLE bool isBduVulnerabilityImported(const QString &bduId) const;
+
   // --- Пересчет и форматирование ---
   Q_INVOKABLE void recalculateAll();
   Q_INVOKABLE QString formatNumber(double value, int decimals = 1) const;
@@ -269,17 +282,23 @@ public:
   int totalVulnsCount() const { return m_vulnerabilities.size(); }
   int totalMeasuresCount() const { return m_measures.size(); }
 
+  bool isBduAvailable() const { return m_bduDb.isAvailable(); }
+  int bduTotalCount() const { return m_bduDb.totalCount(); }
+  QString bduDatabasePath() const { return m_bduDb.databasePath(); }
+
 signals:
   void calculated(const QVariantMap &result);
   void dataChanged();
   void assetsChanged();
   void vulnerabilitiesChanged();
   void measuresChanged();
+  void bduAvailabilityChanged();
 
 private:
   void initDefaultData();
   void updateEconomicScenarios();
 
+  BduDatabase m_bduDb;
   QVariantList m_assets;
   QVariantList m_vulnerabilities;
   QVariantList m_measures;

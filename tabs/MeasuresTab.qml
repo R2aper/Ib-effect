@@ -56,6 +56,7 @@ Item {
                 if (m) {
                     root.draft = JSON.parse(JSON.stringify(m))
                     root.dirty = false
+                    root.activateForm(true)
                 }
             }
         }
@@ -67,10 +68,15 @@ Item {
     property int sortKeyIndex: 0          // по умолчанию по коду
     property bool sortDesc: false         // по возрастанию
     property var viewMeasures: []
-    property string selectedId: "SEC-01"
-    property bool cardOpen: true
+    property string selectedId: ""
+    property bool cardOpen: false
     property var draft: ({})
     property bool dirty: false
+
+    function activateForm(act) {
+        formLoader.active = false
+        formLoader.active = act
+    }
 
     // ---------- Вспомогательные функции ----------
     function measureById(id) {
@@ -119,18 +125,16 @@ Item {
     }
 
     function selectMeasure(id) {
-        var changed = (id !== selectedId)
         selectedId = id
         cardOpen = true
-        if (changed) resetDraft()
+        resetDraft()
     }
 
     function resetDraft() {
         var m = measureById(selectedId)
         draft = m ? JSON.parse(JSON.stringify(m)) : ({})
         dirty = false
-        formLoader.active = false
-        formLoader.active = (m !== null)
+        activateForm(m !== null)
     }
 
     function saveDraft() {
@@ -220,7 +224,6 @@ Item {
                             onClicked: {
                                 if (typeof riskCalculator !== "undefined") {
                                     var newM = riskCalculator.addMeasure({ title: "Новая защитная мера", costTCO: 300000 })
-                                    root.selectedId = newM.id
                                     root.selectMeasure(newM.id)
                                 }
                             }
@@ -514,7 +517,9 @@ Item {
                             Text {
                                 anchors.centerIn: parent
                                 visible: root.viewMeasures.length === 0
-                                text: "Меры не найдены"
+                                text: root.measuresModel.length === 0
+                                      ? "Меры защиты еще не добавлены. Нажмите «+ Добавить меру»."
+                                      : "Меры не найдены"
                                 font.family: Style.fontSans
                                 font.pixelSize: Style.fontSizeBodyMd
                                 color: Style.textMuted
@@ -537,7 +542,9 @@ Item {
                         anchors.rightMargin: 10
 
                         Text {
-                            text: "Охвачено векторов ФСТЭК: 19 / 24 • Среднее снижение критичности: -71.4%"
+                            text: root.measuresModel.length > 0
+                                  ? ("Всего мер: " + root.measuresModel.length + " • TCO: " + (typeof riskCalculator !== "undefined" ? riskCalculator.formatRub(riskCalculator.totalTco) : "—"))
+                                  : "Меры защиты не добавлены"
                             font.family: Style.fontMono
                             font.pixelSize: 10
                             color: Style.textSecondary
@@ -731,7 +738,7 @@ Item {
                                 text: "Сохранить меру"
                                 iconText: "✓"
                                 shortcutText: "Ctrl+S"
-                                enabled: root.dirty
+                                enabled: root.selectedId !== ""
                                 onClicked: root.saveDraft()
                             }
                         }
@@ -743,7 +750,7 @@ Item {
 
     Shortcut {
         sequence: "Ctrl+S"
-        enabled: root.cardOpen && root.dirty
+        enabled: root.cardOpen && root.selectedId !== ""
         onActivated: root.saveDraft()
     }
 
@@ -814,7 +821,9 @@ Item {
                             if (typeof riskCalculator !== "undefined") {
                                 var allA = riskCalculator.assets
                                 if (currentIndex >= 0 && currentIndex < allA.length) {
-                                    root.setDraft("asset", allA[currentIndex].id)
+                                    if (root.draft.asset !== allA[currentIndex].id) {
+                                        root.setDraft("asset", allA[currentIndex].id)
+                                    }
                                 }
                             }
                         }
@@ -844,7 +853,9 @@ Item {
                             if (typeof riskCalculator !== "undefined") {
                                 var allV = riskCalculator.vulnerabilities
                                 if (currentIndex >= 0 && currentIndex < allV.length) {
-                                    root.setDraft("targetVuln", allV[currentIndex].id)
+                                    if (root.draft.targetVuln !== allV[currentIndex].id) {
+                                        root.setDraft("targetVuln", allV[currentIndex].id)
+                                    }
                                 }
                             }
                         }
@@ -877,13 +888,34 @@ Item {
                         }
 
                         ColumnLayout {
-                            Layout.preferredWidth: 150
+                            Layout.preferredWidth: 125
+                            Text { text: "Статус меры:"; font.family: Style.fontSans; font.pixelSize: Style.fontSizeBodySm; color: Style.textSecondary }
+                            CustomComboBox {
+                                Layout.fillWidth: true
+                                model: root.statusList
+                                currentIndex: Math.max(0, root.statusList.indexOf(root.draft.status))
+                                onCurrentIndexChanged: {
+                                    if (currentIndex >= 0 && root.statusList[currentIndex] !== root.draft.status)
+                                        root.setDraft("status", root.statusList[currentIndex])
+                                }
+                            }
+                        }
+
+                        ColumnLayout {
+                            Layout.preferredWidth: 140
                             Text { text: "TCO в год (₽):"; font.family: Style.fontSans; font.pixelSize: Style.fontSizeBodySm; color: Style.textSecondary }
                             CustomTextField {
                                 Layout.fillWidth: true
                                 suffixText: "₽"
-                                text: root.draft.tco || ""
-                                onTextChanged: if (text !== root.draft.tco) root.setDraft("tco", text)
+                                text: root.draft.costTCO !== undefined ? Math.round(root.draft.costTCO).toString() : (root.draft.tcoNum !== undefined ? Math.round(root.draft.tcoNum).toString() : (root.draft.tco || "300000"))
+                                onTextChanged: {
+                                    var num = parseFloat(text.replace(/[^\d.-]/g, "")) || 0
+                                    if (num !== root.draft.costTCO) {
+                                        root.setDraft("costTCO", num)
+                                        root.setDraft("tcoNum", num)
+                                        root.setDraft("tco", text)
+                                    }
+                                }
                             }
                         }
                     }
@@ -928,32 +960,42 @@ Item {
                         Layout.fillWidth: true
                         Text { text: "Новая доля уязвимых узлов (NewShare):"; font.family: Style.fontSans; font.pixelSize: Style.fontSizeBodySm; color: Style.textSecondary }
                         Item { Layout.fillWidth: true }
-                        Text { text: "Было: " + (root.draft.oldShare || ""); font.family: Style.fontMono; font.pixelSize: 10; color: Style.textSecondary }
+                        Text { text: "Было: " + (root.draft.oldShare || "не задано"); font.family: Style.fontMono; font.pixelSize: 10; color: Style.textSecondary }
                     }
                     CustomComboBox {
                         Layout.fillWidth: true
                         model: [
-                            "Менее 10% компонентов (l·L = 0.10) [Патчинг/изоляция]",
-                            "От 10% до 50% компонентов (l·L = 0.12)",
+                            "Более 70% компонентов (l·L = 0.20)",
                             "От 50% до 70% компонентов (l·L = 0.16)",
-                            "Более 70% компонентов (l·L = 0.20)"
+                            "От 10% до 50% компонентов (l·L = 0.12)",
+                            "Менее 10% компонентов (l·L = 0.10) [Патчинг / изоляция]"
                         ]
-                        currentIndex: 0
+                        currentIndex: root.draft.newShare !== undefined ? root.draft.newShare : 3
+                        onCurrentIndexChanged: {
+                            if (currentIndex !== root.draft.newShare) {
+                                root.setDraft("newShare", currentIndex)
+                            }
+                        }
                     }
 
                     RowLayout {
                         Layout.fillWidth: true
                         Text { text: "Защищенность периметра (NewPerimeter):"; font.family: Style.fontSans; font.pixelSize: Style.fontSizeBodySm; color: Style.textSecondary }
                         Item { Layout.fillWidth: true }
-                        Text { text: "Было: " + (root.draft.oldPerimeter || ""); font.family: Style.fontMono; font.pixelSize: 10; color: Style.textSecondary }
+                        Text { text: "Было: " + (root.draft.oldPerimeter || "не задано"); font.family: Style.fontMono; font.pixelSize: 10; color: Style.textSecondary }
                     }
                     SegmentedControl {
                         Layout.fillWidth: true
                         items: [
-                            "Недоступно из Интернет (0.18)",
-                            "Доступно из Интернет (0.33)"
+                            "Доступно из Интернет (0.33)",
+                            "Недоступно из Интернет (0.18)"
                         ]
-                        currentIndex: 0
+                        currentIndex: root.draft.newPerimeter !== undefined ? root.draft.newPerimeter : 1
+                        onCurrentIndexChanged: {
+                            if (currentIndex !== root.draft.newPerimeter) {
+                                root.setDraft("newPerimeter", currentIndex)
+                            }
+                        }
                     }
                 }
             }

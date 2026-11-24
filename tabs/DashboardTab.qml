@@ -9,6 +9,52 @@ ScrollView {
     contentWidth: width
     clip: true
 
+    readonly property var vulns: (typeof riskCalculator !== "undefined") ? riskCalculator.vulnerabilities : []
+    readonly property var assets: (typeof riskCalculator !== "undefined") ? riskCalculator.assets : []
+    readonly property var scenarios: (typeof riskCalculator !== "undefined") ? riskCalculator.economicScenarios : []
+
+    // Подсчет распределения критичности угроз из реальной базы проекта
+    readonly property int countCrit: {
+        var c = 0
+        for (var i = 0; i < vulns.length; ++i) {
+            if (vulns[i].level === "Критический" || vulns[i].cvss >= 9.0) c++
+        }
+        return c
+    }
+    readonly property int countHigh: {
+        var c = 0
+        for (var i = 0; i < vulns.length; ++i) {
+            if (vulns[i].level === "Высокий" || (vulns[i].cvss >= 7.0 && vulns[i].cvss < 9.0)) c++
+        }
+        return c
+    }
+    readonly property int countMed: {
+        var c = 0
+        for (var i = 0; i < vulns.length; ++i) {
+            if (vulns[i].level === "Средний" || (vulns[i].cvss >= 4.0 && vulns[i].cvss < 7.0)) c++
+        }
+        return c
+    }
+    readonly property int countLow: {
+        var c = 0
+        for (var i = 0; i < vulns.length; ++i) {
+            if (vulns[i].level === "Низкий" || (vulns[i].cvss > 0 && vulns[i].cvss < 4.0)) c++
+        }
+        return c
+    }
+    readonly property int totalThreats: countCrit + countHigh + countMed + countLow
+
+    // Топ-5 активов по убытку SLE
+    readonly property var topAssets: {
+        var list = root.assets.slice()
+        list.sort(function(a, b) {
+            var sA = (a.directRecoveryCost || 0) + (a.indirectBusinessLoss || 0)
+            var sB = (b.directRecoveryCost || 0) + (b.indirectBusinessLoss || 0)
+            return sB - sA
+        })
+        return list.slice(0, 5)
+    }
+
     ColumnLayout {
         width: root.width
         spacing: 12
@@ -24,22 +70,22 @@ ScrollView {
                 Layout.fillWidth: true
                 title: "АКТИВЫ КОММЕРЧЕСКОЙ ТАЙНЫ"
                 iconText: "КТ"
-                value: (typeof riskCalculator !== "undefined") ? riskCalculator.totalAssetsCount.toString() : "5"
+                value: (typeof riskCalculator !== "undefined") ? riskCalculator.totalAssetsCount.toString() : "0"
                 unitText: "активов"
-                footerLeft: "Режим ст. 10 98-ФЗ: соблюден"
-                footerRight: "100%"
-                badgeText: "ЗАЩИЩЕНО"
+                footerLeft: (typeof riskCalculator !== "undefined" && riskCalculator.totalAssetsCount > 0) ? "Режим ст. 10 98-ФЗ: соблюден" : "Нет добавленных активов"
+                footerRight: (typeof riskCalculator !== "undefined" && riskCalculator.totalAssetsCount > 0) ? "100%" : "—"
+                badgeText: (typeof riskCalculator !== "undefined" && riskCalculator.totalAssetsCount > 0) ? "ЗАЩИЩЕНО" : "ПУСТО"
             }
 
             MetricCard {
                 Layout.fillWidth: true
                 title: "ОТСЛЕЖИВАЕМЫЕ УЯЗВИМОСТИ"
                 iconText: "УБИ"
-                value: (typeof riskCalculator !== "undefined") ? riskCalculator.totalVulnsCount.toString() : "5"
+                value: (typeof riskCalculator !== "undefined") ? riskCalculator.totalVulnsCount.toString() : "0"
                 unitText: "сценариев угроз"
                 footerLeft: "Методика ФСТЭК 2025"
-                footerRight: "БДУ ФСТЭК"
-                badgeText: "ФСТЭК 2025"
+                footerRight: (typeof riskCalculator !== "undefined" && riskCalculator.isBduAvailable) ? "БДУ: 86k зап." : "БДУ ФСТЭК"
+                badgeText: (typeof riskCalculator !== "undefined" && riskCalculator.totalVulnsCount > 0) ? "ФСТЭК 2025" : "ПУСТО"
                 badgeColor: Style.surfaceContainerHighest
                 badgeTextColor: Style.textPrimary
             }
@@ -48,11 +94,11 @@ ScrollView {
                 Layout.fillWidth: true
                 title: "ПЛАН ЗАЩИТНЫХ МЕР"
                 iconText: "СЗИ"
-                value: (typeof riskCalculator !== "undefined") ? riskCalculator.totalMeasuresCount.toString() : "4"
+                value: (typeof riskCalculator !== "undefined") ? riskCalculator.totalMeasuresCount.toString() : "0"
                 unitText: "комплексов мер"
-                footerLeft: (typeof riskCalculator !== "undefined") ? ("TCO: " + riskCalculator.formatRub(riskCalculator.totalTco)) : "TCO: —"
+                footerLeft: (typeof riskCalculator !== "undefined" && riskCalculator.totalMeasuresCount > 0) ? ("TCO: " + riskCalculator.formatRub(riskCalculator.totalTco)) : "TCO: —"
                 footerRight: "ГОСТ 27005"
-                badgeText: "В ПЛАНЕ"
+                badgeText: (typeof riskCalculator !== "undefined" && riskCalculator.totalMeasuresCount > 0) ? "В ПЛАНЕ" : "ПУСТО"
                 badgeColor: Style.surfaceContainerHigh
                 badgeTextColor: Style.textPrimary
             }
@@ -61,11 +107,19 @@ ScrollView {
                 Layout.fillWidth: true
                 title: "СУММАРНЫЙ NET ROSI"
                 iconText: "ROSI"
-                value: (typeof riskCalculator !== "undefined") ? ((riskCalculator.netRosiPercent >= 0 ? "+" : "") + riskCalculator.formatNumber(riskCalculator.netRosiPercent, 1) + "%") : "+0.0%"
-                valueColor: (typeof riskCalculator !== "undefined" && riskCalculator.netBenefit >= 0) ? Style.riskLowText : Style.riskCriticalText
-                badgeText: (typeof riskCalculator !== "undefined" && riskCalculator.netBenefit >= 0) ? "ЭФФЕКТИВНО" : "УБЫТОЧНО"
+                value: (typeof riskCalculator !== "undefined" && riskCalculator.hasValidRosi)
+                       ? ((riskCalculator.netRosiPercent >= 0 ? "+" : "") + riskCalculator.formatNumber(riskCalculator.netRosiPercent, 1) + "%")
+                       : "—"
+                valueColor: (typeof riskCalculator !== "undefined" && riskCalculator.hasValidRosi && riskCalculator.netBenefit >= 0)
+                            ? Style.riskLowText
+                            : (typeof riskCalculator !== "undefined" && riskCalculator.hasValidRosi ? Style.riskCriticalText : Style.textSecondary)
+                badgeText: (typeof riskCalculator !== "undefined" && riskCalculator.hasValidRosi)
+                           ? (riskCalculator.netBenefit >= 0 ? "ЭФФЕКТИВНО" : "УБЫТОЧНО")
+                           : "НЕТ ДАННЫХ"
                 footerLeft: "ΔALE экономия:"
-                footerRight: (typeof riskCalculator !== "undefined") ? (riskCalculator.formatRub(riskCalculator.totalAvoidedLoss) + " / год") : "—"
+                footerRight: (typeof riskCalculator !== "undefined" && riskCalculator.hasValidRosi)
+                             ? (riskCalculator.formatRub(riskCalculator.totalAvoidedLoss) + " / год")
+                             : "—"
             }
         }
 
@@ -104,7 +158,7 @@ ScrollView {
                                 color: Style.textPrimary
                             }
                             Text {
-                                text: "(N=38)"
+                                text: "(N=" + root.totalThreats + ")"
                                 font.family: Style.fontMono
                                 font.pixelSize: Style.fontSizeCodeSm
                                 color: Style.textSecondary
@@ -123,16 +177,29 @@ ScrollView {
                             Layout.fillWidth: true
                             height: 20
                             color: Style.surfaceContainer
+                            clip: true
+
+                            Text {
+                                anchors.centerIn: parent
+                                visible: root.totalThreats === 0
+                                text: "Угрозы еще не добавлены в проект"
+                                font.family: Style.fontSans
+                                font.pixelSize: 10
+                                color: Style.textMuted
+                            }
 
                             Row {
                                 anchors.fill: parent
+                                visible: root.totalThreats > 0
+
                                 Rectangle {
-                                    width: parent.width * 0.105
+                                    width: root.totalThreats > 0 ? (parent.width * (root.countCrit / root.totalThreats)) : 0
                                     height: parent.height
                                     color: Style.riskCriticalText
+                                    visible: width > 0
                                     Text {
                                         anchors.centerIn: parent
-                                        text: "4"
+                                        text: root.countCrit.toString()
                                         color: Style.textOnPrimary
                                         font.family: Style.fontMono
                                         font.pixelSize: 10
@@ -140,12 +207,13 @@ ScrollView {
                                     }
                                 }
                                 Rectangle {
-                                    width: parent.width * 0.289
+                                    width: root.totalThreats > 0 ? (parent.width * (root.countHigh / root.totalThreats)) : 0
                                     height: parent.height
                                     color: "#444748"
+                                    visible: width > 0
                                     Text {
                                         anchors.centerIn: parent
-                                        text: "11"
+                                        text: root.countHigh.toString()
                                         color: Style.textOnPrimary
                                         font.family: Style.fontMono
                                         font.pixelSize: 10
@@ -153,12 +221,13 @@ ScrollView {
                                     }
                                 }
                                 Rectangle {
-                                    width: parent.width * 0.447
+                                    width: root.totalThreats > 0 ? (parent.width * (root.countMed / root.totalThreats)) : 0
                                     height: parent.height
                                     color: "#A1A1AA"
+                                    visible: width > 0
                                     Text {
                                         anchors.centerIn: parent
-                                        text: "17"
+                                        text: root.countMed.toString()
                                         color: Style.textPrimary
                                         font.family: Style.fontMono
                                         font.pixelSize: 10
@@ -166,12 +235,13 @@ ScrollView {
                                     }
                                 }
                                 Rectangle {
-                                    width: parent.width * 0.159
+                                    width: root.totalThreats > 0 ? (parent.width * (root.countLow / root.totalThreats)) : 0
                                     height: parent.height
                                     color: Style.surfaceContainerHighest
+                                    visible: width > 0
                                     Text {
                                         anchors.centerIn: parent
-                                        text: "6"
+                                        text: root.countLow.toString()
                                         color: Style.textPrimary
                                         font.family: Style.fontMono
                                         font.pixelSize: 10
@@ -188,10 +258,10 @@ ScrollView {
 
                             Repeater {
                                 model: [
-                                    { name: "Критический", count: "4", pct: "10.5%", color: Style.riskCriticalText },
-                                    { name: "Высокий", count: "11", pct: "28.9%", color: "#444748" },
-                                    { name: "Средний", count: "17", pct: "44.7%", color: "#A1A1AA" },
-                                    { name: "Низкий", count: "6", pct: "15.9%", color: Style.surfaceContainerHighest }
+                                    { name: "Критический", count: root.countCrit.toString(), pct: root.totalThreats > 0 ? ((root.countCrit / root.totalThreats * 100).toFixed(1) + "%") : "0%", color: Style.riskCriticalText },
+                                    { name: "Высокий", count: root.countHigh.toString(), pct: root.totalThreats > 0 ? ((root.countHigh / root.totalThreats * 100).toFixed(1) + "%") : "0%", color: "#444748" },
+                                    { name: "Средний", count: root.countMed.toString(), pct: root.totalThreats > 0 ? ((root.countMed / root.totalThreats * 100).toFixed(1) + "%") : "0%", color: "#A1A1AA" },
+                                    { name: "Низкий", count: root.countLow.toString(), pct: root.totalThreats > 0 ? ((root.countLow / root.totalThreats * 100).toFixed(1) + "%") : "0%", color: Style.surfaceContainerHighest }
                                 ]
 
                                 Rectangle {
@@ -293,14 +363,21 @@ ScrollView {
                             }
                         }
 
+                        Text {
+                            visible: root.scenarios.length === 0
+                            text: "Нет данных для отображения.\nДобавьте активы, уязвимости и назначьте защитные меры на вкладке «Меры»."
+                            font.family: Style.fontSans
+                            font.pixelSize: Style.fontSizeBodySm
+                            color: Style.textMuted
+                            font.italic: true
+                            horizontalAlignment: Text.AlignHCenter
+                            Layout.fillWidth: true
+                            Layout.topMargin: 40
+                        }
+
                         // Comparative Pair Bars
                         Repeater {
-                            model: [
-                                { title: "Кейс 1: BDU:2025-01611 / Центральный сервер СУБД PostgreSQL", vBase: 4.75, vRes: 1.54, delta: "-67.6%" },
-                                { title: "Кейс 2: Конструктор УБИ / АРМ разработчиков и Git-сервер", vBase: 5.50, vRes: 1.82, delta: "-66.9%" },
-                                { title: "BDU:2024-01928 / Доступ к БД АСУ ТП (SCADA Node 01)", vBase: 8.80, vRes: 2.20, delta: "-75.0%" },
-                                { title: "CVE-2023-38606 / RCE в контроллере домена (AD-DC-01)", vBase: 9.50, vRes: 3.00, delta: "-68.4%" }
-                            ]
+                            model: root.scenarios.slice(0, 4)
 
                             Rectangle {
                                 Layout.fillWidth: true
@@ -317,7 +394,7 @@ ScrollView {
                                     RowLayout {
                                         Layout.fillWidth: true
                                         Text {
-                                            text: modelData.title
+                                            text: modelData.measureId + ": " + modelData.measureTitle
                                             font.family: Style.fontSans
                                             font.pixelSize: Style.fontSizeBodySm
                                             font.weight: Font.DemiBold
@@ -334,7 +411,7 @@ ScrollView {
                                             Text {
                                                 id: deltaText
                                                 anchors.centerIn: parent
-                                                text: modelData.delta
+                                                text: modelData.deltaVText
                                                 font.family: Style.fontMono
                                                 font.pixelSize: 10
                                                 font.weight: Font.Bold
@@ -363,7 +440,7 @@ ScrollView {
                                             color: Style.surfaceContainer
 
                                             Rectangle {
-                                                width: parent.width * (modelData.vBase / 10.0)
+                                                width: Math.min(parent.width, parent.width * (modelData.vBase / 10.0))
                                                 height: parent.height
                                                 color: "#27272A"
                                             }
@@ -385,7 +462,7 @@ ScrollView {
                                             color: Style.surfaceContainer
 
                                             Rectangle {
-                                                width: parent.width * (modelData.vRes / 10.0)
+                                                width: Math.min(parent.width, parent.width * (modelData.vRes / 10.0))
                                                 height: parent.height
                                                 color: "#A1A1AA"
                                             }
@@ -394,6 +471,8 @@ ScrollView {
                                 }
                             }
                         }
+
+                        Item { Layout.fillHeight: true }
                     }
                 }
 
@@ -428,13 +507,20 @@ ScrollView {
                             }
                         }
 
+                        Text {
+                            visible: root.scenarios.length === 0
+                            text: "Меры защиты не добавлены. Создайте меры на вкладке «Меры»."
+                            font.family: Style.fontSans
+                            font.pixelSize: Style.fontSizeBodySm
+                            color: Style.textMuted
+                            font.italic: true
+                            horizontalAlignment: Text.AlignHCenter
+                            Layout.fillWidth: true
+                            Layout.topMargin: 20
+                        }
+
                         Repeater {
-                            model: [
-                                { code: "Кейс 1", name: "Изоляция СУБД во внутренний сегмент (МЭ) + патчинг", rosi: "+613.3%", tco: "450 000 ₽", deltaAle: "3 210 000 ₽", pct: 0.85 },
-                                { code: "Кейс 2", name: "Внедрение Endpoint DLP + блокировка USB и внешнего контура", rosi: "+666.7%", tco: "600 000 ₽", deltaAle: "4 600 000 ₽", pct: 0.88 },
-                                { code: "М-03", name: "Сегментация сети КИИ (NGFW / Микросегментация)", rosi: "+215.4%", tco: "3.2M ₽", deltaAle: "10.1M ₽", pct: 0.78 },
-                                { code: "М-01", name: "Внедрение EDR-агентов на АРМ операторов КИИ", rosi: "+168.0%", tco: "2.5M ₽", deltaAle: "6.7M ₽", pct: 0.62 }
-                            ]
+                            model: root.scenarios.slice(0, 4)
 
                             ColumnLayout {
                                 Layout.fillWidth: true
@@ -443,7 +529,7 @@ ScrollView {
                                 RowLayout {
                                     Layout.fillWidth: true
                                     Text {
-                                        text: modelData.code + ": " + modelData.name
+                                        text: modelData.measureId + ": " + modelData.measureTitle
                                         font.family: Style.fontSans
                                         font.pixelSize: Style.fontSizeBodySm
                                         color: Style.textPrimary
@@ -455,7 +541,7 @@ ScrollView {
                                         font.family: Style.fontMono
                                         font.pixelSize: Style.fontSizeCodeMd
                                         font.weight: Font.Bold
-                                        color: Style.textPrimary
+                                        color: modelData.netBenefitNum >= 0 ? Style.riskLowText : Style.riskCriticalText
                                     }
                                 }
 
@@ -465,7 +551,7 @@ ScrollView {
                                     color: Style.surfaceContainer
 
                                     Rectangle {
-                                        width: parent.width * modelData.pct
+                                        width: Math.min(parent.width, Math.max(8, parent.width * Math.min(1.0, Math.max(0.05, (modelData.rosiNum + 100.0) / 400.0))))
                                         height: parent.height
                                         color: Style.primary
                                     }
@@ -481,7 +567,7 @@ ScrollView {
                                     }
                                     Item { Layout.fillWidth: true }
                                     Text {
-                                        text: "ΔALE: " + modelData.deltaAle + " / год"
+                                        text: "ΔALE: " + modelData.avoidedLoss + " / год"
                                         font.family: Style.fontMono
                                         font.pixelSize: 10
                                         color: Style.textSecondary
@@ -489,6 +575,8 @@ ScrollView {
                                 }
                             }
                         }
+
+                        Item { Layout.fillHeight: true }
                     }
                 }
             }
@@ -512,14 +600,14 @@ ScrollView {
                         ColumnLayout {
                             spacing: 1
                             Text {
-                                text: "Топ-5 по ожидаемому убытку (ALE)"
+                                text: "Топ активов по единичному ущербу (SLE)"
                                 font.family: Style.fontSans
                                 font.pixelSize: Style.fontSizeHeadlineMd
                                 font.weight: Font.DemiBold
                                 color: Style.textPrimary
                             }
                             Text {
-                                text: "Ранжирование сценариев до мер защиты (₽)"
+                                text: "Ранжирование по совокупной стоимости актива (₽)"
                                 font.family: Style.fontSans
                                 font.pixelSize: Style.fontSizeBodySm
                                 color: Style.textSecondary
@@ -532,7 +620,7 @@ ScrollView {
                             color: Style.surfaceContainerHigh
                             Text {
                                 anchors.centerIn: parent
-                                text: "Год 2025"
+                                text: "Проект"
                                 font.family: Style.fontMono
                                 font.pixelSize: 10
                                 color: Style.textPrimary
@@ -546,68 +634,28 @@ ScrollView {
                         height: 24
                         spacing: 0
 
-                        TableHeaderCell { Layout.fillWidth: true; Layout.preferredWidth: 130; text: "Угроза / Актив" }
-                        TableHeaderCell { Layout.preferredWidth: 60; text: "SLE"; alignment: Text.AlignRight }
-                        TableHeaderCell { Layout.preferredWidth: 44; text: "ARO"; alignment: Text.AlignRight }
-                        TableHeaderCell { Layout.preferredWidth: 64; text: "ALE до"; alignment: Text.AlignRight }
-                        TableHeaderCell { Layout.preferredWidth: 64; text: "ALE пос"; alignment: Text.AlignRight }
+                        TableHeaderCell { Layout.fillWidth: true; Layout.preferredWidth: 130; text: "Актив / Угроза" }
+                        TableHeaderCell { Layout.preferredWidth: 70; text: "SLE"; alignment: Text.AlignRight }
+                        TableHeaderCell { Layout.preferredWidth: 44; text: "I_infr"; alignment: Text.AlignRight }
+                        TableHeaderCell { Layout.preferredWidth: 70; text: "Прямой"; alignment: Text.AlignRight }
                         TableHeaderCell { Layout.preferredWidth: 64; text: "Статус"; alignment: Text.AlignHCenter; hasRightBorder: false }
+                    }
+
+                    Text {
+                        visible: root.topAssets.length === 0
+                        text: "Нет добавленных активов.\nСоздайте активы на вкладке «Активы»."
+                        font.family: Style.fontSans
+                        font.pixelSize: Style.fontSizeBodySm
+                        color: Style.textMuted
+                        font.italic: true
+                        horizontalAlignment: Text.AlignHCenter
+                        Layout.fillWidth: true
+                        Layout.topMargin: 40
                     }
 
                     // Table Rows
                     Repeater {
-                        model: [
-                            {
-                                threat: "BDU:2024-01928",
-                                asset: "SCADA Node 01",
-                                sle: "18.5M",
-                                aro: "0.65",
-                                aleBase: "12.0M",
-                                aleRes: "3.0M",
-                                status: "Критический",
-                                statusShort: "КРИТИЧ"
-                            },
-                            {
-                                threat: "CVE-2023-38606",
-                                asset: "AD-DC-01 (Kerberos)",
-                                sle: "11.0M",
-                                aro: "0.80",
-                                aleBase: "8.8M",
-                                aleRes: "2.8M",
-                                status: "Критический",
-                                statusShort: "КРИТИЧ"
-                            },
-                            {
-                                threat: "Кейс 2 (УБИ.027)",
-                                asset: "Git-сервер и АРМ",
-                                sle: "10.0M",
-                                aro: "0.69",
-                                aleBase: "6.9M",
-                                aleRes: "2.3M",
-                                status: "Высокий",
-                                statusShort: "ВЫСОК"
-                            },
-                            {
-                                threat: "BDU:2023-05441",
-                                asset: "API Gateway Prod",
-                                sle: "14.2M",
-                                aro: "0.45",
-                                aleBase: "6.4M",
-                                aleRes: "1.8M",
-                                status: "Высокий",
-                                statusShort: "ВЫСОК"
-                            },
-                            {
-                                threat: "Кейс 1 (01611)",
-                                asset: "СУБД PostgreSQL",
-                                sle: "8.0M",
-                                aro: "0.59",
-                                aleBase: "4.8M",
-                                aleRes: "1.5M",
-                                status: "Высокий",
-                                statusShort: "ВЫСОК"
-                            }
-                        ]
+                        model: root.topAssets
 
                         Rectangle {
                             Layout.fillWidth: true
@@ -615,6 +663,9 @@ ScrollView {
                             color: (index % 2 === 0) ? Style.panelSurface : Style.surfaceLow
                             border.color: Style.hairlineBorder
                             border.width: 1
+
+                            readonly property real sleVal: (modelData.directRecoveryCost || 0) + (modelData.indirectBusinessLoss || 0)
+                            readonly property string vCode: (modelData.vulns && modelData.vulns.length > 0) ? modelData.vulns[0] : "Без угроз"
 
                             RowLayout {
                                 anchors.fill: parent
@@ -633,20 +684,20 @@ ScrollView {
                                             width: 6
                                             height: 6
                                             radius: 3
-                                            color: Style.getRiskColor(modelData.status)
+                                            color: vCode !== "Без угроз" ? Style.riskHigh : Style.textMuted
                                         }
                                         Text {
-                                            text: modelData.threat
-                                            font.family: Style.fontMono
-                                            font.pixelSize: Style.fontSizeCodeSm
+                                            text: modelData.primaryAssetName || ""
+                                            font.family: Style.fontSans
+                                            font.pixelSize: Style.fontSizeBodySm
                                             font.weight: Font.DemiBold
                                             color: Style.textPrimary
                                             elide: Text.ElideRight
                                         }
                                     }
                                     Text {
-                                        text: modelData.asset
-                                        font.family: Style.fontSans
+                                        text: (modelData.supportingAssetName && modelData.supportingAssetName !== "-") ? modelData.supportingAssetName : vCode
+                                        font.family: Style.fontMono
                                         font.pixelSize: 10
                                         color: Style.textSecondary
                                         elide: Text.ElideRight
@@ -654,8 +705,8 @@ ScrollView {
                                 }
 
                                 Text {
-                                    Layout.preferredWidth: 60
-                                    text: modelData.sle
+                                    Layout.preferredWidth: 70
+                                    text: typeof riskCalculator !== "undefined" ? riskCalculator.formatRub(sleVal) : "—"
                                     font.family: Style.fontMono
                                     font.pixelSize: Style.fontSizeCodeSm
                                     color: Style.textPrimary
@@ -664,7 +715,12 @@ ScrollView {
 
                                 Text {
                                     Layout.preferredWidth: 44
-                                    text: modelData.aro
+                                    text: {
+                                        var k = (modelData.componentType === 0 ? 0.55 : (modelData.componentType === 3 ? 0.35 : 0.25))
+                                        var l = (modelData.share === 0 ? 0.20 : (modelData.share === 1 ? 0.16 : 0.10))
+                                        var p = (modelData.perimeter === 0 ? 0.33 : 0.18)
+                                        return (k + l + p).toFixed(2)
+                                    }
                                     font.family: Style.fontMono
                                     font.pixelSize: Style.fontSizeCodeSm
                                     color: Style.textSecondary
@@ -672,18 +728,8 @@ ScrollView {
                                 }
 
                                 Text {
-                                    Layout.preferredWidth: 64
-                                    text: modelData.aleBase
-                                    font.family: Style.fontMono
-                                    font.pixelSize: Style.fontSizeCodeSm
-                                    font.weight: Font.DemiBold
-                                    color: Style.textPrimary
-                                    horizontalAlignment: Text.AlignRight
-                                }
-
-                                Text {
-                                    Layout.preferredWidth: 64
-                                    text: modelData.aleRes
+                                    Layout.preferredWidth: 70
+                                    text: typeof riskCalculator !== "undefined" ? riskCalculator.formatRub(modelData.directRecoveryCost || 0) : "—"
                                     font.family: Style.fontMono
                                     font.pixelSize: Style.fontSizeCodeSm
                                     color: Style.textSecondary
@@ -692,8 +738,8 @@ ScrollView {
 
                                 RiskBadge {
                                     Layout.preferredWidth: 64
-                                    level: modelData.status
-                                    text: modelData.statusShort
+                                    level: vCode !== "Без угроз" ? "Высокий" : "Низкий"
+                                    text: vCode !== "Без угроз" ? "УГРОЗА" : "ЧИСТО"
                                     compact: true
                                 }
                             }

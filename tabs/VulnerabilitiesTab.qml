@@ -255,7 +255,7 @@ Item {
                         AppButton {
                             text: "Импорт БДУ"
                             iconText: "↓"
-                            onClicked: console.log("TODO: импорт БДУ")
+                            onClicked: window.openBdu()
                         }
                     }
                 }
@@ -497,7 +497,9 @@ Item {
                             Text {
                                 anchors.centerIn: parent
                                 visible: root.viewVulns.length === 0
-                                text: "Уязвимости не найдены"
+                                text: root.vulnModel.length === 0
+                                      ? "Уязвимости еще не добавлены. Нажмите «Импорт БДУ» или «+ Уязвимость»."
+                                      : "Уязвимости не найдены"
                                 font.family: Style.fontSans
                                 font.pixelSize: Style.fontSizeBodyMd
                                 color: Style.textMuted
@@ -1092,7 +1094,75 @@ Item {
                 }
             }
 
+            // Group 4: Сведения из БДУ ФСТЭК (если FromBDU=true)
+            Rectangle {
+                visible: !!root.draft.fromBdu && (!!root.draft.software || !!root.draft.solution || !!root.draft.vendor)
+                Layout.fillWidth: true
+                Layout.leftMargin: 10
+                Layout.rightMargin: 10
+                implicitHeight: g4Col.implicitHeight + 20
+                color: Style.surfaceLow
+                border.color: Style.hairlineBorder
+                border.width: 1
+
+                ColumnLayout {
+                    id: g4Col
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    spacing: 8
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Text {
+                            text: "4. КАРТОЧКА БДУ ФСТЭК РОССИИ"
+                            font.family: Style.fontSans
+                            font.pixelSize: Style.fontSizeHeadlineSm
+                            font.weight: Font.DemiBold
+                            color: Style.textPrimary
+                        }
+                        Item { Layout.fillWidth: true }
+                        Text {
+                            text: "Реестр ФСТЭК РФ"
+                            font.family: Style.fontMono
+                            font.pixelSize: 10
+                            color: Style.riskLowText
+                        }
+                    }
+
+                    ColumnLayout {
+                        visible: !!root.draft.software || !!root.draft.vendor
+                        Layout.fillWidth: true
+                        spacing: 2
+                        Text { text: "Затронутое ПО / Вендоры:"; font.family: Style.fontSans; font.pixelSize: Style.fontSizeBodySm; color: Style.textSecondary }
+                        Text {
+                            text: (root.draft.vendor ? (root.draft.vendor + " — ") : "") + (root.draft.software || "")
+                            font.family: Style.fontMono
+                            font.pixelSize: 11
+                            color: Style.textPrimary
+                            wrapMode: Text.WordWrap
+                            Layout.fillWidth: true
+                        }
+                    }
+
+                    ColumnLayout {
+                        visible: !!root.draft.solution
+                        Layout.fillWidth: true
+                        spacing: 2
+                        Text { text: "Рекомендации ФСТЭК по устранению:"; font.family: Style.fontSans; font.pixelSize: Style.fontSizeBodySm; color: Style.textSecondary }
+                        Text {
+                            text: root.draft.solution || ""
+                            font.family: Style.fontSans
+                            font.pixelSize: 11
+                            color: Style.textPrimary
+                            wrapMode: Text.WordWrap
+                            Layout.fillWidth: true
+                        }
+                    }
+                }
+            }
+
             Item { Layout.preferredHeight: 8 }
         }
     }
+
 }

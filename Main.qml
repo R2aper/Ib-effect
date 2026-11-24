@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "."
 import "tabs"
+import "components"
 
 ApplicationWindow {
     id: window
@@ -118,6 +119,39 @@ ApplicationWindow {
                     }
                 }
 
+                // BDU Database Indicator
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 28
+                    color: (typeof riskCalculator !== "undefined" && riskCalculator.isBduAvailable) ? Style.riskLowBg : Style.surfaceLow
+                    border.color: (typeof riskCalculator !== "undefined" && riskCalculator.isBduAvailable) ? Style.riskLowBorder : Style.hairlineBorder
+                    border.width: 1
+
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 10
+                        anchors.rightMargin: 10
+                        spacing: 6
+
+                        Text {
+                            text: (typeof riskCalculator !== "undefined" && riskCalculator.isBduAvailable) ? "●" : "○"
+                            font.pixelSize: 10
+                            color: (typeof riskCalculator !== "undefined" && riskCalculator.isBduAvailable) ? Style.riskLowText : Style.textMuted
+                        }
+                        Text {
+                            text: (typeof riskCalculator !== "undefined" && riskCalculator.isBduAvailable)
+                                  ? ("БДУ: " + riskCalculator.formatNumber(riskCalculator.bduTotalCount, 0) + " зап.")
+                                  : "БДУ: база не найдена"
+                            font.family: Style.fontMono
+                            font.pixelSize: 10
+                            font.weight: Font.DemiBold
+                            color: (typeof riskCalculator !== "undefined" && riskCalculator.isBduAvailable) ? Style.riskLowText : Style.textSecondary
+                            Layout.fillWidth: true
+                            elide: Text.ElideRight
+                        }
+                    }
+                }
+
                 // Sidebar Bottom Telemetry
                 Rectangle {
                     Layout.fillWidth: true
@@ -188,6 +222,20 @@ ApplicationWindow {
                 HelpTab {}
             }
         }
+    }
+
+    BduImportModal {
+        id: globalBduModal
+        anchors.fill: parent
+        z: 9999
+    }
+
+    function openBdu() {
+        globalBduModal.openDefault()
+    }
+
+    function openBduForAsset(assetId, assetName, keyword) {
+        globalBduModal.openForAsset(assetId, assetName, keyword)
     }
 
 }

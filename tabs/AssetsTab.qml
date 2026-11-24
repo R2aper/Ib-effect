@@ -68,9 +68,90 @@ Item {
                 if (a) {
                     root.draft = JSON.parse(JSON.stringify(a))
                     root.dirty = false
+                    root.updateSuggestedVulns()
                 }
             }
         }
+        function onVulnerabilitiesChanged() {
+            root.updateSuggestedVulns()
+        }
+    }
+
+    property var suggestedVulns: []
+    property string detectedSoftware: ""
+
+    function extractSoftwareKeyword(str) {
+        if (!str) return ""
+        var matches = str.match(/(PostgreSQL|Postgres|GitLab|Nginx|Apache|Linux|Windows|SCADA|Docker|Kubernetes|Oracle|Redis|Node|Java|OpenSSL|SSH|1C|1С|IIS|Exchange|SharePoint)/i)
+        if (matches && matches.length > 0) return matches[1]
+        var clean = str.replace(/srv-|app-|ws-|db\d*|standby|server|core|node|АРМ|клиент|база|условия|ключи|исходный|код/gi, " ").trim()
+        var parts = clean.split(/[\s\(\)\[\],]+/).filter(function(w) { return w.length > 2 })
+        return parts.length > 0 ? parts[0] : ""
+    }
+
+    function updateSuggestedVulns() {
+        if (typeof riskCalculator === "undefined" || !riskCalculator.isBduAvailable || !root.draft || !root.draft.id) {
+            suggestedVulns = []
+            detectedSoftware = ""
+            return
+        }
+        var kw = extractSoftwareKeyword((root.draft.supportingAssetName || "") + " " + (root.draft.primaryAssetName || ""))
+        detectedSoftware = kw
+        if (!kw || kw.length < 2) {
+            suggestedVulns = []
+            return
+        }
+        var results = riskCalculator.searchBdu(kw, 3, 5) // Critical & High
+        var currentVulns = root.draft.vulns || []
+        var filtered = []
+        for (var i = 0; i < results.length; ++i) {
+            var item = results[i]
+            if (currentVulns.indexOf(item.id) === -1 && currentVulns.indexOf(item.title) === -1) {
+                filtered.push(item)
+                if (filtered.length >= 2) break
+            }
+        }
+        suggestedVulns = filtered
+    }
+
+    function getVulnDisplayInfo(idOrTitle) {
+        if (typeof riskCalculator === "undefined") {
+            return { id: idOrTitle, title: idOrTitle, cvss: "", color: Style.textSecondary, desc: "" }
+        }
+        var allV = riskCalculator.vulnerabilities
+        for (var i = 0; i < allV.length; ++i) {
+            if (allV[i].id === idOrTitle || allV[i].title === idOrTitle) {
+                var v = allV[i]
+                var lvlColor = Style.riskMedium
+                if (v.level === "Критический" || v.cvss >= 9.0) lvlColor = Style.riskCritical
+                else if (v.level === "Высокий" || v.cvss >= 7.0) lvlColor = Style.riskHigh
+                else if (v.level === "Средний" || v.cvss >= 4.0) lvlColor = Style.riskMedium
+                else lvlColor = Style.riskLow
+
+                return {
+                    id: v.id,
+                    title: v.title,
+                    cvss: (v.cvss !== undefined && v.cvss > 0) ? v.cvss.toFixed(1) : "",
+                    level: v.level || "",
+                    color: lvlColor,
+                    desc: v.description || ""
+                }
+            }
+        }
+        if (typeof idOrTitle === "string" && idOrTitle.indexOf("BDU:") === 0) {
+            var det = riskCalculator.getBduDetails(idOrTitle)
+            if (det && det.id) {
+                return {
+                    id: det.id,
+                    title: det.title,
+                    cvss: (det.cvssScore !== undefined && det.cvssScore > 0) ? det.cvssScore.toFixed(1) : "",
+                    level: det.severityLevel || "",
+                    color: det.severityLevel === "Критический" ? Style.riskCritical : Style.riskHigh,
+                    desc: det.description || ""
+                }
+            }
+        }
+        return { id: idOrTitle, title: idOrTitle, cvss: "", color: Style.textSecondary, desc: "" }
     }
 
     // ---------- Состояние ----------
@@ -188,6 +269,7 @@ Item {
         dirty = false
         formLoader.active = false      // пересоздаём форму, чтобы поля подхватили значения
         formLoader.active = (a !== null)
+        root.updateSuggestedVulns()
     }
     function saveDraft() {
         if (typeof riskCalculator !== "undefined") {
@@ -480,7 +562,9 @@ Item {
                             Text {
                                 anchors.centerIn: parent
                                 visible: root.viewAssets.length === 0
-                                text: "Активы не найдены"
+                                text: root.assets.length === 0
+                                      ? "Активы еще не добавлены. Нажмите «+ Актив», чтобы создать первый."
+                                      : "Активы не найдены"
                                 font.family: Style.fontSans
                                 font.pixelSize: Style.fontSizeBodyMd
                                 color: Style.textMuted
@@ -749,12 +833,25 @@ Item {
                         text: root.draft.primaryAssetName || ""
                         onTextChanged: if (text !== root.draft.primaryAssetName) root.setDraft("primaryAssetName", text)
                     }
-                    Text { text: "Вспомогательный актив (пусто — «-» в таблице):"; font.family: Style.fontSans; font.pixelSize: Style.fontSizeBodySm; color: Style.textSecondary }
-                    CustomTextField {
+                    Text { text: "Вспомогательный актив (ИТ-компонент):"; font.family: Style.fontSans; font.pixelSize: Style.fontSizeBodySm; color: Style.textSecondary }
+                    RowLayout {
                         Layout.fillWidth: true
-                        isMonospace: true
-                        text: root.draft.supportingAssetName || ""
-                        onTextChanged: if (text !== root.draft.supportingAssetName) root.setDraft("supportingAssetName", text)
+                        spacing: 6
+                        CustomTextField {
+                            Layout.fillWidth: true
+                            isMonospace: true
+                            placeholderText: "Нажмите «Выбрать» или введите имя хоста..."
+                            text: root.draft.supportingAssetName || ""
+                            onTextChanged: if (text !== root.draft.supportingAssetName) {
+                                root.setDraft("supportingAssetName", text)
+                                root.updateSuggestedVulns()
+                            }
+                        }
+                        AppButton {
+                            text: "Выбрать"
+                            iconText: "📋"
+                            onClicked: supportingAssetModal.isOpen = true
+                        }
                     }
                 }
             }
@@ -1057,25 +1154,177 @@ Item {
 
                     Repeater {
                         model: root.draft.vulns || []
-                        delegate: RowLayout {
+                        delegate: Rectangle {
                             Layout.fillWidth: true
-                            Text {
-                                Layout.fillWidth: true
-                                text: "• " + modelData
-                                font.family: Style.fontSans
-                                font.pixelSize: Style.fontSizeBodySm
-                                color: Style.textPrimary
-                                elide: Text.ElideRight
+                            implicitHeight: rowLay.implicitHeight + 8
+                            color: Style.surfaceContainer
+                            border.color: Style.hairlineBorder
+                            border.width: 1
+                            radius: 3
+
+                            readonly property var vInfo: root.getVulnDisplayInfo(modelData)
+
+                            RowLayout {
+                                id: rowLay
+                                anchors.fill: parent
+                                anchors.leftMargin: 6
+                                anchors.rightMargin: 6
+                                anchors.topMargin: 4
+                                anchors.bottomMargin: 4
+                                spacing: 6
+
+                                // Код BDU
+                                Rectangle {
+                                    implicitWidth: bduCodeText.implicitWidth + 8
+                                    implicitHeight: 20
+                                    color: Style.surfaceContainerHighest
+                                    border.color: Style.hairlineBorder
+                                    radius: 2
+                                    Text {
+                                        id: bduCodeText
+                                        anchors.centerIn: parent
+                                        text: vInfo.id
+                                        font.family: Style.fontMono
+                                        font.pixelSize: 10
+                                        font.weight: Font.Bold
+                                        color: Style.textPrimary
+                                    }
+                                }
+
+                                // Бейдж CVSS (если есть)
+                                Rectangle {
+                                    visible: vInfo.cvss !== ""
+                                    implicitWidth: cvssValText.implicitWidth + 8
+                                    implicitHeight: 20
+                                    color: vInfo.color
+                                    radius: 2
+                                    Text {
+                                        id: cvssValText
+                                        anchors.centerIn: parent
+                                        text: vInfo.cvss
+                                        font.family: Style.fontMono
+                                        font.pixelSize: 10
+                                        font.weight: Font.Bold
+                                        color: "#ffffff"
+                                    }
+                                }
+
+                                // Название с тултипом
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: vInfo.title
+                                    font.family: Style.fontSans
+                                    font.pixelSize: 11
+                                    color: Style.textPrimary
+                                    elide: Text.ElideRight
+
+                                    ToolTip.visible: hoverMa.containsMouse
+                                    ToolTip.text: vInfo.id + ": " + vInfo.title + (vInfo.desc ? ("\n\n" + vInfo.desc) : "")
+                                    ToolTip.delay: 250
+
+                                    MouseArea {
+                                        id: hoverMa
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                    }
+                                }
+
+                                AppButton {
+                                    text: "Открепить"
+                                    onClicked: {
+                                        if (typeof riskCalculator !== "undefined" && root.draft.id) {
+                                            riskCalculator.unlinkVulnerabilityFromAsset(root.draft.id, modelData)
+                                        } else {
+                                            var v = root.draft.vulns.slice()
+                                            v.splice(index, 1)
+                                            root.setDraft("vulns", v)
+                                        }
+                                    }
+                                }
                             }
-                            AppButton {
-                                text: "Открепить"
-                                onClicked: {
-                                    if (typeof riskCalculator !== "undefined" && root.draft.id) {
-                                        riskCalculator.unlinkVulnerabilityFromAsset(root.draft.id, modelData)
-                                    } else {
-                                        var v = root.draft.vulns.slice()
-                                        v.splice(index, 1)
-                                        root.setDraft("vulns", v)
+                        }
+                    }
+
+                    // Блок умных рекомендаций из БДУ ФСТЭК по распознанному ПО
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        visible: root.suggestedVulns.length > 0
+                        spacing: 4
+
+                        Text {
+                            text: "💡 Рекомендованные угрозы для «" + root.detectedSoftware + "» из БДУ ФСТЭК:"
+                            font.family: Style.fontSans
+                            font.pixelSize: 11
+                            font.weight: Font.DemiBold
+                            color: Style.accent
+                        }
+
+                        Repeater {
+                            model: root.suggestedVulns
+                            delegate: Rectangle {
+                                Layout.fillWidth: true
+                                implicitHeight: 30
+                                color: Style.surfaceContainerHighest
+                                border.color: Style.hairlineBorder
+                                border.width: 1
+                                radius: 2
+
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.leftMargin: 6
+                                    anchors.rightMargin: 6
+                                    spacing: 6
+
+                                    Rectangle {
+                                        implicitWidth: 30
+                                        implicitHeight: 18
+                                        color: modelData.cvssScore >= 9.0 ? Style.riskCritical : (modelData.cvssScore >= 7.0 ? Style.riskHigh : Style.riskMedium)
+                                        radius: 2
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: modelData.cvssScore.toFixed(1)
+                                            font.family: Style.fontMono
+                                            font.pixelSize: 9
+                                            font.weight: Font.Bold
+                                            color: "#ffffff"
+                                        }
+                                    }
+
+                                    Text {
+                                        text: modelData.id
+                                        font.family: Style.fontMono
+                                        font.pixelSize: 10
+                                        font.weight: Font.Bold
+                                        color: Style.textPrimary
+                                    }
+
+                                    Text {
+                                        Layout.fillWidth: true
+                                        text: modelData.title
+                                        font.family: Style.fontSans
+                                        font.pixelSize: 11
+                                        color: Style.textSecondary
+                                        elide: Text.ElideRight
+
+                                        ToolTip.visible: sugHover.containsMouse
+                                        ToolTip.text: modelData.id + " (CVSS " + modelData.cvssScore + "):\n" + modelData.title
+                                        ToolTip.delay: 250
+                                        MouseArea {
+                                            id: sugHover
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                        }
+                                    }
+
+                                    AppButton {
+                                        text: "+ В 1 клик"
+                                        isPrimary: true
+                                        onClicked: {
+                                            if (typeof riskCalculator !== "undefined" && root.draft.id) {
+                                                riskCalculator.importFromBdu(modelData.id)
+                                                riskCalculator.linkVulnerabilityToAsset(root.draft.id, modelData.id)
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -1114,11 +1363,30 @@ Item {
                                 }
                             }
                         }
+                        AppButton {
+                            text: "🔍 Найти в БДУ"
+                            iconText: "🔍"
+                            onClicked: {
+                                var kw = root.detectedSoftware || root.extractSoftwareKeyword((root.draft.supportingAssetName || "") + " " + (root.draft.primaryAssetName || ""))
+                                window.openBduForAsset(root.draft.id, root.draft.primaryAssetName, kw)
+                            }
+                        }
                     }
                 }
             }
 
             Item { Layout.preferredHeight: 8 }
+        }
+    }
+
+    SupportingAssetModal {
+        id: supportingAssetModal
+        onAssetSelected: function(assetName, compType) {
+            root.setDraft("supportingAssetName", assetName)
+            if (compType !== undefined) {
+                root.setDraft("componentType", compType)
+            }
+            root.updateSuggestedVulns()
         }
     }
 }
