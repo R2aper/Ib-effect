@@ -220,7 +220,6 @@ Item {
                         AppButton {
                             isPrimary: true
                             text: "+ Мера"
-                            iconText: "+"
                             onClicked: {
                                 if (typeof riskCalculator !== "undefined") {
                                     var newM = riskCalculator.addMeasure({ title: "Новая защитная мера", costTCO: 300000 })

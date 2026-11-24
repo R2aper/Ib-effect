@@ -42,20 +42,28 @@ Rectangle {
 
             Rectangle {
                 visible: root.iconText !== ""
-                width: 20
                 height: 20
+                implicitWidth: Math.max(20, iconLabel.implicitWidth + 8)
+                // опционально ограничить максимальную ширину, чтобы не раздувало карточку
+                // Layout.maximumWidth: 48
+
                 color: Style.surfaceLow
                 radius: 2
                 border.color: Style.hairlineBorder
                 border.width: 1
+                clip: true
 
                 Text {
+                    id: iconLabel
                     anchors.centerIn: parent
                     text: root.iconText
                     font.family: Style.fontMono
                     font.pixelSize: 10
                     font.weight: Font.Bold
                     color: Style.textSecondary
+                    elide: Text.ElideRight
+                    // если хочешь жёстко ограничить:
+                    // width: Math.min(implicitWidth, 40)
                 }
             }
         }

@@ -242,7 +242,6 @@ Item {
                         AppButton {
                             isPrimary: true
                             text: "+ Угроза"
-                            iconText: "+"
                             onClicked: {
                                 if (typeof riskCalculator !== "undefined") {
                                     var newV = riskCalculator.addVulnerability({ title: "Новый сценарий угрозы безопасности", cvss: 7.5 })

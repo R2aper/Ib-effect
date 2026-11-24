@@ -109,19 +109,7 @@ ScrollView {
                                 font.weight: Font.DemiBold
                                 color: Style.textSecondary
                             }
-                            Rectangle {
-                                height: 18
-                                implicitWidth: isoTag.implicitWidth + 8
-                                color: Style.surfaceContainerHigh
-                                radius: 2
-                                Text {
-                                    id: isoTag
-                                    anchors.centerIn: parent
-                                    font.family: Style.fontMono
-                                    font.pixelSize: 10
-                                    color: Style.textPrimary
-                                }
-                            }
+
                         }
 
                         RowLayout {

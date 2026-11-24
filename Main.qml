@@ -10,8 +10,8 @@ ApplicationWindow {
     id: window
     width: 1366
     height: 840
-    minimumWidth: 1100
-    minimumHeight: 700
+    minimumWidth: 1200
+    minimumHeight: 800
     visible: true
     title: "Net ROSI Calculator — КТ / ФСТЭК / ГОСТ Р ИСО/МЭК 27005"
     color: Style.windowBackground
