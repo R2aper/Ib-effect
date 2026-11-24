@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Qt5Compat.GraphicalEffects
 import "."
 import "tabs"
 import "components"
@@ -64,58 +65,78 @@ ApplicationWindow {
                     currentIndex: window.currentTabIndex
 
                     model: [
-                        { icon: "📊", label: "Dashboard" },
-                        { icon: "🗄️", label: "Активы" },
-                        { icon: "🛡️", label: "Уязвимости" },
-                        { icon: "⚙️", label: "Меры" },
-                        { icon: "🧮", label: "CVSS 3.1" },
-                        { icon: "💳", label: "Экономика" },
-                        { icon: "📖", label: "Справка" }
+                        { icon: "assets/icons/dashboard.svg",   label: "Dashboard" },
+                        { icon: "assets/icons/assets.svg",      label: "Активы" },
+                        { icon: "assets/icons/risks.svg",       label: "Уязвимости" },
+                        { icon: "assets/icons/measures.svg",    label: "Меры" },
+                        { icon: "assets/icons/criteria.svg",    label: "CVSS 3.1" },
+                        { icon: "assets/icons/economics.svg",   label: "Экономика" },
+                        { icon: "assets/icons/methodology.svg", label: "Справка" }
                     ]
 
                     delegate: Rectangle {
                         width: navList.width
-                        height: 34
-                        color: (window.currentTabIndex === index) ? Style.surfaceActive : (navMouse.containsMouse ? Style.surfaceHover : "transparent")
+                            height: 34
+                            color: (window.currentTabIndex === index)
+                                   ? Style.surfaceActive
+                                   : (navMouse.containsMouse ? Style.surfaceHover : "transparent")
 
-                        // Active Indicator Bar
-                        Rectangle {
-                            visible: window.currentTabIndex === index
-                            anchors.left: parent.left
-                            anchors.top: parent.top
-                            anchors.bottom: parent.bottom
-                            width: 3
-                            color: Style.primary
-                        }
-
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: 12
-                            anchors.rightMargin: 12
-                            spacing: 10
-
-                            Text {
-                                text: modelData.icon
-                                font.pixelSize: 14
+                            // Active Indicator Bar
+                            Rectangle {
+                                visible: window.currentTabIndex === index
+                                anchors.left: parent.left
+                                anchors.top: parent.top
+                                anchors.bottom: parent.bottom
+                                width: 3
+                                color: Style.primary
                             }
 
-                            Text {
-                                text: modelData.label
-                                font.family: Style.fontSans
-                                font.pixelSize: Style.fontSizeBodyMd
-                                font.weight: (window.currentTabIndex === index) ? Font.DemiBold : Font.Normal
-                                color: (window.currentTabIndex === index) ? Style.textPrimary : Style.textSecondary
-                                Layout.fillWidth: true
-                            }
-                        }
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.leftMargin: 12
+                                anchors.rightMargin: 12
+                                spacing: 10
 
-                        MouseArea {
-                            id: navMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: window.currentTabIndex = index
-                        }
+                                Item {
+                                    width: 16
+                                    height: 16
+
+                                    Image {
+                                        id: iconImg
+                                        anchors.fill: parent
+                                        source: modelData.icon
+                                        sourceSize.width: 16
+                                        sourceSize.height: 16
+                                        fillMode: Image.PreserveAspectFit
+                                        visible: false
+                                    }
+
+                                    ColorOverlay {
+                                        anchors.fill: iconImg
+                                        source: iconImg
+                                        color: (window.currentTabIndex === index)
+                                               ? Style.textPrimary
+                                               : Style.textSecondary
+                                    }
+                                }
+
+                                Text {
+                                    text: modelData.label
+                                    font.family: Style.fontSans
+                                    font.pixelSize: Style.fontSizeBodyMd
+                                    font.weight: (window.currentTabIndex === index) ? Font.DemiBold : Font.Normal
+                                    color: (window.currentTabIndex === index) ? Style.textPrimary : Style.textSecondary
+                                    Layout.fillWidth: true
+                                }
+                            }
+
+                            MouseArea {
+                                id: navMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: window.currentTabIndex = index
+                            }
                     }
                 }
 

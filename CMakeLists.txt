@@ -48,6 +48,13 @@ qt_add_qml_module(appNew
         components/TableHeaderCell.qml
         components/BduImportModal.qml
         components/SupportingAssetModal.qml
+        assets/icons/dashboard.svg
+        assets/icons/assets.svg
+        assets/icons/risks.svg
+        assets/icons/measures.svg
+        assets/icons/criteria.svg
+        assets/icons/economics.svg
+        assets/icons/methodology.svg
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

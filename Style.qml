@@ -5,7 +5,6 @@ pragma Singleton
 QtObject {
     id: style
 
-    // Functional Surfaces & Structural Lines (from Stitch DESIGN.md)
     readonly property color windowBackground: "#FAFAFA"
     readonly property color panelSurface: "#FFFFFF"
     readonly property color surfaceHover: "#F4F4F5"
@@ -29,7 +28,6 @@ QtObject {
     readonly property color primaryPressed: "#404040"
     readonly property color textOnPrimary: "#FFFFFF"
 
-    // Risk Criticality Semantics (Exact values from Stitch DESIGN.md)
     // Low (Низкий)
     readonly property color riskLowText: "#16A34A"
     readonly property color riskLowBg: "#F0FDF4"
