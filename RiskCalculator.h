@@ -8,6 +8,7 @@
 #include <QVariantMap>
 
 #include "BduDatabase.h"
+#include "RiskStorage.h"
 
 namespace RiskModel {
 Q_NAMESPACE
@@ -18,16 +19,16 @@ Q_NAMESPACE
 enum class ComponentType {
   CriticalBusiness =
       0, // Уязвимости подвержены компоненты системы, обеспечивающие реализацию
-         // важных процессов (бизнес-процессов), функций, полномочий
+  // важных процессов (бизнес-процессов), функций, полномочий
   FirewallGateway, // Уязвимости подвержены межсетевые экраны/сетевые устройства
-                   // и шлюзы
-  TelecomControl,  // Уязвимости подвержены телекоммуникационное оборудование,
-                   // система управления сетью передачи данных
+  // и шлюзы
+  TelecomControl, // Уязвимости подвержены телекоммуникационное оборудование,
+  // система управления сетью передачи данных
   Server, // Уязвимости подвержены серверы (центральные вычислительные узлы)
   Workstation, // Уязвимости подвержены пользовательские устройства
-               // (автоматизированные рабочие места)
-  Storage,     // Уязвимости подвержены системы хранения данных
-  Other        // Уязвимости подвержены другие компоненты
+  // (автоматизированные рабочие места)
+  Storage, // Уязвимости подвержены системы хранения данных
+  Other    // Уязвимости подвержены другие компоненты
 };
 Q_ENUM_NS(ComponentType)
 
@@ -180,43 +181,65 @@ public:
   QVariantMap toVariantMap() const;
 };
 
-// ---------------------------- Главный класс калькулятора ----------------------------
+// ---------------------------- Главный класс калькулятора
+// ----------------------------
 
 class RiskCalculator : public QObject {
   Q_OBJECT
 
   // Свойства для списков сущностей
   Q_PROPERTY(QVariantList assets READ assets NOTIFY assetsChanged FINAL)
-  Q_PROPERTY(QVariantList vulnerabilities READ vulnerabilities NOTIFY vulnerabilitiesChanged FINAL)
+  Q_PROPERTY(QVariantList vulnerabilities READ vulnerabilities NOTIFY
+                 vulnerabilitiesChanged FINAL)
   Q_PROPERTY(QVariantList measures READ measures NOTIFY measuresChanged FINAL)
 
   // Свойства для вкладки «Экономика»
-  Q_PROPERTY(QVariantList economicScenarios READ economicScenarios NOTIFY dataChanged FINAL)
-  Q_PROPERTY(QVariantMap portfolioSummary READ portfolioSummary NOTIFY dataChanged FINAL)
+  Q_PROPERTY(QVariantList economicScenarios READ economicScenarios NOTIFY
+                 dataChanged FINAL)
+  Q_PROPERTY(QVariantMap portfolioSummary READ portfolioSummary NOTIFY
+                 dataChanged FINAL)
 
   // Финансовые показатели
   Q_PROPERTY(bool hasValidRosi READ hasValidRosi NOTIFY dataChanged FINAL)
   Q_PROPERTY(double netRosiPercent READ netRosiPercent NOTIFY dataChanged FINAL)
   Q_PROPERTY(double netBenefit READ netBenefit NOTIFY dataChanged FINAL)
-  Q_PROPERTY(double totalAvoidedLoss READ totalAvoidedLoss NOTIFY dataChanged FINAL)
+  Q_PROPERTY(
+      double totalAvoidedLoss READ totalAvoidedLoss NOTIFY dataChanged FINAL)
   Q_PROPERTY(double totalTco READ totalTco NOTIFY dataChanged FINAL)
 
   // Количественные показатели
-  Q_PROPERTY(int totalAssetsCount READ totalAssetsCount NOTIFY assetsChanged FINAL)
-  Q_PROPERTY(int totalVulnsCount READ totalVulnsCount NOTIFY vulnerabilitiesChanged FINAL)
-  Q_PROPERTY(int totalMeasuresCount READ totalMeasuresCount NOTIFY measuresChanged FINAL)
+  Q_PROPERTY(
+      int totalAssetsCount READ totalAssetsCount NOTIFY assetsChanged FINAL)
+  Q_PROPERTY(int totalVulnsCount READ totalVulnsCount NOTIFY
+                 vulnerabilitiesChanged FINAL)
+  Q_PROPERTY(int totalMeasuresCount READ totalMeasuresCount NOTIFY
+                 measuresChanged FINAL)
 
   // Интеграция с БДУ ФСТЭК (bdu.sqlite)
-  Q_PROPERTY(bool isBduAvailable READ isBduAvailable NOTIFY bduAvailabilityChanged FINAL)
-  Q_PROPERTY(int bduTotalCount READ bduTotalCount NOTIFY bduAvailabilityChanged FINAL)
-  Q_PROPERTY(QString bduDatabasePath READ bduDatabasePath NOTIFY bduAvailabilityChanged FINAL)
+  Q_PROPERTY(bool isBduAvailable READ isBduAvailable NOTIFY
+                 bduAvailabilityChanged FINAL)
+  Q_PROPERTY(
+      int bduTotalCount READ bduTotalCount NOTIFY bduAvailabilityChanged FINAL)
+  Q_PROPERTY(QString bduDatabasePath READ bduDatabasePath NOTIFY
+                 bduAvailabilityChanged FINAL)
+
+  // Локальное хранилище пользовательских данных (SQLite)
+  Q_PROPERTY(bool isStorageAvailable READ isStorageAvailable CONSTANT FINAL)
+  Q_PROPERTY(QString storagePath READ storagePath CONSTANT FINAL)
 
 public:
+  // Хранилище в <AppDataLocation>/userdata.sqlite
   explicit RiskCalculator(QObject *parent = nullptr);
+  // Своё расположение базы (":memory:" - без записи на диск, для тестов)
+  explicit RiskCalculator(const QString &storagePath,
+                          QObject *parent = nullptr);
 
   // Статические методы формул
-  static double vulnerabilityLevel(double iCvss, double iInfr, double iAt, double iImp);
-  static double calcIinfr(RiskModel::ComponentType k, RiskModel::ComponentShare l, RiskModel::PerimeterAccess p);
+  static double vulnerabilityLevel(double iCvss, double iInfr, double iAt,
+                                   double iImp);
+  static double calcIinfr(RiskModel::ComponentType k,
+                          RiskModel::ComponentShare l,
+                          RiskModel::PerimeterAccess p);
   static QString criticalityText(double v);
   static QString slaFromV(double v);
   static double probabilityFromV(double v);
@@ -230,37 +253,48 @@ public:
                                            const QVariantMap &measure) const;
 
   // --- Управление активами ---
-  Q_INVOKABLE QVariantMap addAsset(const QVariantMap &assetData = QVariantMap());
+  Q_INVOKABLE QVariantMap
+  addAsset(const QVariantMap &assetData = QVariantMap());
   Q_INVOKABLE bool updateAsset(const QVariantMap &assetData);
   Q_INVOKABLE bool deleteAsset(const QString &id);
   Q_INVOKABLE QVariantMap getAsset(const QString &id) const;
 
   // --- Привязка мер и уязвимостей к активам ---
-  Q_INVOKABLE bool linkMeasureToAsset(const QString &assetId, const QString &measureIdOrTitle);
-  Q_INVOKABLE bool unlinkMeasureFromAsset(const QString &assetId, const QString &measureIdOrTitle);
-  Q_INVOKABLE bool linkVulnerabilityToAsset(const QString &assetId, const QString &vulnIdOrTitle);
-  Q_INVOKABLE bool unlinkVulnerabilityFromAsset(const QString &assetId, const QString &vulnIdOrTitle);
+  Q_INVOKABLE bool linkMeasureToAsset(const QString &assetId,
+                                      const QString &measureIdOrTitle);
+  Q_INVOKABLE bool unlinkMeasureFromAsset(const QString &assetId,
+                                          const QString &measureIdOrTitle);
+  Q_INVOKABLE bool linkVulnerabilityToAsset(const QString &assetId,
+                                            const QString &vulnIdOrTitle);
+  Q_INVOKABLE bool unlinkVulnerabilityFromAsset(const QString &assetId,
+                                                const QString &vulnIdOrTitle);
 
   // --- Управление уязвимостями ---
-  Q_INVOKABLE QVariantMap addVulnerability(const QVariantMap &vulnData = QVariantMap());
+  Q_INVOKABLE QVariantMap
+  addVulnerability(const QVariantMap &vulnData = QVariantMap());
   Q_INVOKABLE bool updateVulnerability(const QVariantMap &vulnData);
   Q_INVOKABLE bool deleteVulnerability(const QString &id);
   Q_INVOKABLE QVariantMap getVulnerability(const QString &id) const;
 
   // --- Управление мерами ---
-  Q_INVOKABLE QVariantMap addMeasure(const QVariantMap &measureData = QVariantMap());
+  Q_INVOKABLE QVariantMap
+  addMeasure(const QVariantMap &measureData = QVariantMap());
   Q_INVOKABLE bool updateMeasure(const QVariantMap &measureData);
   Q_INVOKABLE bool deleteMeasure(const QString &id);
   Q_INVOKABLE QVariantMap getMeasure(const QString &id) const;
 
   // --- Интеграция с БДУ ФСТЭК (bdu.sqlite) ---
-  Q_INVOKABLE QVariantList searchBdu(const QString &query = QString(), int severityFilter = 0, int limit = 50);
+  Q_INVOKABLE QVariantList searchBdu(const QString &query = QString(),
+                                     int severityFilter = 0, int limit = 50);
   Q_INVOKABLE QVariantMap getBduDetails(const QString &bduId);
   Q_INVOKABLE QVariantMap importFromBdu(const QString &bduId);
   Q_INVOKABLE bool isBduVulnerabilityImported(const QString &bduId) const;
 
   // --- Пересчет и форматирование ---
   Q_INVOKABLE void recalculateAll();
+
+  // Удалить ВСЕ активы, уязвимости и меры (в памяти и в базе)
+  Q_INVOKABLE void clearAllData();
   Q_INVOKABLE QString formatNumber(double value, int decimals = 1) const;
   Q_INVOKABLE QString formatRub(double value) const;
   Q_INVOKABLE QString formatPercent(double value, int decimals = 1) const;
@@ -286,6 +320,9 @@ public:
   int bduTotalCount() const { return m_bduDb.totalCount(); }
   QString bduDatabasePath() const { return m_bduDb.databasePath(); }
 
+  bool isStorageAvailable() const { return m_storage.isOpen(); }
+  QString storagePath() const { return m_storage.path(); }
+
 signals:
   void calculated(const QVariantMap &result);
   void dataChanged();
@@ -293,12 +330,21 @@ signals:
   void vulnerabilitiesChanged();
   void measuresChanged();
   void bduAvailabilityChanged();
+  // Ошибка записи/чтения локальной базы (текст для показа пользователю)
+  void storageError(const QString &message);
 
 private:
   void initDefaultData();
   void updateEconomicScenarios();
 
+  // --- Хранилище ---
+  void loadFromStorage();
+  void persist(RiskStorage::Entity entity, const QVariantMap &data);
+  void forget(RiskStorage::Entity entity, const QString &id);
+  void reportStorageError();
+
   BduDatabase m_bduDb;
+  RiskStorage m_storage;
   QVariantList m_assets;
   QVariantList m_vulnerabilities;
   QVariantList m_measures;

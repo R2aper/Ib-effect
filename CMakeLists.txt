@@ -22,6 +22,8 @@ qt_add_executable(appNew
     RiskCalculator.h
     BduDatabase.cpp
     BduDatabase.h
+    RiskStorage.h
+    RiskStorage.cpp
 )
 
 qt_add_qml_module(appNew
@@ -29,6 +31,8 @@ qt_add_qml_module(appNew
     SOURCES
         Cvsscalculator.cpp
         Cvsscalculator.h
+        RiskStorage.h
+        RiskStorage.cpp
     QML_FILES
         Main.qml
         Style.qml
