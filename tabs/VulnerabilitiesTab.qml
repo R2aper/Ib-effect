@@ -1238,59 +1238,6 @@ Item {
                 }
             }
 
-            // Group 5: Заметки
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.leftMargin: 10
-                Layout.rightMargin: 10
-                implicitHeight: g5Col.implicitHeight + 20
-                color: Style.surfaceLow
-                border.color: Style.hairlineBorder
-                border.width: 1
-
-                ColumnLayout {
-                    id: g5Col
-                    anchors.fill: parent
-                    anchors.margins: 10
-                    spacing: 8
-
-                    Text {
-                        text: "5. ЗАМЕТКИ"
-                        font.family: Style.fontSans
-                        font.pixelSize: Style.fontSizeHeadlineSm
-                        font.weight: Font.DemiBold
-                        color: Style.textPrimary
-                    }
-
-                    Text {
-                        text: "Контекст, источники и решения для этого сценария:"
-                        font.family: Style.fontSans
-                        font.pixelSize: Style.fontSizeBodySm
-                        color: Style.textSecondary
-                    }
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        height: 82
-                        color: Style.panelSurface
-                        border.color: Style.hairlineBorder
-                        border.width: 1
-
-                        TextEdit {
-                            anchors.fill: parent
-                            anchors.margins: 6
-                            text: root.draft.notes || ""
-                            font.family: Style.fontSans
-                            font.pixelSize: Style.fontSizeBodySm
-                            color: Style.textPrimary
-                            wrapMode: TextEdit.WordWrap
-                            selectByMouse: true
-                            onTextChanged: if (text !== root.draft.notes) root.setDraft("notes", text)
-                        }
-                    }
-                }
-            }
-
             Item { Layout.preferredHeight: 8 }
         }
     }
