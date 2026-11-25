@@ -652,10 +652,13 @@ Item {
                         Layout.fillHeight: true
                         clip: true
                         contentWidth: availableWidth
+                        contentHeight: formLoader.height
+                        ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
 
                         Loader {
                             id: formLoader
                             width: parent.width
+                            height: item ? item.implicitHeight : 0
                             active: false
                             sourceComponent: formComponent
                         }
