@@ -57,23 +57,28 @@ Item {
 
     // ---------- Данные из C++ RiskCalculator ----------
     property var assets: (typeof riskCalculator !== "undefined") ? riskCalculator.assets : []
+    property var vulnerabilityItems: (typeof riskCalculator !== "undefined") ? riskCalculator.vulnerabilities : []
+    property var measureItems: (typeof riskCalculator !== "undefined") ? riskCalculator.measures : []
 
     Connections {
         target: (typeof riskCalculator !== "undefined") ? riskCalculator : null
         function onAssetsChanged() {
             root.assets = riskCalculator.assets
             root.rebuild()
-            if (root.selectedId !== "") {
+            if (root.selectedId !== "" && !root.dirty) {
                 var a = root.assetById(root.selectedId)
                 if (a) {
                     root.draft = JSON.parse(JSON.stringify(a))
-                    root.dirty = false
                     root.updateSuggestedVulns()
                 }
             }
         }
         function onVulnerabilitiesChanged() {
+            root.vulnerabilityItems = riskCalculator.vulnerabilities
             root.updateSuggestedVulns()
+        }
+        function onMeasuresChanged() {
+            root.measureItems = riskCalculator.measures
         }
     }
 
@@ -272,16 +277,89 @@ Item {
         root.updateSuggestedVulns()
     }
     function saveDraft() {
-        if (typeof riskCalculator !== "undefined") {
-            riskCalculator.updateAsset(draft)
+        if (typeof riskCalculator === "undefined") return
+
+        var current = root.assetById(root.selectedId)
+        if (!current) return
+        var linkedKeys = ["vulns", "measures"]
+        for (var k = 0; k < linkedKeys.length; ++k) {
+            var key = linkedKeys[k]
+            var before = current[key] || []
+            var after = root.draft[key] || []
+            var isMeasure = key === "measures"
+
+            for (var i = 0; i < before.length; ++i) {
+                if (after.indexOf(before[i]) === -1) {
+                    if (isMeasure)
+                        riskCalculator.unlinkMeasureFromAsset(root.selectedId, before[i])
+                    else
+                        riskCalculator.unlinkVulnerabilityFromAsset(root.selectedId, before[i])
+                }
+            }
+            for (var j = 0; j < after.length; ++j) {
+                if (before.indexOf(after[j]) !== -1) continue
+                if (isMeasure) {
+                    var measure = null
+                    for (var m = 0; m < root.measureItems.length; ++m) {
+                        if (root.measureItems[m].id === after[j] || root.measureItems[m].title === after[j]) {
+                            measure = root.measureItems[m]
+                            break
+                        }
+                    }
+                    if (measure && measure.asset && measure.asset !== root.selectedId)
+                        riskCalculator.updateMeasure({ id: measure.id, asset: root.selectedId })
+                    else
+                        riskCalculator.linkMeasureToAsset(root.selectedId, after[j])
+                } else {
+                    riskCalculator.linkVulnerabilityToAsset(root.selectedId, after[j])
+                }
+            }
         }
+
+        riskCalculator.updateAsset(root.draft)
+        var updated = root.assetById(root.selectedId)
+        if (updated) root.draft = JSON.parse(JSON.stringify(updated))
         dirty = false
+        root.updateSuggestedVulns()
     }
     function setDraft(key, value) {
         var d = draft
         d[key] = value
         draft = d
         dirty = true
+    }
+    function linkedEntities(key) {
+        var ids = root.draft[key] || []
+        var items = key === "vulns" ? root.vulnerabilityItems : root.measureItems
+        var linked = []
+        for (var i = 0; i < ids.length; ++i) {
+            var found = null
+            for (var j = 0; j < items.length; ++j) {
+                if (items[j].id === ids[i] || items[j].title === ids[i]) {
+                    found = items[j]
+                    break
+                }
+            }
+            linked.push(found || { id: ids[i], title: ids[i] })
+        }
+        return linked
+    }
+    function isDraftLinked(key, id) {
+        var ids = root.draft[key] || []
+        return ids.indexOf(id) !== -1
+    }
+    function addDraftLink(key, id) {
+        if (!id || root.isDraftLinked(key, id)) return
+        var ids = (root.draft[key] || []).slice()
+        ids.push(id)
+        root.setDraft(key, ids)
+    }
+    function removeDraftLink(key, id) {
+        var ids = (root.draft[key] || []).slice()
+        var index = ids.indexOf(id)
+        if (index === -1) return
+        ids.splice(index, 1)
+        root.setDraft(key, ids)
     }
 
     onSearchTextChanged: rebuild()
@@ -1005,6 +1083,226 @@ Item {
                 }
             }
 
+            // 4. Привязанные уязвимости и меры защиты
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.leftMargin: 10
+                Layout.rightMargin: 10
+                implicitHeight: linksColumn.implicitHeight + 20
+                color: Style.surfaceLow
+                border.color: Style.hairlineBorder
+                border.width: 1
+
+                ColumnLayout {
+                    id: linksColumn
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    spacing: 10
+
+                    Text {
+                        text: "СВЯЗАННЫЕ УЯЗВИМОСТИ И МЕРЫ"
+                        font.family: Style.fontSans
+                        font.pixelSize: Style.fontSizeHeadlineSm
+                        font.weight: Font.DemiBold
+                        color: Style.textPrimary
+                    }
+
+                    Text {
+                        text: "Выберите записи для привязки к этому активу. Сведения о привязанных записях отображаются ниже."
+                        Layout.fillWidth: true
+                        wrapMode: Text.Wrap
+                        font.family: Style.fontSans
+                        font.pixelSize: Style.fontSizeBodySm
+                        color: Style.textSecondary
+                    }
+
+                    Text {
+                        text: "УЯЗВИМОСТИ"
+                        font.family: Style.fontSans
+                        font.pixelSize: Style.fontSizeBodySm
+                        font.weight: Font.DemiBold
+                        color: Style.textSecondary
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 6
+                        CustomComboBox {
+                            id: vulnerabilityPicker
+                            Layout.fillWidth: true
+                            model: root.vulnerabilityItems.map(function(v) {
+                                return (v.id || "") + " · " + (v.title || "Без названия")
+                            })
+                        }
+                        AppButton {
+                            text: "Привязать"
+                            enabledState: vulnerabilityPicker.currentIndex >= 0
+                                          && vulnerabilityPicker.currentIndex < root.vulnerabilityItems.length
+                                          && !root.isDraftLinked("vulns", root.vulnerabilityItems[vulnerabilityPicker.currentIndex].id)
+                            onClicked: {
+                                if (vulnerabilityPicker.currentIndex >= 0)
+                                    root.addDraftLink("vulns", root.vulnerabilityItems[vulnerabilityPicker.currentIndex].id)
+                            }
+                        }
+                    }
+
+                    Repeater {
+                        model: root.linkedEntities("vulns")
+                        delegate: Rectangle {
+                            required property var modelData
+                            Layout.fillWidth: true
+                            implicitHeight: vulnDetails.implicitHeight + 14
+                            color: Style.panelSurface
+                            border.color: Style.hairlineBorder
+                            border.width: 1
+
+                            RowLayout {
+                                id: vulnDetails
+                                anchors.fill: parent
+                                anchors.margins: 7
+                                spacing: 8
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 3
+                                    Text {
+                                        text: modelData.title || modelData.id
+                                        Layout.fillWidth: true
+                                        wrapMode: Text.Wrap
+                                        font.family: Style.fontSans
+                                        font.pixelSize: Style.fontSizeBodySm
+                                        font.weight: Font.DemiBold
+                                        color: Style.textPrimary
+                                    }
+                                    Text {
+                                        text: (modelData.id || "")
+                                              + (modelData.level ? " · " + modelData.level : "")
+                                              + (modelData.cvss ? " · CVSS " + Number(modelData.cvss).toFixed(1) : "")
+                                        Layout.fillWidth: true
+                                        wrapMode: Text.Wrap
+                                        font.family: Style.fontMono
+                                        font.pixelSize: Style.fontSizeCodeSm
+                                        color: Style.textSecondary
+                                    }
+                                    Text {
+                                        text: modelData.desc || modelData.description || modelData.notes || ""
+                                        visible: text !== ""
+                                        Layout.fillWidth: true
+                                        wrapMode: Text.Wrap
+                                        font.family: Style.fontSans
+                                        font.pixelSize: Style.fontSizeBodySm
+                                        color: Style.textSecondary
+                                    }
+                                }
+                                AppButton {
+                                    text: "Убрать"
+                                    onClicked: root.removeDraftLink("vulns", modelData.id)
+                                }
+                            }
+                        }
+                    }
+                    Text {
+                        visible: root.linkedEntities("vulns").length === 0
+                        text: "К активу не привязаны уязвимости."
+                        font.family: Style.fontSans
+                        font.pixelSize: Style.fontSizeBodySm
+                        color: Style.textMuted
+                    }
+
+                    Rectangle { Layout.fillWidth: true; height: 1; color: Style.hairlineBorder }
+
+                    Text {
+                        text: "МЕРЫ ЗАЩИТЫ"
+                        font.family: Style.fontSans
+                        font.pixelSize: Style.fontSizeBodySm
+                        font.weight: Font.DemiBold
+                        color: Style.textSecondary
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 6
+                        CustomComboBox {
+                            id: measurePicker
+                            Layout.fillWidth: true
+                            model: root.measureItems.map(function(m) {
+                                return (m.id || "") + " · " + (m.title || "Без названия")
+                            })
+                        }
+                        AppButton {
+                            text: "Привязать"
+                            enabledState: measurePicker.currentIndex >= 0
+                                          && measurePicker.currentIndex < root.measureItems.length
+                                          && !root.isDraftLinked("measures", root.measureItems[measurePicker.currentIndex].id)
+                            onClicked: {
+                                if (measurePicker.currentIndex >= 0)
+                                    root.addDraftLink("measures", root.measureItems[measurePicker.currentIndex].id)
+                            }
+                        }
+                    }
+
+                    Repeater {
+                        model: root.linkedEntities("measures")
+                        delegate: Rectangle {
+                            required property var modelData
+                            Layout.fillWidth: true
+                            implicitHeight: measureDetails.implicitHeight + 14
+                            color: Style.panelSurface
+                            border.color: Style.hairlineBorder
+                            border.width: 1
+
+                            RowLayout {
+                                id: measureDetails
+                                anchors.fill: parent
+                                anchors.margins: 7
+                                spacing: 8
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 3
+                                    Text {
+                                        text: modelData.title || modelData.id
+                                        Layout.fillWidth: true
+                                        wrapMode: Text.Wrap
+                                        font.family: Style.fontSans
+                                        font.pixelSize: Style.fontSizeBodySm
+                                        font.weight: Font.DemiBold
+                                        color: Style.textPrimary
+                                    }
+                                    Text {
+                                        text: (modelData.id || "")
+                                              + (modelData.measureType ? " · " + modelData.measureType : "")
+                                              + (modelData.status ? " · " + modelData.status : "")
+                                        Layout.fillWidth: true
+                                        wrapMode: Text.Wrap
+                                        font.family: Style.fontMono
+                                        font.pixelSize: Style.fontSizeCodeSm
+                                        color: Style.textSecondary
+                                    }
+                                    Text {
+                                        text: modelData.description || modelData.desc || modelData.fstecClass || ""
+                                        visible: text !== ""
+                                        Layout.fillWidth: true
+                                        wrapMode: Text.Wrap
+                                        font.family: Style.fontSans
+                                        font.pixelSize: Style.fontSizeBodySm
+                                        color: Style.textSecondary
+                                    }
+                                }
+                                AppButton {
+                                    text: "Убрать"
+                                    onClicked: root.removeDraftLink("measures", modelData.id)
+                                }
+                            }
+                        }
+                    }
+                    Text {
+                        visible: root.linkedEntities("measures").length === 0
+                        text: "К активу не привязаны меры защиты."
+                        font.family: Style.fontSans
+                        font.pixelSize: Style.fontSizeBodySm
+                        color: Style.textMuted
+                    }
+                }
+            }
 
 
             Item { Layout.preferredHeight: 8 }
