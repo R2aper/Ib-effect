@@ -631,20 +631,6 @@ Item {
                             anchors.rightMargin: 10
                             spacing: 8
 
-                            Rectangle {
-                                height: 22
-                                implicitWidth: badgeText.implicitWidth + 12
-                                color: Style.primary
-                                Text {
-                                    id: badgeText
-                                    anchors.centerIn: parent
-                                    text: root.draft.id || ""
-                                    font.family: Style.fontMono
-                                    font.pixelSize: Style.fontSizeCodeSm
-                                    font.weight: Font.Bold
-                                    color: Style.textOnPrimary
-                                }
-                            }
 
                             Text {
                                 Layout.fillWidth: true
@@ -656,17 +642,7 @@ Item {
                                 elide: Text.ElideRight
                             }
 
-                            RiskBadge {
-                                level: root.draft.levelOld || "Высокий"
-                                text: (root.draft.levelOld ? root.draft.levelOld.toUpperCase() : "") + " ДО"
-                                compact: true
-                            }
-                            Text { text: "→"; font.family: Style.fontSans; color: Style.textSecondary }
-                            RiskBadge {
-                                level: root.draft.levelNew || "Низкий"
-                                text: (root.draft.levelNew ? root.draft.levelNew.toUpperCase() : "") + " ПОСЛЕ"
-                                compact: true
-                            }
+
                         }
                     }
 

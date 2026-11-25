@@ -609,20 +609,6 @@ Item {
                             anchors.rightMargin: 10
                             spacing: 8
 
-                            Rectangle {
-                                height: 22
-                                implicitWidth: badgeText.implicitWidth + 12
-                                color: Style.primary
-                                Text {
-                                    id: badgeText
-                                    anchors.centerIn: parent
-                                    text: root.draft.id || ""
-                                    font.family: Style.fontMono
-                                    font.pixelSize: Style.fontSizeCodeSm
-                                    font.weight: Font.Bold
-                                    color: Style.textOnPrimary
-                                }
-                            }
 
                             Text {
                                 text: root.draft.title || ""
@@ -748,7 +734,7 @@ Item {
                     anchors.fill: parent
                     anchors.margins: 2
                     items: [
-                        "Найдено в БДУ ФСТЭК (FromBDU=true)",
+                        "Найдено в БДУ ФСТЭК",
                         "Собственный сценарий УБИ (п. 5.3.3)"
                     ]
                     currentIndex: root.draft.fromBdu ? 0 : 1
