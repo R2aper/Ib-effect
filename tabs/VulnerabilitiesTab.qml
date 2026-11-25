@@ -828,12 +828,13 @@ Item {
                     // CVSS v3.1 Card
                     Rectangle {
                         Layout.fillWidth: true
-                        height: !root.draft.fromBdu ? 92 : 50
+                        implicitHeight: Math.max(!root.draft.fromBdu ? 92 : 50, cvssCol.implicitHeight + 16)
                         color: Style.surfaceContainerHighest
                         border.color: Style.hairlineBorder
                         border.width: 1
 
                         ColumnLayout {
+                            id: cvssCol
                             anchors.fill: parent
                             anchors.margins: 8
                             spacing: 6
@@ -866,6 +867,8 @@ Item {
                                         font.pixelSize: Style.fontSizeBodySm
                                         font.weight: Font.DemiBold
                                         color: Style.textPrimary
+                                        wrapMode: Text.WordWrap
+                                        Layout.fillWidth: true
                                     }
                                     Text {
                                         text: root.draft.vector || ""

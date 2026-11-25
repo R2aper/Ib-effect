@@ -844,7 +844,7 @@ Item {
                         onTextChanged: if (text !== root.draft.title) root.setDraft("title", text)
                     }
 
-                    RowLayout {
+                    ColumnLayout {
                         Layout.fillWidth: true
                         spacing: 8
 
@@ -862,33 +862,38 @@ Item {
                             }
                         }
 
-                        ColumnLayout {
-                            Layout.preferredWidth: 125
-                            Text { text: "Статус меры:"; font.family: Style.fontSans; font.pixelSize: Style.fontSizeBodySm; color: Style.textSecondary }
-                            CustomComboBox {
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing: 8
+
+                            ColumnLayout {
                                 Layout.fillWidth: true
-                                model: root.statusList
-                                currentIndex: Math.max(0, root.statusList.indexOf(root.draft.status))
-                                onCurrentIndexChanged: {
-                                    if (currentIndex >= 0 && root.statusList[currentIndex] !== root.draft.status)
-                                        root.setDraft("status", root.statusList[currentIndex])
+                                Text { text: "Статус меры:"; font.family: Style.fontSans; font.pixelSize: Style.fontSizeBodySm; color: Style.textSecondary }
+                                CustomComboBox {
+                                    Layout.fillWidth: true
+                                    model: root.statusList
+                                    currentIndex: Math.max(0, root.statusList.indexOf(root.draft.status))
+                                    onCurrentIndexChanged: {
+                                        if (currentIndex >= 0 && root.statusList[currentIndex] !== root.draft.status)
+                                            root.setDraft("status", root.statusList[currentIndex])
+                                    }
                                 }
                             }
-                        }
 
-                        ColumnLayout {
-                            Layout.preferredWidth: 140
-                            Text { text: "TCO в год (₽):"; font.family: Style.fontSans; font.pixelSize: Style.fontSizeBodySm; color: Style.textSecondary }
-                            CustomTextField {
+                            ColumnLayout {
                                 Layout.fillWidth: true
-                                suffixText: "₽"
-                                text: root.draft.costTCO !== undefined ? Math.round(root.draft.costTCO).toString() : (root.draft.tcoNum !== undefined ? Math.round(root.draft.tcoNum).toString() : (root.draft.tco || "300000"))
-                                onTextChanged: {
-                                    var num = parseFloat(text.replace(/[^\d.-]/g, "")) || 0
-                                    if (num !== root.draft.costTCO) {
-                                        root.setDraft("costTCO", num)
-                                        root.setDraft("tcoNum", num)
-                                        root.setDraft("tco", text)
+                                Text { text: "TCO в год (₽):"; font.family: Style.fontSans; font.pixelSize: Style.fontSizeBodySm; color: Style.textSecondary }
+                                CustomTextField {
+                                    Layout.fillWidth: true
+                                    suffixText: "₽"
+                                    text: root.draft.costTCO !== undefined ? Math.round(root.draft.costTCO).toString() : (root.draft.tcoNum !== undefined ? Math.round(root.draft.tcoNum).toString() : (root.draft.tco || "300000"))
+                                    onTextChanged: {
+                                        var num = parseFloat(text.replace(/[^\d.-]/g, "")) || 0
+                                        if (num !== root.draft.costTCO) {
+                                            root.setDraft("costTCO", num)
+                                            root.setDraft("tcoNum", num)
+                                            root.setDraft("tco", text)
+                                        }
                                     }
                                 }
                             }
