@@ -1048,13 +1048,16 @@ Item {
                             font.pixelSize: Style.fontSizeHeadlineSm
                             font.weight: Font.DemiBold
                             color: Style.textPrimary
+                            wrapMode: Text.WordWrap
+                            Layout.fillWidth: true
+                            Layout.minimumWidth: 0
                         }
-                        Item { Layout.fillWidth: true }
                         Text {
                             text: "п. 18, 21 ФСТЭК"
                             font.family: Style.fontMono
                             font.pixelSize: 10
                             color: Style.textSecondary
+                            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                         }
                     }
 
@@ -1064,59 +1067,103 @@ Item {
 
                         Rectangle {
                             Layout.fillWidth: true
-                            height: 52
+                            Layout.minimumWidth: 0
+                            implicitHeight: Math.max(52, baseIndexCol.implicitHeight + 14)
                             color: Style.panelSurface
                             border.color: Style.hairlineBorder
                             border.width: 1
 
                             ColumnLayout {
-                                anchors.centerIn: parent
+                                id: baseIndexCol
+                                anchors.fill: parent
+                                anchors.margins: 6
                                 spacing: 1
-                                Text { text: "Базовый индекс V:"; font.family: Style.fontSans; font.pixelSize: 10; color: Style.textSecondary }
+                                Text {
+                                    text: "Базовый индекс V:"
+                                    font.family: Style.fontSans
+                                    font.pixelSize: 10
+                                    color: Style.textSecondary
+                                    wrapMode: Text.WordWrap
+                                    horizontalAlignment: Text.AlignHCenter
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                }
                                 Text {
                                     text: root.draft.vBase || ""
                                     font.family: Style.fontMono
                                     font.pixelSize: Style.fontSizeMetricDisplay
                                     font.weight: Font.Bold
                                     color: Style.getRiskColor(root.draft.level || "")
+                                    horizontalAlignment: Text.AlignHCenter
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
                                 }
                             }
                         }
 
                         Rectangle {
                             Layout.fillWidth: true
-                            height: 52
+                            Layout.minimumWidth: 0
+                            implicitHeight: Math.max(52, tableLevelCol.implicitHeight + 14)
                             color: Style.panelSurface
                             border.color: Style.hairlineBorder
                             border.width: 1
 
                             ColumnLayout {
-                                anchors.centerIn: parent
+                                id: tableLevelCol
+                                anchors.fill: parent
+                                anchors.margins: 6
                                 spacing: 1
-                                Text { text: "Уровень Таблицы 2:"; font.family: Style.fontSans; font.pixelSize: 10; color: Style.textSecondary }
+                                Text {
+                                    text: "Уровень Таблицы 2:"
+                                    font.family: Style.fontSans
+                                    font.pixelSize: 10
+                                    color: Style.textSecondary
+                                    wrapMode: Text.WordWrap
+                                    horizontalAlignment: Text.AlignHCenter
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                }
                                 RiskBadge {
                                     level: root.draft.level || "Низкий"
+                                    Layout.alignment: Qt.AlignHCenter
                                 }
                             }
                         }
 
                         Rectangle {
                             Layout.fillWidth: true
-                            height: 52
+                            Layout.minimumWidth: 0
+                            implicitHeight: Math.max(52, slaCol.implicitHeight + 14)
                             color: Style.panelSurface
                             border.color: Style.hairlineBorder
                             border.width: 1
 
                             ColumnLayout {
-                                anchors.centerIn: parent
+                                id: slaCol
+                                anchors.fill: parent
+                                anchors.margins: 6
                                 spacing: 1
-                                Text { text: "Нормативный SLA:"; font.family: Style.fontSans; font.pixelSize: 10; color: Style.textSecondary }
+                                Text {
+                                    text: "Нормативный SLA:"
+                                    font.family: Style.fontSans
+                                    font.pixelSize: 10
+                                    color: Style.textSecondary
+                                    wrapMode: Text.WordWrap
+                                    horizontalAlignment: Text.AlignHCenter
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                }
                                 Text {
                                     text: root.draft.sla || ""
                                     font.family: Style.fontMono
                                     font.pixelSize: Style.fontSizeHeadlineSm
                                     font.weight: Font.Bold
                                     color: Style.textPrimary
+                                    wrapMode: Text.WordWrap
+                                    horizontalAlignment: Text.AlignHCenter
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
                                 }
                             }
                         }
