@@ -18,7 +18,9 @@ public:
   int totalCount() const { return m_totalCount; }
   QString databasePath() const { return m_dbPath; }
 
-  QVariantList search(const QString &query, int severityFilter = 0, int limit = 50);
+  QVariantList search(const QString &query, int severityFilter = 0, int limit = 50,
+                      int sortOrder = 0, bool exploitOnly = false,
+                      bool fixOnly = false);
   QVariantMap getVulnerability(const QString &bduId);
 
 private:

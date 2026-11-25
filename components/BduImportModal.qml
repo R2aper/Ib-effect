@@ -40,6 +40,9 @@ Item {
 
     property string searchKeyword: ""
     property int severityFilterIndex: 0 // 0: Все, 1: Критический, 2: Высокий, 3: Средний, 4: Низкий
+    property int sortOrderIndex: 0
+    property bool exploitOnly: false
+    property bool fixOnly: false
     property string statusMessage: ""
 
     function getSeverityLevel() {
@@ -58,10 +61,11 @@ Item {
             return
         }
         var sev = getSeverityLevel()
-        var res = riskCalculator.searchBdu(searchKeyword, sev, 60)
+        var res = riskCalculator.searchBdu(searchKeyword, sev, 60,
+                                           sortOrderIndex, exploitOnly, fixOnly)
         searchResults = res
         selectedResultIndex = 0
-        statusMessage = "Найдено записей: " + res.length
+        statusMessage = ""
     }
 
     function importCurrent(bduId) {
@@ -96,6 +100,9 @@ Item {
                 searchKeyword = ""
             }
             severityFilterIndex = 0
+            sortOrderIndex = 0
+            exploitOnly = false
+            fixOnly = false
             doSearch()
             searchField.forceActiveFocus()
         }
@@ -220,58 +227,116 @@ Item {
             // ==================== Панель поиска и фильтров ====================
             Rectangle {
                 Layout.fillWidth: true
-                height: 48
+                height: 78
                 color: Style.surfaceLow
                 border.color: Style.hairlineBorder
                 border.width: 1
 
-                RowLayout {
+                ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 8
-                    spacing: 10
+                    spacing: 6
 
-                    CustomTextField {
-                        id: searchField
+                    RowLayout {
                         Layout.fillWidth: true
-                        placeholderText: "Поиск по BDU ID, CVE, ПО, вендору или тексту (например: PostgreSQL, Nginx, Linux, CVE-2024)..."
-                        isMonospace: false
-                        onTextChanged: {
-                            root.searchKeyword = text
-                            debounceTimer.restart()
+                        spacing: 8
+
+                        CustomTextField {
+                            id: searchField
+                            Layout.fillWidth: true
+                            placeholderText: "BDU ID, CVE, название, ПО или вендор — например CVE-2024, PostgreSQL, Linux"
+                            isMonospace: false
+                            onTextChanged: {
+                                root.searchKeyword = text
+                                debounceTimer.restart()
+                            }
+                            Keys.onReturnPressed: root.doSearch()
                         }
-                        Keys.onReturnPressed: root.doSearch()
+
+                        AppButton {
+                            visible: searchField.text.length > 0
+                            text: "Очистить"
+                            onClicked: {
+                                searchField.text = ""
+                                searchField.forceActiveFocus()
+                            }
+                        }
+
+                        AppButton {
+                            isPrimary: true
+                            text: "Найти"
+                            iconText: "🔍"
+                            onClicked: root.doSearch()
+                        }
                     }
 
-                    Text {
-                        text: "Уровень:"
-                        font.family: Style.fontSans
-                        font.pixelSize: Style.fontSizeBodySm
-                        color: Style.textSecondary
-                    }
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 8
 
-                    CustomComboBox {
-                        Layout.preferredWidth: 160
-                        model: [
-                            "Все уровни",
-                            "Критический (≥9.0)",
-                            "Высокий (7.0–8.9)",
-                            "Средний (4.0–6.9)",
-                            "Низкий (<4.0)"
-                        ]
-                        currentIndex: root.severityFilterIndex
-                        onCurrentIndexChanged: {
-                            if (root.severityFilterIndex !== currentIndex) {
-                                root.severityFilterIndex = currentIndex
+                        Text {
+                            text: "Уровень"
+                            font.family: Style.fontSans
+                            font.pixelSize: Style.fontSizeBodySm
+                            color: Style.textSecondary
+                        }
+
+                        CustomComboBox {
+                            Layout.preferredWidth: 154
+                            model: [
+                                "Все уровни",
+                                "Критический (≥9.0)",
+                                "Высокий (7.0–8.9)",
+                                "Средний (4.0–6.9)",
+                                "Низкий (<4.0)"
+                            ]
+                            currentIndex: root.severityFilterIndex
+                            onCurrentIndexChanged: {
+                                if (root.severityFilterIndex !== currentIndex) {
+                                    root.severityFilterIndex = currentIndex
+                                    root.doSearch()
+                                }
+                            }
+                        }
+
+                        Text {
+                            text: "Сортировка"
+                            font.family: Style.fontSans
+                            font.pixelSize: Style.fontSizeBodySm
+                            color: Style.textSecondary
+                        }
+
+                        CustomComboBox {
+                            Layout.preferredWidth: 165
+                            model: ["По релевантности", "CVSS: сначала выше", "Сначала новые", "По BDU ID"]
+                            currentIndex: root.sortOrderIndex
+                            onCurrentIndexChanged: {
+                                if (root.sortOrderIndex !== currentIndex) {
+                                    root.sortOrderIndex = currentIndex
+                                    root.doSearch()
+                                }
+                            }
+                        }
+
+                        Item { Layout.fillWidth: true }
+
+                        AppButton {
+                            text: "Есть эксплойт"
+                            isPrimary: root.exploitOnly
+                            onClicked: {
+                                root.exploitOnly = !root.exploitOnly
                                 root.doSearch()
                             }
                         }
-                    }
 
-                    AppButton {
-                        isPrimary: true
-                        text: "Найти"
-                        iconText: "🔍"
-                        onClicked: root.doSearch()
+                        AppButton {
+                            text: "Есть исправление"
+                            isPrimary: root.fixOnly
+                            onClicked: {
+                                root.fixOnly = !root.fixOnly
+                                root.doSearch()
+                            }
+                        }
                     }
                 }
             }
@@ -437,7 +502,10 @@ Item {
                                 anchors.centerIn: parent
                                 visible: root.searchResults.length === 0
                                 text: (typeof riskCalculator !== "undefined" && riskCalculator.isBduAvailable)
-                                      ? "Введите поисковый запрос или выберите фильтр для отображения уязвимостей"
+                                      ? (root.searchKeyword.length > 0 || root.severityFilterIndex > 0
+                                         || root.exploitOnly || root.fixOnly
+                                         ? "По заданным условиям ничего не найдено"
+                                         : "Уязвимости не найдены")
                                       : "База данных БДУ недоступна"
                                 font.family: Style.fontSans
                                 font.pixelSize: Style.fontSizeBodyMd

@@ -285,7 +285,9 @@ public:
 
   // --- Интеграция с БДУ ФСТЭК (bdu.sqlite) ---
   Q_INVOKABLE QVariantList searchBdu(const QString &query = QString(),
-                                     int severityFilter = 0, int limit = 50);
+                                     int severityFilter = 0, int limit = 50,
+                                     int sortOrder = 0, bool exploitOnly = false,
+                                     bool fixOnly = false);
   Q_INVOKABLE QVariantMap getBduDetails(const QString &bduId);
   Q_INVOKABLE QVariantMap importFromBdu(const QString &bduId);
   Q_INVOKABLE bool isBduVulnerabilityImported(const QString &bduId) const;

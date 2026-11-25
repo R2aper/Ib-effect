@@ -363,62 +363,7 @@ ScrollView {
                 }
             }
 
-            // Step-by-step formula details box (Числовая подстановка по ФСТЭК и ГОСТ)
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredWidth: parent.width * 0.55
-                implicitHeight: 220
-                color: Style.panelSurface
-                border.color: Style.hairlineBorder
-                border.width: 1
 
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 12
-                    spacing: 6
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Text {
-                            text: "ЧИСЛОВАЯ ПОДСТАНОВКА В ФОРМУЛЫ"
-                            font.family: Style.fontSans
-                            font.pixelSize: Style.fontSizeHeadlineSm
-                            font.weight: Font.DemiBold
-                            color: Style.textPrimary
-                        }
-                        Item { Layout.fillWidth: true }
-                        Text {
-                            font.family: Style.fontMono
-                            font.pixelSize: 10
-                            color: Style.textSecondary
-                        }
-                    }
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        color: Style.surfaceLow
-                        border.color: Style.hairlineBorder
-                        border.width: 1
-
-                        ScrollView {
-                            anchors.fill: parent
-                            clip: true
-                            ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
-
-                            Text {
-                                width: parent.width - 16
-                                anchors.margins: 8
-                                text: root.currentScenario ? root.currentScenario.formulaDetails : "Выберите сценарий из таблицы ниже для просмотра детального протокола расчета."
-                                font.family: Style.fontMono
-                                font.pixelSize: 11
-                                color: Style.textPrimary
-                                wrapMode: Text.WordWrap
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         // Summary Data Grid for Portfolio

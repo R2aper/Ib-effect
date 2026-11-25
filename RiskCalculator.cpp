@@ -1092,8 +1092,10 @@ QVariantMap RiskCalculator::getMeasure(const QString &id) const {
 // ----------------------------
 
 QVariantList RiskCalculator::searchBdu(const QString &query, int severityFilter,
-                                       int limit) {
-  QVariantList list = m_bduDb.search(query, severityFilter, limit);
+                                       int limit, int sortOrder, bool exploitOnly,
+                                       bool fixOnly) {
+  QVariantList list =
+      m_bduDb.search(query, severityFilter, limit, sortOrder, exploitOnly, fixOnly);
   for (int i = 0; i < list.size(); ++i) {
     QVariantMap item = list[i].toMap();
     const QString id = item.value(QStringLiteral("id")).toString();

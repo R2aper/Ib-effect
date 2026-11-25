@@ -109,7 +109,8 @@ static QString levelTextFromInt(int sevLevel) {
   }
 }
 
-QVariantList BduDatabase::search(const QString &query, int severityFilter, int limit) {
+QVariantList BduDatabase::search(const QString &query, int severityFilter, int limit,
+                                 int sortOrder, bool exploitOnly, bool fixOnly) {
   QVariantList results;
   if (!m_available) return results;
 
@@ -118,6 +119,28 @@ QVariantList BduDatabase::search(const QString &query, int severityFilter, int l
 
   const QString qTrimmed = query.trimmed();
   QSqlQuery q(db);
+  const auto appendFilters = [severityFilter, exploitOnly, fixOnly](QString &sql) {
+    if (severityFilter > 0) {
+      sql += QStringLiteral("AND v.severity_level = :sev ");
+    }
+    if (exploitOnly) {
+      sql += QStringLiteral("AND v.has_exploit > 0 ");
+    }
+    if (fixOnly) {
+      sql += QStringLiteral("AND v.has_fix > 0 ");
+    }
+  };
+  const auto orderClause = [sortOrder](const QString &defaultOrder) {
+    switch (sortOrder) {
+    case 1: return QStringLiteral("ORDER BY v.cvss_score DESC, v.id ASC ");
+    case 2: return QStringLiteral("ORDER BY v.identify_year DESC, v.cvss_score DESC ");
+    case 3: return QStringLiteral("ORDER BY v.id ASC ");
+    default: return defaultOrder;
+    }
+  };
+  const auto bindFilters = [&q, severityFilter](void) {
+    if (severityFilter > 0) q.bindValue(QStringLiteral(":sev"), severityFilter);
+  };
 
   auto parseRow = [](const QSqlQuery &queryObj) -> QVariantMap {
     QVariantMap item;
@@ -166,13 +189,12 @@ QVariantList BduDatabase::search(const QString &query, int severityFilter, int l
         "       v.has_exploit, v.has_fix, v.description "
         "FROM vulnerabilities v "
         "WHERE (1=1) ");
-    if (severityFilter > 0) {
-      sql += QStringLiteral("AND v.severity_level = :sev ");
-    }
-    sql += QStringLiteral("ORDER BY v.identify_year DESC, v.cvss_score DESC LIMIT :lim");
+    appendFilters(sql);
+    sql += orderClause(QStringLiteral("ORDER BY v.identify_year DESC, v.cvss_score DESC "));
+    sql += QStringLiteral("LIMIT :lim");
 
     q.prepare(sql);
-    if (severityFilter > 0) q.bindValue(QStringLiteral(":sev"), severityFilter);
+    bindFilters();
     q.bindValue(QStringLiteral(":lim"), limit);
 
     if (q.exec()) {
@@ -189,14 +211,13 @@ QVariantList BduDatabase::search(const QString &query, int severityFilter, int l
         "       v.has_exploit, v.has_fix, v.description "
         "FROM vulnerabilities v "
         "WHERE v.id LIKE :idPat ");
-    if (severityFilter > 0) {
-      sql += QStringLiteral("AND v.severity_level = :sev ");
-    }
-    sql += QStringLiteral("ORDER BY v.cvss_score DESC LIMIT :lim");
+    appendFilters(sql);
+    sql += orderClause(QStringLiteral("ORDER BY v.cvss_score DESC "));
+    sql += QStringLiteral("LIMIT :lim");
 
     q.prepare(sql);
     q.bindValue(QStringLiteral(":idPat"), qTrimmed.toUpper() + QStringLiteral("%"));
-    if (severityFilter > 0) q.bindValue(QStringLiteral(":sev"), severityFilter);
+    bindFilters();
     q.bindValue(QStringLiteral(":lim"), limit);
 
     if (q.exec() && q.size() != 0) {
@@ -214,14 +235,13 @@ QVariantList BduDatabase::search(const QString &query, int severityFilter, int l
         "FROM cves c "
         "JOIN vulnerabilities v ON v.id = c.bdu_id "
         "WHERE c.cve_id LIKE :cvePat ");
-    if (severityFilter > 0) {
-      sql += QStringLiteral("AND v.severity_level = :sev ");
-    }
-    sql += QStringLiteral("ORDER BY v.cvss_score DESC LIMIT :lim");
+    appendFilters(sql);
+    sql += orderClause(QStringLiteral("ORDER BY v.cvss_score DESC "));
+    sql += QStringLiteral("LIMIT :lim");
 
     q.prepare(sql);
     q.bindValue(QStringLiteral(":cvePat"), qTrimmed.toUpper() + QStringLiteral("%"));
-    if (severityFilter > 0) q.bindValue(QStringLiteral(":sev"), severityFilter);
+    bindFilters();
     q.bindValue(QStringLiteral(":lim"), limit);
 
     if (q.exec()) {
@@ -251,14 +271,13 @@ QVariantList BduDatabase::search(const QString &query, int severityFilter, int l
         "FROM vulnerabilities_fts f "
         "JOIN vulnerabilities v ON v.rowid = f.rowid "
         "WHERE vulnerabilities_fts MATCH :match ");
-    if (severityFilter > 0) {
-      sql += QStringLiteral("AND v.severity_level = :sev ");
-    }
-    sql += QStringLiteral("ORDER BY v.cvss_score DESC LIMIT :lim");
+    appendFilters(sql);
+    sql += orderClause(QStringLiteral("ORDER BY v.cvss_score DESC "));
+    sql += QStringLiteral("LIMIT :lim");
 
     q.prepare(sql);
     q.bindValue(QStringLiteral(":match"), ftsExpr);
-    if (severityFilter > 0) q.bindValue(QStringLiteral(":sev"), severityFilter);
+    bindFilters();
     q.bindValue(QStringLiteral(":lim"), limit);
 
     if (q.exec()) {
@@ -275,15 +294,14 @@ QVariantList BduDatabase::search(const QString &query, int severityFilter, int l
         "       v.has_exploit, v.has_fix, v.description "
         "FROM vulnerabilities v "
         "WHERE (v.name LIKE :p OR v.software_names LIKE :p OR v.vendors LIKE :p OR v.cves_joined LIKE :p OR v.id LIKE :p) ");
-    if (severityFilter > 0) {
-      sql += QStringLiteral("AND v.severity_level = :sev ");
-    }
-    sql += QStringLiteral("ORDER BY v.cvss_score DESC LIMIT :lim");
+    appendFilters(sql);
+    sql += orderClause(QStringLiteral("ORDER BY v.cvss_score DESC "));
+    sql += QStringLiteral("LIMIT :lim");
 
     q.prepare(sql);
     const QString pat = QStringLiteral("%") + qTrimmed + QStringLiteral("%");
     q.bindValue(QStringLiteral(":p"), pat);
-    if (severityFilter > 0) q.bindValue(QStringLiteral(":sev"), severityFilter);
+    bindFilters();
     q.bindValue(QStringLiteral(":lim"), limit);
 
     if (q.exec()) {
