@@ -8,7 +8,7 @@ Item {
     id: root
 
     property int selectedIndex: 0
-    signal openCvssCalculator(string vector, double score)
+    signal openCvssCalculator(string id, string vector, double score)
 
     // ---------- Данные из C++ RiskCalculator ----------
     property var vulnModel: (typeof riskCalculator !== "undefined") ? riskCalculator.vulnerabilities : []
@@ -828,48 +828,90 @@ Item {
                     // CVSS v3.1 Card
                     Rectangle {
                         Layout.fillWidth: true
-                        height: 50
+                        height: !root.draft.fromBdu ? 92 : 50
                         color: Style.surfaceContainerHighest
                         border.color: Style.hairlineBorder
                         border.width: 1
 
-                        RowLayout {
+                        ColumnLayout {
                             anchors.fill: parent
                             anchors.margins: 8
-                            spacing: 10
+                            spacing: 6
 
-                            Rectangle {
-                                width: 34
-                                height: 34
-                                color: Style.primary
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: root.draft.cvss || ""
-                                    font.family: Style.fontMono
-                                    font.pixelSize: Style.fontSizeCodeMd
-                                    font.weight: Font.Bold
-                                    color: Style.textOnPrimary
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing: 10
+
+                                Rectangle {
+                                    width: 34
+                                    height: 34
+                                    color: Style.primary
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: root.draft.cvss !== undefined && root.draft.cvss !== null
+                                              ? Number(root.draft.cvss).toFixed(1) : "-"
+                                        font.family: Style.fontMono
+                                        font.pixelSize: Style.fontSizeCodeMd
+                                        font.weight: Font.Bold
+                                        color: Style.textOnPrimary
+                                    }
+                                }
+
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 1
+                                    Text {
+                                        text: "Базовый балл CVSS v3.1 (I_cvss)"
+                                        font.family: Style.fontSans
+                                        font.pixelSize: Style.fontSizeBodySm
+                                        font.weight: Font.DemiBold
+                                        color: Style.textPrimary
+                                    }
+                                    Text {
+                                        text: root.draft.vector || ""
+                                        font.family: Style.fontMono
+                                        font.pixelSize: 10
+                                        color: Style.textSecondary
+                                        elide: Text.ElideRight
+                                        Layout.fillWidth: true
+                                    }
+                                }
+
+                                AppButton {
+                                    visible: !root.draft.fromBdu
+                                    text: "Калькулятор"
+                                    iconText: "↗"
+                                    onClicked: root.openCvssCalculator(
+                                        root.draft.id || "",
+                                        root.draft.vector || "",
+                                        Number(root.draft.cvss || 0)
+                                    )
                                 }
                             }
 
-                            ColumnLayout {
+                            RowLayout {
+                                visible: !root.draft.fromBdu
                                 Layout.fillWidth: true
-                                spacing: 1
+                                spacing: 8
                                 Text {
-                                    text: "Базовый балл CVSS v3.1 (I_cvss)"
+                                    text: "Балл:"
                                     font.family: Style.fontSans
                                     font.pixelSize: Style.fontSizeBodySm
-                                    font.weight: Font.DemiBold
-                                    color: Style.textPrimary
-                                }
-                                Text {
-                                    text: root.draft.vector || ""
-                                    font.family: Style.fontMono
-                                    font.pixelSize: 10
                                     color: Style.textSecondary
-                                    elide: Text.ElideRight
-                                    Layout.fillWidth: true
                                 }
+                                CustomTextField {
+                                    Layout.preferredWidth: 90
+                                    text: root.draft.cvss !== undefined && root.draft.cvss !== null
+                                          ? String(root.draft.cvss) : ""
+                                    isMonospace: true
+                                    onTextChanged: {
+                                        var v = parseFloat(text)
+                                        if (!isNaN(v) && v >= 0 && v <= 10) {
+                                            if (v !== root.draft.cvss) root.setDraft("cvss", v)
+                                        }
+                                    }
+                                }
+                                Item { Layout.fillWidth: true }
                             }
                         }
                     }
@@ -1141,6 +1183,59 @@ Item {
                             color: Style.textPrimary
                             wrapMode: Text.WordWrap
                             Layout.fillWidth: true
+                        }
+                    }
+                }
+            }
+
+            // Group 5: Заметки
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.leftMargin: 10
+                Layout.rightMargin: 10
+                implicitHeight: g5Col.implicitHeight + 20
+                color: Style.surfaceLow
+                border.color: Style.hairlineBorder
+                border.width: 1
+
+                ColumnLayout {
+                    id: g5Col
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    spacing: 8
+
+                    Text {
+                        text: "5. ЗАМЕТКИ"
+                        font.family: Style.fontSans
+                        font.pixelSize: Style.fontSizeHeadlineSm
+                        font.weight: Font.DemiBold
+                        color: Style.textPrimary
+                    }
+
+                    Text {
+                        text: "Контекст, источники и решения для этого сценария:"
+                        font.family: Style.fontSans
+                        font.pixelSize: Style.fontSizeBodySm
+                        color: Style.textSecondary
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 82
+                        color: Style.panelSurface
+                        border.color: Style.hairlineBorder
+                        border.width: 1
+
+                        TextEdit {
+                            anchors.fill: parent
+                            anchors.margins: 6
+                            text: root.draft.notes || ""
+                            font.family: Style.fontSans
+                            font.pixelSize: Style.fontSizeBodySm
+                            color: Style.textPrimary
+                            wrapMode: TextEdit.WordWrap
+                            selectByMouse: true
+                            onTextChanged: if (text !== root.draft.notes) root.setDraft("notes", text)
                         }
                     }
                 }

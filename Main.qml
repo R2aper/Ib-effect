@@ -233,12 +233,15 @@ ApplicationWindow {
                 DashboardTab {}
                 AssetsTab {}
                 VulnerabilitiesTab {
-                    onOpenCvssCalculator: function(vector, score) {
+                    onOpenCvssCalculator: function(id, vector, score) {
+                        cvssTab.openWithVector(id, vector, score)
                         window.currentTabIndex = 4; // Switch to CVSS tab
                     }
                 }
                 MeasuresTab {}
-                CvssCalcTab {}
+                CvssCalcTab {
+                    id: cvssTab
+                }
                 EconomicsTab {}
                 HelpTab {}
             }

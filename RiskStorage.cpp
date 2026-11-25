@@ -205,7 +205,7 @@ RiskStorage::~RiskStorage() { close(); }
 
 QString RiskStorage::defaultPath() {
   QString base =
-      QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+      QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
   if (base.isEmpty())
     base = QDir::homePath() + QStringLiteral("/.risk-calculator");
   return QDir(base).filePath(QStringLiteral("userdata.sqlite"));

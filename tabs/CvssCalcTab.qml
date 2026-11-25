@@ -9,6 +9,58 @@ ScrollView {
     contentWidth: availableWidth
     clip: true
 
+    property string targetVulnerabilityId: ""
+    property var vulnerabilityModel: (typeof riskCalculator !== "undefined")
+                                      ? riskCalculator.vulnerabilities : []
+    property var vulnerabilityLabels: []
+
+    Connections {
+        target: (typeof riskCalculator !== "undefined") ? riskCalculator : null
+        function onVulnerabilitiesChanged() {
+            root.rebuildVulnerabilityList()
+        }
+    }
+
+    function rebuildVulnerabilityList() {
+        root.vulnerabilityModel = (typeof riskCalculator !== "undefined")
+                                  ? riskCalculator.vulnerabilities : []
+        var labels = []
+        var selectedIndex = -1
+        for (var i = 0; i < root.vulnerabilityModel.length; ++i) {
+            var item = root.vulnerabilityModel[i].toMap ? root.vulnerabilityModel[i].toMap()
+                                                       : root.vulnerabilityModel[i]
+            var id = item.id || ""
+            var title = item.title || "Сценарий угрозы"
+            labels.push((id ? id + " — " : "") + title)
+            if (id === root.targetVulnerabilityId)
+                selectedIndex = i
+        }
+        root.vulnerabilityLabels = labels
+        if (root.vulnerabilityModel.length > 0) {
+            vulnCombo.currentIndex = selectedIndex >= 0
+                                      ? selectedIndex
+                                      : 0
+        }
+    }
+
+    function selectedVulnerabilityId() {
+        if (vulnCombo.currentIndex < 0
+                || vulnCombo.currentIndex >= root.vulnerabilityModel.length)
+            return ""
+        var item = root.vulnerabilityModel[vulnCombo.currentIndex]
+        item = item.toMap ? item.toMap() : item
+        return item.id || ""
+    }
+
+    function openWithVector(id, vector, score) {
+        root.targetVulnerabilityId = id || ""
+        if (vector)
+            calc.applyVector(vector)
+        root.rebuildVulnerabilityList()
+    }
+
+    Component.onCompleted: rebuildVulnerabilityList()
+
     // ------------------------------------------------------------------
     // Вся логика расчёта - в C++ (CvssCalculator)
     // ------------------------------------------------------------------
@@ -507,12 +559,12 @@ ScrollView {
                     CustomComboBox {
                         id: vulnCombo
                         Layout.fillWidth: true
-                        model: [
-                            "BDU:2025-01611 — RCE в модуле PostgreSQL",
-                            "Конструктор УБИ — Копирование исходного кода инсайдером",
-                            "BDU:2024-01928 — Доступ к БД АСУ ТП (SCADA)",
-                            "BDU:2023-05441 — Эксфильтрация через API платёжного шлюза"
-                        ]
+                        model: root.vulnerabilityLabels
+                        onCurrentIndexChanged: {
+                            var id = root.selectedVulnerabilityId()
+                            if (id !== "")
+                                root.targetVulnerabilityId = id
+                        }
                     }
 
                     AppButton {
@@ -520,8 +572,17 @@ ScrollView {
                         isPrimary: true
                         text: "Применить I_cvss (" + calc.score.toFixed(1) + ") к уязвимости"
                         iconText: "✓"
-                        // TODO: передать в модель реестра, например:
-                        // onClicked: vulnModel.applyCvss(vulnCombo.currentIndex, calc.score, calc.vectorString)
+                        enabled: root.selectedVulnerabilityId() !== ""
+                        onClicked: {
+                            var targetId = root.selectedVulnerabilityId()
+                            if (typeof riskCalculator !== "undefined" && targetId !== "") {
+                                riskCalculator.updateVulnerability({
+                                    id: targetId,
+                                    cvss: calc.score,
+                                    vector: calc.vectorString
+                                })
+                            }
+                        }
                     }
                 }
             }

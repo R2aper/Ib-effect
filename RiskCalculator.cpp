@@ -886,6 +886,8 @@ QVariantMap RiskCalculator::addVulnerability(const QVariantMap &vulnData) {
     v["sla"] = "До 7 дней";
   if (!v.contains("status"))
     v["status"] = "Открыта";
+  if (!v.contains("notes"))
+    v["notes"] = "";
 
   m_vulnerabilities.append(v);
   persist(RiskStorage::Entity::Vulnerability, v);
